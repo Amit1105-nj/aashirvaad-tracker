@@ -20,7 +20,7 @@ const BRAND_CONFIG = {
   },
   Candyman: {
     category: 'confectionery and candies',
-    description: "ITC's candy brand — includes Fantastik éclairs, Lacto King, and other sugar confectionery",
+    description: "ITC's candy brand — includes Yippee éclairs, Lacto King, and other sugar confectionery",
     subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/sweets','r/nostalgia'],
     competitors: ['Cadbury Eclairs','Mentos','Alpenliebe','Parle','Kopiko'],
     topics: 'childhood nostalgia, sweetness level, price per candy, school tuck shop, gifting, flavour variety, availability in local shops',
@@ -32,7 +32,7 @@ const BRAND_CONFIG = {
     competitors: ['Britannia','Parle-G','McVities','Oreo','Maggi'],
     topics: 'biscuit texture, cream filling, tea time biscuits, Dark Fantasy premium feel, pasta cooking time, Marie Light health claims, gifting boxes',
   },
-  Fantastik: {
+  Yippee: {
     category: 'instant noodles',
     description: "ITC's instant noodles brand competing in the Indian instant noodle market",
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/pune','r/CasualConversation'],
