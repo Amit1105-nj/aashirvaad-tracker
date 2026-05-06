@@ -31,7 +31,7 @@ const BRANDS = {
     competitors: ['Britannia','Parle-G','McVities','Oreo','Maggi'],
     newSubs: ['r/snackexchange'],
   },
-  Fantastik: {
+  Yippee: {
     emoji: '🍜',
     category: 'Instant Noodles',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/pune','r/CasualConversation'],
