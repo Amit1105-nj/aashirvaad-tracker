@@ -42,7 +42,7 @@ const BRANDS = {
     emoji: '🍫',
     category: 'Premium Chocolates',
     subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning'],
-    competitors: ['Cadbury Silk','Ferrero Rocher','Lindt','Amul Dark','Belgian chocolates'],
+    competitors: ['Cadbury Silk','Ferrero Rocher','Lindt','Amul Dark','Smoor','Manam','Royce'],
     newSubs: ['r/chocolate','r/luxury','r/GiftsForHer','r/weddingplanning'],
   },
 };
