@@ -145,6 +145,22 @@ export default function Home() {
     } catch(err){addLog('Download error: '+err.message,'error');}
   };
 
+  const downloadPPT=async()=>{
+    if(!report) return;
+    addLog('Generating PowerPoint...','step');
+    try {
+      const res=await fetch('/api/ppt',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({data:report,meta:report.meta})});
+      if(!res.ok) throw new Error('PPT generation failed');
+      const blob=await res.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download=`Aashirvaad_Reddit_${fromDate}_to_${toDate}.pptx`;
+      a.click();URL.revokeObjectURL(url);
+      addLog('PowerPoint downloaded ✓ — opens in PowerPoint, Google Slides, Keynote','ok');
+    } catch(err){addLog('PPT error: '+err.message,'error');}
+  };
+
   const stepLabels={s1:'Reddit scrape',s2:'AI analysis',s3:'Sentiment',s4:'Keywords',s5:'Insights',s6:'Build report'};
 
   // Sidebar nav items
@@ -214,7 +230,7 @@ export default function Home() {
 
           <div style={{marginBottom:18}}>
             <h1 style={{fontSize:19,fontWeight:600}}>Brand Intelligence Dashboard</h1>
-            <p style={{fontSize:12,color:C.muted,marginTop:3}}>Pick date range → Run → 9 slides appear here + clickable Reddit links + Word download</p>
+            <p style={{fontSize:12,color:C.muted,marginTop:3}}>Pick date range → Run → report appears here + clickable Reddit links + download as PPT or Word</p>
           </div>
 
           {/* ── CONFIG PANEL ── */}
@@ -276,6 +292,9 @@ export default function Home() {
             <div style={{display:'flex',alignItems:'center',gap:10,paddingTop:14,borderTop:`1px solid ${C.border}`,flexWrap:'wrap'}}>
               <button onClick={runAgent} disabled={running} style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',fontSize:13,fontWeight:600,cursor:running?'not-allowed':'pointer',opacity:running?0.4:1,whiteSpace:'nowrap'}}>
                 {running?'⏳ Running...':'▶ Run Now'}
+              </button>
+              <button onClick={downloadPPT} disabled={!report} style={{color:report?'#a78bfa':C.muted,border:`1px solid ${report?'rgba(167,139,250,0.5)':C.border}`,borderRadius:7,padding:'10px 16px',fontSize:12,cursor:report?'pointer':'not-allowed',background:report?'rgba(167,139,250,0.1)':'transparent',whiteSpace:'nowrap',fontWeight:report?600:400}}>
+                ↓ Download PPT
               </button>
               <button onClick={downloadDoc} disabled={!report} style={{color:report?C.grn:C.muted,border:`1px solid ${report?'rgba(34,197,94,0.4)':C.border}`,borderRadius:7,padding:'10px 16px',fontSize:12,cursor:report?'pointer':'not-allowed',background:'transparent',whiteSpace:'nowrap'}}>
                 ↓ Download Word (.doc)
