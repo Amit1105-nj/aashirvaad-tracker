@@ -43,7 +43,7 @@ const BRAND_CONFIG = {
     category: 'premium chocolates',
     description: "ITC's luxury chocolate brand — positioned as India's finest artisan chocolate, sold in ITC hotels and premium retail",
     subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning'],
-    competitors: ['Cadbury Silk','Ferrero Rocher','Lindt','Amul Dark','Belgian chocolates'],
+    competitors: ['Cadbury Silk','Ferrero Rocher','Lindt','Amul Dark','Smoor','Manam','Royce'],
     topics: 'premium gifting, hotel chocolate, price vs quality, cocoa percentage, packaging luxury, comparison to imported chocolates, wedding gifting, corporate gifting',
   },
 };
