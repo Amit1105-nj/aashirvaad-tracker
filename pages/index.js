@@ -347,14 +347,13 @@ export default function Home(){
                   </div>
                   <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
                     {brandConfig.subreddits.map(s=>{
-                      const isNew=brandConfig.newSubs.includes(s);
                       const on=activeSubs.has(s);
                       return(
                         <button key={s} onClick={()=>toggleSub(s)} style={{fontSize:10,padding:'3px 8px',borderRadius:4,cursor:'pointer',
-                          border:`1px solid ${on?(isNew?'rgba(167,139,250,0.5)':'rgba(255,69,0,0.4)'):'rgba(255,255,255,0.08)'}`,
-                          color:on?(isNew?C.pur:C.acc):C.muted,
-                          background:on?(isNew?'rgba(167,139,250,0.1)':'rgba(255,69,0,0.1)'):'transparent'}}>
-                          {s}{isNew?' ✦':''}
+                          border:`1px solid ${on?'rgba(255,69,0,0.4)':'rgba(255,255,255,0.08)'}`,
+                          color:on?C.acc:C.muted,
+                          background:on?'rgba(255,69,0,0.1)':'transparent'}}>
+                          {s}
                         </button>
                       );
                     })}
