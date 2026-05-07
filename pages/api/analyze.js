@@ -134,13 +134,11 @@ Return ONLY valid JSON. No markdown. All strings under 80 chars. Vary all number
       data = JSON.parse(match[0]);
     }
 
-    // For simulated posts, attach generated Reddit URLs
+    // For simulated posts — mark clearly, no fake URLs
     if (!hasRealData && data.top_posts) {
       data.top_posts = data.top_posts.map(post => {
-        if (!post.reddit_url || post.reddit_url.includes('<slug>')) {
-          const postId = makePostId();
-          post.reddit_url = makeRedditUrl(post.subreddit, post.title, postId);
-        }
+        post.reddit_url = ''; // No fake URLs for simulated data
+        post.is_simulated = true;
         return post;
       });
     }
