@@ -148,10 +148,10 @@ export default function Home(){
             realPosts = scrapeData.posts;
             addLog(`✓ Scraped ${realPosts.length} real Reddit posts`,'ok');
           } else {
-            addLog('No live posts found — falling back to AI simulation','lwarn');
+            addLog('No live posts found — falling back to AI simulation','warn');
           }
         }catch(scrapeErr){
-          addLog('Scrape error: '+scrapeErr.message+' — using AI simulation','lwarn');
+          addLog('Scrape error: '+scrapeErr.message+' — using AI simulation','warn');
         }
       }
       setProgress(25);
@@ -433,8 +433,7 @@ export default function Home(){
 
               {/* Run row */}
               <div className="run-row" style={{display:'flex',alignItems:'center',gap:10,paddingTop:14,borderTop:`1px solid ${C.border}`,flexWrap:'wrap'}}>
-                {/* Data mode toggle */}
-                <div style={{display:'flex',background:C.card,borderRadius:7,overflow:'hidden',border:`1px solid ${C.border}`,flexShrink:0}}>
+                  <div style={{display:'flex',background:C.card,borderRadius:7,overflow:'hidden',border:`1px solid ${C.border}`,flexShrink:0}}>
                   <button onClick={()=>setDataMode('live')}
                     style={{padding:'7px 12px',fontSize:11,fontWeight:600,border:'none',cursor:'pointer',
                       background:dataMode==='live'?C.red:'transparent',color:dataMode==='live'?'white':C.muted}}>
@@ -482,7 +481,7 @@ export default function Home(){
               {logs.map((l,i)=>(
                 <div key={i} style={{marginBottom:2,lineHeight:1.6}}>
                   <span style={{color:'#2d3a55'}}>[{l.ts}] </span>
-                  <span style={{color:l.type==='ok'?C.grn:l.type==='error'?C.red:l.type==='step'?C.pur:C.muted,
+                  <span style={{color:l.type==='ok'?C.grn:l.type==='error'?C.red:l.type==='step'?C.pur:l.type==='warn'?C.ylw:C.muted,
                     fontWeight:l.type==='step'?600:400}}>{l.msg}</span>
                 </div>
               ))}
