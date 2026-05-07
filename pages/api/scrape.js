@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   try {
     // Build search queries — brand keyword across each subreddit
-    const subList = subreddits.split(',').map(s => s.trim()).slice(0, 5); // limit to 5 subs per run
+    const subList = subreddits.split(',').map(s => s.trim()).slice(0, 8); // 8 subreddits per run
     
     // Calculate date range
     const from = new Date(fromDate);
