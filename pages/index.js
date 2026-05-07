@@ -700,11 +700,19 @@ export default function Home(){
                       </a>
                       <div style={{fontSize:11,color:C.muted,fontStyle:'italic',borderLeft:'2px solid #FF4500',paddingLeft:7,marginBottom:6}}>{p.key_quote}</div>
                       <div style={{display:'flex',alignItems:'center',gap:8}}>
-                        <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
-                          style={{fontSize:10,color:C.acc,textDecoration:'none',padding:'3px 10px',border:'1px solid rgba(255,69,0,0.3)',borderRadius:6}}>
-                          🔗 Open on Reddit
-                        </a>
-                        <span style={{fontSize:10,color:'rgba(255,255,255,0.15)',wordBreak:'break-all',flex:1}}>{p.reddit_url}</span>
+                        {p.reddit_url ? (
+                          <>
+                            <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
+                              style={{fontSize:10,color:C.acc,textDecoration:'none',padding:'3px 10px',border:'1px solid rgba(255,69,0,0.3)',borderRadius:6}}>
+                              🔗 Open on Reddit
+                            </a>
+                            <span style={{fontSize:10,color:'rgba(255,255,255,0.15)',wordBreak:'break-all',flex:1}}>{p.reddit_url}</span>
+                          </>
+                        ) : (
+                          <span style={{fontSize:10,color:C.muted,fontStyle:'italic',padding:'3px 10px',border:`1px solid ${C.border}`,borderRadius:6}}>
+                            🤖 AI Simulated post — switch to Live mode for real links
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
