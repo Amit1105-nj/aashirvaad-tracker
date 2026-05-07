@@ -47,11 +47,6 @@ const BRAND_CONFIG = {
     topics: 'premium gifting, hotel chocolate, price vs quality, cocoa percentage, packaging luxury, wedding gifting, corporate gifting, date night, luxury India, comparison to Smoor and Manam',
   },
 };
-function makeRedditUrl(subreddit, title, postId) {
-  const sub = subreddit.replace('r/', '');
-  const slug = title.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '_').slice(0, 50);
-  return `https://www.reddit.com/r/${sub}/comments/${postId}/${slug}/`;
-}
 
 function makePostId() {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -60,40 +55,66 @@ function makePostId() {
   return id;
 }
 
+function makeRedditUrl(subreddit, title, postId) {
+  const sub = subreddit.replace('r/', '');
+  const slug = title.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '_').slice(0, 50);
+  return `https://www.reddit.com/r/${sub}/comments/${postId}/${slug}/`;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { fromDate, toDate, brand, subreddits, callType, themes } = req.body;
+  const { fromDate, toDate, brand, subreddits, callType, themes, realPosts } = req.body;
   if (!fromDate || !toDate || !brand) return res.status(400).json({ error: 'Missing required fields' });
 
   const config = BRAND_CONFIG[brand] || BRAND_CONFIG['Aashirvaad'];
   const allSubs = subreddits || config.subreddits.join(', ');
-  const allComps = config.competitors.join(', ');
+
+  // Check if we have real scraped posts to analyse
+  const hasRealData = realPosts && realPosts.length > 0;
+  const dataSource = hasRealData ? 'REAL Reddit data scraped via Apify' : 'AI-simulated Reddit data';
 
   try {
     let prompt;
 
     if (callType === 'core') {
-      prompt = `You are simulating Reddit brand intelligence data for "${brand}" (${config.description}).
-This is a ${config.category} brand made by ITC India.
-Date range: ${fromDate} to ${toDate}. Subreddits: ${allSubs}.
-Competitors to track: ${allComps}.
+      const postsContext = hasRealData
+        ? `Here are the REAL Reddit posts scraped from Reddit for "${brand}":
+${realPosts.slice(0, 15).map((p, i) => `
+Post ${i+1}:
+- Title: ${p.title}
+- Subreddit: ${p.subreddit}
+- Upvotes: ${p.upvotes}
+- Comments: ${p.num_comments}
+- Author: ${p.author}
+- Content: ${p.body?.slice(0, 200) || ''}
+- URL: ${p.reddit_url}
+- Flair: ${p.flair || 'none'}
+- Awards: ${p.awards || 0}
+`).join('')}
 
-Return ONLY valid JSON. No markdown. No backticks. All strings under 90 chars. Vary ALL numbers — do not copy examples exactly.
+Analyse these REAL posts to extract sentiment, themes, and competitor mentions. Use the actual post data.`
+        : `Simulate realistic Reddit data for "${brand}" (${config.description}) based on your training knowledge about Indian consumers discussing this brand on Reddit. Date: ${fromDate} to ${toDate}. Subreddits: ${allSubs}.`;
 
-{"summary":{"total_posts":34,"total_comments":178,"sentiment_score":69,"sentiment_label":"Positive","top_subreddit":"${config.subreddits[0]}"},"sentiment_breakdown":{"positive":54,"neutral":29,"negative":17},"top_themes":[{"theme":"<theme relevant to ${config.category}>","count":16,"sentiment":"positive","example":"<realistic Indian Reddit comment about ${brand}>","icon":"🍞"},{"theme":"<theme>","count":10,"sentiment":"negative","example":"<comment>","icon":"💰"},{"theme":"<theme>","count":8,"sentiment":"neutral","example":"<comment>","icon":"📦"},{"theme":"<theme>","count":7,"sentiment":"positive","example":"<comment>","icon":"⭐"},{"theme":"<theme>","count":6,"sentiment":"positive","example":"<comment>","icon":"🚚"}],"competitors_mentioned":[${config.competitors.map(c => `{"brand":"${c}","mentions":5,"vs_brand":"favorable"}`).join(',')}],"top_posts":[{"title":"<realistic Reddit post title about ${brand}>","subreddit":"${config.subreddits[0]}","upvotes":923,"num_comments":187,"sentiment":"positive","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":2},{"title":"<post>","subreddit":"${config.subreddits[1]}","upvotes":445,"num_comments":134,"sentiment":"neutral","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":1},{"title":"<post>","subreddit":"${config.subreddits[2]}","upvotes":312,"num_comments":89,"sentiment":"positive","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":0},{"title":"<post>","subreddit":"${config.subreddits[3] || config.subreddits[0]}","upvotes":267,"num_comments":72,"sentiment":"negative","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":0},{"title":"<post>","subreddit":"${config.subreddits[4] || config.subreddits[1]}","upvotes":198,"num_comments":56,"sentiment":"positive","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":0}]}
+      prompt = `You are a brand intelligence analyst. ${postsContext}
 
-Use authentic Indian Reddit language. Topics to cover: ${config.topics}. Vary subreddits across posts.`;
+${hasRealData ? 'Analyse the real posts above and' : ''} Return ONLY valid JSON. No markdown. No backticks. All strings under 90 chars.
+
+{"summary":{"total_posts":${hasRealData ? realPosts.length : 34},"total_comments":${hasRealData ? realPosts.reduce((a,p) => a + (p.num_comments||0), 0) : 178},"sentiment_score":<int 40-90>,"sentiment_label":"Positive|Neutral|Mixed|Negative","top_subreddit":"${config.subreddits[0]}","data_source":"${dataSource}"},"sentiment_breakdown":{"positive":<int>,"neutral":<int>,"negative":<int — must sum to exactly 100>},"top_themes":[{"theme":"<theme relevant to ${config.category}>","count":<int>,"sentiment":"positive|neutral|negative","example":"<${hasRealData ? 'direct quote or paraphrase from real posts above' : 'realistic Indian Reddit comment about ' + brand}>","icon":"<emoji>"},{"theme":"<theme>","count":<int>,"sentiment":"positive|neutral|negative","example":"<${hasRealData ? 'quote from real posts' : 'comment'}>","icon":"<emoji>"},{"theme":"<theme>","count":<int>,"sentiment":"positive|neutral|negative","example":"<example>","icon":"<emoji>"},{"theme":"<theme>","count":<int>,"sentiment":"positive|neutral|negative","example":"<example>","icon":"<emoji>"},{"theme":"<theme>","count":<int>,"sentiment":"positive|neutral|negative","example":"<example>","icon":"<emoji>"}],"competitors_mentioned":[${config.competitors.map(c => `{"brand":"${c}","mentions":<int 1-15>,"vs_brand":"favorable|unfavorable|neutral"}`).join(',')}],"top_posts":[${hasRealData ? realPosts.slice(0,5).map(p => `{"title":"${p.title.replace(/"/g,"'")}","subreddit":"${p.subreddit}","upvotes":${p.upvotes},"num_comments":${p.num_comments},"sentiment":"<positive|neutral|negative>","key_quote":"<key insight from this post under 80 chars>","author":"${p.author}","flair":"${p.flair||''}","awards":${p.awards||0},"reddit_url":"${p.reddit_url}"}`).join(',') : `{"title":"<realistic Reddit post title about ${brand}>","subreddit":"${config.subreddits[0]}","upvotes":<int>,"num_comments":<int>,"sentiment":"positive|neutral|negative","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":<int>,"reddit_url":"https://reddit.com/r/${config.subreddits[0].replace('r/','')}/comments/${makePostId()}/<slug>/"},{"title":"<post>","subreddit":"${config.subreddits[1]}","upvotes":<int>,"num_comments":<int>,"sentiment":"positive|neutral|negative","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":<int>,"reddit_url":"https://reddit.com/r/${config.subreddits[1].replace('r/','')}/comments/${makePostId()}/<slug>/"},{"title":"<post>","subreddit":"${config.subreddits[2]}","upvotes":<int>,"num_comments":<int>,"sentiment":"positive|neutral|negative","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":<int>,"reddit_url":"https://reddit.com/r/${config.subreddits[2].replace('r/','')}/comments/${makePostId()}/<slug>/"},{"title":"<post>","subreddit":"${config.subreddits[3]||config.subreddits[0]}","upvotes":<int>,"num_comments":<int>,"sentiment":"positive|neutral|negative","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":<int>,"reddit_url":"https://reddit.com/r/${(config.subreddits[3]||config.subreddits[0]).replace('r/','')}/comments/${makePostId()}/<slug>/"},{"title":"<post>","subreddit":"${config.subreddits[4]||config.subreddits[1]}","upvotes":<int>,"num_comments":<int>,"sentiment":"positive|neutral|negative","key_quote":"<quote>","author":"<username>","flair":"<flair>","awards":<int>,"reddit_url":"https://reddit.com/r/${(config.subreddits[4]||config.subreddits[1]).replace('r/','')}/comments/${makePostId()}/<slug>/"}`}]}
+
+${hasRealData ? 'IMPORTANT: For top_posts, use the EXACT reddit_url from the real posts provided above. Do not generate fake URLs.' : 'Use authentic Indian Reddit language. Topics: ' + config.topics}`;
 
     } else {
+      const postsContext = hasRealData
+        ? `Based on these real Reddit posts about "${brand}": ${realPosts.slice(0,10).map(p => p.title + '. ' + (p.body||'').slice(0,100)).join(' | ')}`
+        : `Based on simulated Reddit data for "${brand}" (${config.category}). Themes: ${themes || config.topics}.`;
+
       prompt = `Brand: "${brand}" (${config.category}, ITC India). Reddit window: ${fromDate} to ${toDate}.
-Themes found: ${themes || config.topics}.
+${postsContext}
 
 Return ONLY valid JSON. No markdown. All strings under 80 chars. Vary all numbers.
 
-{"keyword_associations":[{"keyword":"<word users link to ${brand}>","frequency":54,"trend":"rising","context":"<why>"},{"keyword":"<kw>","frequency":39,"trend":"rising","context":"<ctx>"},{"keyword":"<kw>","frequency":31,"trend":"stable","context":"<ctx>"},{"keyword":"<kw>","frequency":26,"trend":"rising","context":"<ctx>"},{"keyword":"<kw>","frequency":22,"trend":"rising","context":"<ctx>"},{"keyword":"<kw>","frequency":18,"trend":"stable","context":"<ctx>"},{"keyword":"<kw>","frequency":16,"trend":"stable","context":"<ctx>"},{"keyword":"<kw>","frequency":9,"trend":"falling","context":"<ctx>"}],"keyword_clusters":[{"cluster":"Quality and Taste","keywords":["<w>","<w>","<w>"]},{"cluster":"Price and Value","keywords":["<w>","<w>","<w>"]},{"cluster":"Brand Experience","keywords":["<w>","<w>","<w>"]},{"cluster":"Availability","keywords":["<w>","<w>","<w>"]}],"insights":["<Actionable insight 1 for ${brand} brand team — specific to ${config.category}>","<Insight 2>","<Insight 3>","<Insight 4>","<Insight 5>"],"signal_alerts":[{"signal":"<specific risk or opportunity for ${brand}>","urgency":"high","action":"<specific action>"},{"signal":"<signal 2>","urgency":"medium","action":"<action>"},{"signal":"<signal 3>","urgency":"medium","action":"<action>"}]}
-
-Make insights and signals specific to ${config.category} — not generic.`;
+{"keyword_associations":[{"keyword":"<word users link to ${brand}>","frequency":<int>,"trend":"rising|stable|falling","context":"<why>"},{"keyword":"<kw>","frequency":<int>,"trend":"rising|stable|falling","context":"<ctx>"},{"keyword":"<kw>","frequency":<int>,"trend":"rising|stable|falling","context":"<ctx>"},{"keyword":"<kw>","frequency":<int>,"trend":"rising|stable|falling","context":"<ctx>"},{"keyword":"<kw>","frequency":<int>,"trend":"rising|stable|falling","context":"<ctx>"},{"keyword":"<kw>","frequency":<int>,"trend":"rising|stable|falling","context":"<ctx>"},{"keyword":"<kw>","frequency":<int>,"trend":"rising|stable|falling","context":"<ctx>"},{"keyword":"<kw>","frequency":<int>,"trend":"rising|stable|falling","context":"<ctx>"}],"keyword_clusters":[{"cluster":"Quality and Taste","keywords":["<w>","<w>","<w>"]},{"cluster":"Price and Value","keywords":["<w>","<w>","<w>"]},{"cluster":"Brand Experience","keywords":["<w>","<w>","<w>"]},{"cluster":"Availability","keywords":["<w>","<w>","<w>"]}],"insights":["<Actionable insight 1 for ${brand} brand team — specific to ${config.category}${hasRealData ? ' based on real Reddit data' : ''}>","<Insight 2>","<Insight 3>","<Insight 4>","<Insight 5>"],"signal_alerts":[{"signal":"<specific risk or opportunity for ${brand}${hasRealData ? ' from real posts' : ''}>","urgency":"high","action":"<specific action>"},{"signal":"<signal 2>","urgency":"medium","action":"<action>"},{"signal":"<signal 3>","urgency":"medium","action":"<action>"}]}`;
     }
 
     const message = await client.messages.create({
@@ -113,19 +134,20 @@ Make insights and signals specific to ${config.category} — not generic.`;
       data = JSON.parse(match[0]);
     }
 
-    if (data.top_posts) {
+    // For simulated posts, attach generated Reddit URLs
+    if (!hasRealData && data.top_posts) {
       data.top_posts = data.top_posts.map(post => {
-        const postId = makePostId();
-        return { ...post, reddit_url: makeRedditUrl(post.subreddit, post.title, postId), post_id: postId };
+        if (!post.reddit_url || post.reddit_url.includes('<slug>')) {
+          const postId = makePostId();
+          post.reddit_url = makeRedditUrl(post.subreddit, post.title, postId);
+        }
+        return post;
       });
     }
 
-    // Attach brand config to response so frontend can use it
-    data.brand_config = {
-      category: config.category,
-      competitors: config.competitors,
-      subreddits: config.subreddits,
-    };
+    data.brand_config = { category: config.category, competitors: config.competitors, subreddits: config.subreddits };
+    data.data_source = dataSource;
+    data.is_real_data = hasRealData;
 
     return res.status(200).json({ success: true, data });
 
@@ -135,4 +157,4 @@ Make insights and signals specific to ${config.category} — not generic.`;
   }
 }
 
-export const config = { api: { bodyParser: { sizeLimit: '1mb' } } };
+export const config = { api: { bodyParser: { sizeLimit: '2mb' } } };
