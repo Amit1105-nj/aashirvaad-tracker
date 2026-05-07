@@ -5,6 +5,8 @@ import Head from 'next/head';
 const BRANDS = {
   Aashirvaad: {
     emoji: '🌾',
+    logo: '/logos/aashirvaad.png',
+    logoBg: '#c0392b',
     category: 'Atta & Flour',
     subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS'],
     competitors: ['Pillsbury','Fortune Atta','Annapurna','Patanjali Atta',"Nature's Basket"],
@@ -12,6 +14,8 @@ const BRANDS = {
   },
   Bingo: {
     emoji: '🍟',
+    logo: '/logos/bingo.png',
+    logoBg: '#f5f5f5',
     category: 'Snacks & Chips',
     subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
     competitors: ['Lays','Kurkure','Haldirams','Too Yumm','Doritos'],
@@ -19,6 +23,8 @@ const BRANDS = {
   },
   Candyman: {
     emoji: '🍬',
+    logo: '/logos/candyman.jpg',
+    logoBg: '#f9ca24',
     category: 'Confectionery',
     subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/sweets','r/nostalgia','r/IndianParenting','r/teachers','r/Diwali'],
     competitors: ['Cadbury Eclairs','Mentos','Alpenliebe','Parle','Kopiko'],
@@ -26,6 +32,8 @@ const BRANDS = {
   },
   Sunfeast: {
     emoji: '🍪',
+    logo: '/logos/sunfeast.png',
+    logoBg: '#f5f5f5',
     category: 'Biscuits & Pasta',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian'],
     competitors: ['Britannia','Parle-G','McVities','Oreo','Maggi','Unibic','Bonn','Bambino','Del Monte'],
@@ -33,6 +41,8 @@ const BRANDS = {
   },
   Yippee: {
     emoji: '🍜',
+    logo: '/logos/yippee.png',
+    logoBg: '#e74c3c',
     category: 'Instant Noodles',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/pune','r/CasualConversation','r/IndianTeens','r/Hostels','r/CollegeIndia','r/LateNightFood'],
     competitors: ['Maggi','Wai Wai','Knorr',"Ching's Secret",'Top Ramen'],
@@ -40,6 +50,8 @@ const BRANDS = {
   },
   Fabelle: {
     emoji: '🍫',
+    logo: '/logos/fabelle.jpg',
+    logoBg: '#1a0a00',
     category: 'Premium Chocolates',
     subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings','r/corporate_india','r/DateNight','r/luxuryindia'],
     competitors: ['Cadbury Silk','Ferrero Rocher','Lindt','Amul Dark','Smoor','Manam','Royce'],
@@ -191,31 +203,40 @@ export default function Home(){
   const sidebarContent = (
     <div style={{display:'flex',flexDirection:'column',gap:5,height:'100%'}}>
       <div style={{display:'flex',alignItems:'center',gap:9,padding:'4px 6px',marginBottom:16}}>
-        <div style={{width:32,height:32,background:C.acc,borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+        <div style={{width:32,height:32,background:'#1a1a2e',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid rgba(255,69,0,0.4)'}}>
           <span style={{fontSize:18}}>📡</span>
         </div>
         <div>
-          <div style={{fontSize:13,fontWeight:600}}>Brand Radar</div>
-          <div style={{fontSize:10,color:C.muted}}>ITC Intelligence</div>
+          <div style={{fontSize:13,fontWeight:600}}>ITC Brand Radar</div>
+          <div style={{fontSize:10,color:C.muted}}>Reddit Intelligence</div>
         </div>
       </div>
 
       <div style={{fontSize:10,color:C.muted,textTransform:'uppercase',letterSpacing:'0.08em',padding:'0 5px',margin:'4px 0 3px'}}>Brands</div>
       {Object.entries(BRANDS).map(([b,cfg])=>(
         <div key={b} onClick={()=>{handleBrandChange(b);setSidebarOpen(false);}}
-          style={{display:'flex',alignItems:'center',gap:7,padding:'7px 9px',borderRadius:6,fontSize:12,cursor:'pointer',
-            color:b===brand?C.acc:C.muted,background:b===brand?'rgba(255,69,0,0.1)':'transparent'}}>
-          <span style={{fontSize:14}}>{cfg.emoji}</span>
+          style={{display:'flex',alignItems:'center',gap:8,padding:'6px 8px',borderRadius:6,fontSize:12,cursor:'pointer',
+            background:b===brand?'rgba(255,69,0,0.1)':'transparent',
+            border:`1px solid ${b===brand?'rgba(255,69,0,0.3)':'transparent'}`}}>
+          <div style={{width:32,height:32,borderRadius:6,overflow:'hidden',flexShrink:0,
+            background:cfg.logoBg,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <img src={cfg.logo} alt={b} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+          </div>
           <div>
-            <div style={{fontWeight:b===brand?600:400}}>{b}</div>
-            <div style={{fontSize:10,color:C.muted}}>{cfg.category}</div>
+            <div style={{fontWeight:b===brand?600:400,color:b===brand?C.acc:C.text,fontSize:11}}>{b}</div>
+            <div style={{fontSize:9,color:C.muted}}>{cfg.category}</div>
           </div>
         </div>
       ))}
 
       <div style={{background:C.card,borderRadius:9,padding:10,marginTop:8}}>
         <div style={{fontSize:10,color:C.muted,textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>Active brand</div>
-        <div style={{fontSize:13,fontWeight:600,color:C.acc,marginBottom:4}}>{brandConfig.emoji} {brand}</div>
+        <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:4}}>
+          <div style={{width:28,height:28,borderRadius:5,overflow:'hidden',background:brandConfig.logoBg,flexShrink:0}}>
+            <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+          </div>
+          <span style={{fontSize:13,fontWeight:600,color:C.acc}}>{brand}</span>
+        </div>
         <div style={{fontSize:10,color:C.muted,marginBottom:6}}>{brandConfig.category}</div>
         <div style={{fontSize:10,color:C.muted,marginBottom:4}}>Tracking {brandConfig.subreddits.length} subreddits</div>
         <div style={{fontSize:10,color:C.muted}}>vs {brandConfig.competitors.length} competitors</div>
@@ -272,7 +293,9 @@ export default function Home(){
             <div style={{fontSize:13,fontWeight:600}}>Brand Radar</div>
           </div>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <span style={{fontSize:14}}>{brandConfig.emoji}</span>
+            <div style={{width:24,height:24,borderRadius:4,overflow:'hidden',background:brandConfig.logoBg}}>
+              <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+            </div>
             <span style={{fontSize:12,color:C.acc,fontWeight:600}}>{brand}</span>
             <button onClick={()=>setSidebarOpen(!sidebarOpen)}
               style={{background:'transparent',border:`1px solid ${C.border}`,borderRadius:6,padding:'6px 10px',color:C.text,fontSize:12,cursor:'pointer'}}>
@@ -306,7 +329,9 @@ export default function Home(){
         <main className="main-content" style={{flex:1,padding:'24px 28px',overflowY:'auto',paddingTop:0}}>
           <div style={{paddingTop:24}} className="mobile-pt">
             <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
-              <span style={{fontSize:24}}>{brandConfig.emoji}</span>
+              <div style={{width:40,height:40,borderRadius:8,overflow:'hidden',background:brandConfig.logoBg,flexShrink:0}}>
+                <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+              </div>
               <h1 className="page-title" style={{fontSize:19,fontWeight:600}}>{brand} Intelligence Dashboard</h1>
             </div>
             <p style={{fontSize:12,color:C.muted,marginBottom:18}}>
@@ -321,13 +346,19 @@ export default function Home(){
               <div className="config-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14,marginBottom:14}}>
                 <div style={{display:'flex',flexDirection:'column',gap:5}}>
                   <label style={{fontSize:11,color:C.muted,fontWeight:500}}>Brand</label>
+                  <div style={{position:'relative'}}>
                   <select value={brand} onChange={e=>handleBrandChange(e.target.value)}
-                    style={{background:C.card,border:`1px solid ${C.acc}`,borderRadius:6,padding:'7px 10px',
-                      fontSize:12,color:C.acc,fontWeight:600,fontFamily:'inherit',outline:'none',cursor:'pointer'}}>
+                    style={{background:C.card,border:`1px solid ${C.acc}`,borderRadius:6,padding:'7px 10px 7px 44px',
+                      fontSize:12,color:C.acc,fontWeight:600,fontFamily:'inherit',outline:'none',cursor:'pointer',width:'100%'}}>
                     {Object.entries(BRANDS).map(([b,cfg])=>(
-                      <option key={b} value={b}>{cfg.emoji} {b} — {cfg.category}</option>
+                      <option key={b} value={b}>{b} — {cfg.category}</option>
                     ))}
                   </select>
+                  <div style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',
+                    width:28,height:28,borderRadius:5,overflow:'hidden',background:brandConfig.logoBg,pointerEvents:'none'}}>
+                    <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                  </div>
+                </div>
                 </div>
                 {[['From date',fromDate,setFromDate],['To date',toDate,setToDate]].map(([lbl,val,fn])=>(
                   <div key={lbl} style={{display:'flex',flexDirection:'column',gap:5}}>
@@ -450,7 +481,12 @@ export default function Home(){
                   borderRadius:12,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',
                   justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
                   <div>
-                    <h2 style={{fontSize:16,fontWeight:700}}>{report.meta.emoji} {brand} · Reddit Intelligence Report</h2>
+                    <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
+                      <div style={{width:36,height:36,borderRadius:7,overflow:'hidden',background:brandConfig.logoBg,flexShrink:0}}>
+                        <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                      </div>
+                      <h2 style={{fontSize:16,fontWeight:700}}>{brand} · Reddit Intelligence Report</h2>
+                    </div>
                     <p style={{fontSize:11,color:C.muted,marginTop:3}}>
                       {report.meta.fromDate} → {report.meta.toDate} · {report.meta.category} · {report.summary.total_posts} posts · {report.summary.total_comments} comments
                     </p>
