@@ -7,9 +7,20 @@ export default async function handler(req, res) {
   const APIFY_API_KEY = process.env.APIFY_API_KEY;
   if (!APIFY_API_KEY) return res.status(500).json({ error: 'APIFY_API_KEY not configured' });
 
+  // Brand-specific search terms to avoid generic word confusion
+  const BRAND_SEARCH_TERMS = {
+    Aashirvaad: ['Aashirvaad atta', 'Aashirvaad flour', 'Aashirvaad wheat'],
+    Bingo: ['Bingo chips', 'Bingo snacks', 'Bingo Mad Angles', 'Bingo Tedhe Medhe', 'Tedhe Medhe', 'ITC Bingo'],
+    Candyman: ['Candyman candy', 'Candyman eclairs', 'ITC Candyman', 'Candyman toffee'],
+    Sunfeast: ['Sunfeast', 'Sunfeast biscuit', 'Sunfeast Dark Fantasy', 'Sunfeast Marie', 'Sunfeast Farmlite'],
+    Yippee: ['Yippee noodles', 'Sunfeast Yippee', 'Yippee instant noodles', 'ITC Yippee'],
+    Fabelle: ['Fabelle', 'Fabelle chocolate', 'Fabelle ITC', 'Fabelle exquisite'],
+  };
+
   try {
     const subList = subreddits.split(',').map(s => s.trim().replace('r/', '')).slice(0, 8);
     const brandLower = brand.toLowerCase();
+    const searchTerms = BRAND_SEARCH_TERMS[brand] || [brand];
 
     // harshmaur/reddit-scraper correct input format:
     // uses searchTerms array + subreddits array
@@ -19,7 +30,7 @@ export default async function handler(req, res) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          searchTerms: [brand],
+          searchTerms,
           subreddits: subList,
           type: 'posts',
           maxItems: 50,
