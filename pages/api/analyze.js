@@ -72,7 +72,7 @@ export default async function handler(req, res) {
 
   // Check if we have real scraped posts to analyse
   const hasRealData = realPosts && realPosts.length > 0;
-  const dataSource = hasRealData ? 'REAL Reddit data scraped via Apify' : 'AI-simulated Reddit data';
+  const dataSource = hasRealData ? 'Live Reddit data scraped via Apify' : 'AI analysis (no live posts found)';
 
   try {
     let prompt;
