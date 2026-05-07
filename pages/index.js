@@ -41,7 +41,7 @@ const BRANDS = {
   },
   Yippee: {
     emoji: '🍜',
-    logo: '/logos/yippee.png',
+    logo: '/logos/yippee.webp',
     logoBg: '#e74c3c',
     category: 'Instant Noodles',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/pune','r/CasualConversation','r/IndianTeens','r/Hostels','r/CollegeIndia','r/LateNightFood'],
