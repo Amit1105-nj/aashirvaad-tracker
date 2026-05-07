@@ -97,7 +97,6 @@ export default function Home(){
   const [history,setHistory]=useState([]);
   const [status,setStatus]=useState('idle');
   const [sidebarOpen,setSidebarOpen]=useState(false);
-  const [dataMode,setDataMode]=useState('live'); // 'live' = Apify real data, 'simulated' = AI only
   const logRef=useRef(null);
   const reportRef=useRef(null);
 
@@ -133,12 +132,12 @@ export default function Home(){
     try{
       setStep('s1','active');setStep('s2','active');setStep('s3','active');
       addLog(`Scanning Reddit for "${brand}" (${BRANDS[brand].category}) | ${fromDate} → ${toDate}`,'step');
-      addLog(`Mode: ${dataMode==='live'?'🔴 Live Reddit scraping via Apify':'🤖 AI Simulated data'}`);
+      addLog('🔴 Live Reddit scraping via Apify');
       addLog(`Subreddits: ${subsStr}`);
       setProgress(8);
 
       // If live mode — scrape real Reddit data first
-      if(dataMode==='live'){
+      {
         addLog('Scraping real Reddit posts via Apify...','step');
         try{
           const scrapeRes = await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
@@ -357,7 +356,7 @@ export default function Home(){
               <h1 className="page-title" style={{fontSize:19,fontWeight:600}}>{brand} Intelligence Dashboard</h1>
             </div>
             <p style={{fontSize:12,color:C.muted,marginBottom:18}}>
-              {brandConfig.category} · Pick dates → Run → 9-slide report + PPT download
+              {brandConfig.category} · Live Reddit data via Apify → AI analysis → 9-slide report + PPT
             </p>
 
             {/* CONFIG PANEL */}
@@ -433,18 +432,7 @@ export default function Home(){
 
               {/* Run row */}
               <div className="run-row" style={{display:'flex',alignItems:'center',gap:10,paddingTop:14,borderTop:`1px solid ${C.border}`,flexWrap:'wrap'}}>
-                  <div style={{display:'flex',background:C.card,borderRadius:7,overflow:'hidden',border:`1px solid ${C.border}`,flexShrink:0}}>
-                  <button onClick={()=>setDataMode('live')}
-                    style={{padding:'7px 12px',fontSize:11,fontWeight:600,border:'none',cursor:'pointer',
-                      background:dataMode==='live'?C.red:'transparent',color:dataMode==='live'?'white':C.muted}}>
-                    🔴 Live
-                  </button>
-                  <button onClick={()=>setDataMode('simulated')}
-                    style={{padding:'7px 12px',fontSize:11,fontWeight:600,border:'none',cursor:'pointer',
-                      background:dataMode==='simulated'?C.pur:'transparent',color:dataMode==='simulated'?'white':C.muted}}>
-                    🤖 Simulated
-                  </button>
-                </div>
+  
                 <button onClick={runAgent} disabled={running}
                   style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',
                     fontSize:13,fontWeight:600,cursor:running?'not-allowed':'pointer',opacity:running?0.4:1,whiteSpace:'nowrap'}}>
