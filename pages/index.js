@@ -97,6 +97,7 @@ export default function Home(){
   const [history,setHistory]=useState([]);
   const [status,setStatus]=useState('idle');
   const [sidebarOpen,setSidebarOpen]=useState(false);
+  const [dataMode,setDataMode]=useState('live'); // 'live' = Apify real data, 'simulated' = AI only
   const logRef=useRef(null);
   const reportRef=useRef(null);
 
@@ -128,14 +129,35 @@ export default function Home(){
     if(!fromDate||!toDate){alert('Please select both dates');return;}
     setRunning(true);setReport(null);setStatus('running');setProgress(0);setSteps({});
     const subsStr=[...activeSubs].join(', ');
+    let realPosts = [];
     try{
       setStep('s1','active');setStep('s2','active');setStep('s3','active');
       addLog(`Scanning Reddit for "${brand}" (${BRANDS[brand].category}) | ${fromDate} → ${toDate}`,'step');
+      addLog(`Mode: ${dataMode==='live'?'🔴 Live Reddit scraping via Apify':'🤖 AI Simulated data'}`);
       addLog(`Subreddits: ${subsStr}`);
-      setProgress(10);
+      setProgress(8);
+
+      // If live mode — scrape real Reddit data first
+      if(dataMode==='live'){
+        addLog('Scraping real Reddit posts via Apify...','step');
+        try{
+          const scrapeRes = await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate})});
+          const scrapeData = await scrapeRes.json();
+          if(scrapeData.success && scrapeData.posts?.length > 0){
+            realPosts = scrapeData.posts;
+            addLog(`✓ Scraped ${realPosts.length} real Reddit posts`,'ok');
+          } else {
+            addLog('No live posts found — falling back to AI simulation','lwarn');
+          }
+        }catch(scrapeErr){
+          addLog('Scrape error: '+scrapeErr.message+' — using AI simulation','lwarn');
+        }
+      }
+      setProgress(25);
 
       const r1=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),callType:'core'})});
+        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),callType:'core',realPosts})});
       const j1=await r1.json();
       if(!j1.success) throw new Error(j1.error||'API call failed');
       const p1=j1.data;
@@ -151,7 +173,7 @@ export default function Home(){
 
       const r2=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,callType:'keywords',
-          themes:p1.top_themes.map(t=>t.theme).join(', ')})});
+          themes:p1.top_themes.map(t=>t.theme).join(', '),realPosts})});
       const j2=await r2.json();
       if(!j2.success) throw new Error(j2.error||'Keywords API call failed');
       const p2=j2.data;
@@ -411,6 +433,19 @@ export default function Home(){
 
               {/* Run row */}
               <div className="run-row" style={{display:'flex',alignItems:'center',gap:10,paddingTop:14,borderTop:`1px solid ${C.border}`,flexWrap:'wrap'}}>
+                {/* Data mode toggle */}
+                <div style={{display:'flex',background:C.card,borderRadius:7,overflow:'hidden',border:`1px solid ${C.border}`,flexShrink:0}}>
+                  <button onClick={()=>setDataMode('live')}
+                    style={{padding:'7px 12px',fontSize:11,fontWeight:600,border:'none',cursor:'pointer',
+                      background:dataMode==='live'?C.red:'transparent',color:dataMode==='live'?'white':C.muted}}>
+                    🔴 Live
+                  </button>
+                  <button onClick={()=>setDataMode('simulated')}
+                    style={{padding:'7px 12px',fontSize:11,fontWeight:600,border:'none',cursor:'pointer',
+                      background:dataMode==='simulated'?C.pur:'transparent',color:dataMode==='simulated'?'white':C.muted}}>
+                    🤖 Simulated
+                  </button>
+                </div>
                 <button onClick={runAgent} disabled={running}
                   style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',
                     fontSize:13,fontWeight:600,cursor:running?'not-allowed':'pointer',opacity:running?0.4:1,whiteSpace:'nowrap'}}>
@@ -491,7 +526,13 @@ export default function Home(){
                       {report.meta.fromDate} → {report.meta.toDate} · {report.meta.category} · {report.summary.total_posts} posts · {report.summary.total_comments} comments
                     </p>
                   </div>
-                  <span style={{fontSize:10,background:'rgba(255,69,0,0.13)',color:C.acc,padding:'3px 10px',borderRadius:16,fontWeight:600}}>Manual run</span>
+                  <div style={{display:'flex',flexDirection:'column',gap:4,alignItems:'flex-end'}}>
+                    <span style={{fontSize:10,background:'rgba(255,69,0,0.13)',color:C.acc,padding:'3px 10px',borderRadius:16,fontWeight:600}}>Manual run</span>
+                    {report.is_real_data
+                      ? <span style={{fontSize:10,background:'rgba(220,38,38,0.13)',color:C.red,padding:'3px 10px',borderRadius:16,fontWeight:600}}>🔴 Live Reddit Data</span>
+                      : <span style={{fontSize:10,background:'rgba(167,139,250,0.13)',color:C.pur,padding:'3px 10px',borderRadius:16,fontWeight:600}}>🤖 AI Simulated</span>
+                    }
+                  </div>
                 </div>
 
                 {/* KPI row */}
