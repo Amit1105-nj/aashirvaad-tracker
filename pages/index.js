@@ -5,7 +5,7 @@ import Head from 'next/head';
 const BRANDS = {
   Aashirvaad: {
     emoji: '🌾',
-    logo: '/logos/aashirvaad.png',
+    logo: '/Aashirvaad.png',
     logoBg: '#c0392b',
     category: 'Atta & Flour',
     subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS'],
@@ -14,7 +14,7 @@ const BRANDS = {
   },
   Bingo: {
     emoji: '🍟',
-    logo: '/logos/bingo.png',
+    logo: '/Bingo.png',
     logoBg: '#f5f5f5',
     category: 'Snacks & Chips',
     subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
@@ -23,7 +23,7 @@ const BRANDS = {
   },
   Candyman: {
     emoji: '🍬',
-    logo: '/logos/candyman.jpg',
+    logo: '/Candyman (1).jpg',
     logoBg: '#f9ca24',
     category: 'Confectionery',
     subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/sweets','r/nostalgia','r/IndianParenting','r/teachers','r/Diwali'],
@@ -32,7 +32,7 @@ const BRANDS = {
   },
   Sunfeast: {
     emoji: '🍪',
-    logo: '/logos/sunfeast.png',
+    logo: '/Sunfeast.png',
     logoBg: '#f5f5f5',
     category: 'Biscuits & Pasta',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian'],
@@ -41,7 +41,7 @@ const BRANDS = {
   },
   Yippee: {
     emoji: '🍜',
-    logo: '/logos/yippee.webp',
+    logo: '/Yippee.webp',
     logoBg: '#e74c3c',
     category: 'Instant Noodles',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/pune','r/CasualConversation','r/IndianTeens','r/Hostels','r/CollegeIndia','r/LateNightFood'],
@@ -50,7 +50,7 @@ const BRANDS = {
   },
   Fabelle: {
     emoji: '🍫',
-    logo: '/logos/fabelle.jpg',
+    logo: '/Fabelle.jpg',
     logoBg: '#1a0a00',
     category: 'Premium Chocolates',
     subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings','r/corporate_india','r/DateNight','r/luxuryindia'],
