@@ -23,7 +23,8 @@ export default async function handler(req, res) {
     const allPosts = [];
 
     // Run one Apify call per subreddit — using exact input format from Apify console
-    for (const sub of subList) {
+    const sub = subList[0]; // search all Reddit, filter after
+    {
       try {
         const runResponse = await fetch(
           `https://api.apify.com/v2/acts/harshmaur~reddit-scraper/runs?token=${APIFY_API_KEY}`,
@@ -32,13 +33,12 @@ export default async function handler(req, res) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               searchTerms: [searchTerm],
-              withinCommunity: `r/${sub}`,
               searchPosts: true,
               searchComments: false,
               searchCommunities: false,
               searchSort: 'new',
-              searchTime: 'month',
-              maxPostsCount: 10,
+              searchTime: 'all',
+              maxPostsCount: 25,
               includeNSFW: false,
               fastMode: true,
               crawlCommentsPerPost: false,
