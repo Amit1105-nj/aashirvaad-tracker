@@ -17,84 +17,69 @@ export default async function handler(req, res) {
   };
 
   try {
-    const subList = subreddits.split(',').map(s => s.trim().replace('r/', '')).slice(0, 6);
     const brandLower = brand.toLowerCase();
     const searchTerm = BRAND_SEARCH_TERMS[brand] || brand;
-    const allPosts = [];
 
-    // Run one Apify call per subreddit — using exact input format from Apify console
-    const sub = subList[0]; // search all Reddit, filter after
-    {
-      try {
-        const runResponse = await fetch(
-          `https://api.apify.com/v2/acts/harshmaur~reddit-scraper/runs?token=${APIFY_API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              searchTerms: [searchTerm],
-              searchPosts: true,
-              searchComments: false,
-              searchCommunities: false,
-              searchSort: 'new',
-              searchTime: 'all',
-              maxPostsCount: 25,
-              includeNSFW: false,
-              fastMode: true,
-              crawlCommentsPerPost: false,
-              proxy: {
-                useApifyProxy: true,
-                apifyProxyGroups: ['RESIDENTIAL'],
-              },
-            })
-          }
-        );
-
-        if (!runResponse.ok) {
-          console.log(`Run failed for r/${sub}`);
-          continue;
-        }
-
-        const runData = await runResponse.json();
-        const runId = runData.data?.id;
-        if (!runId) continue;
-
-        // Poll for completion — max 90 seconds per subreddit
-        let attempts = 0;
-        let runStatus = 'RUNNING';
-        let datasetId = null;
-
-        while (attempts < 18 && (runStatus === 'RUNNING' || runStatus === 'READY')) {
-          await new Promise(r => setTimeout(r, 5000));
-          const s = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_API_KEY}`);
-          const sd = await s.json();
-          runStatus = sd.data?.status;
-          datasetId = sd.data?.defaultDatasetId;
-          if (runStatus === 'FAILED' || runStatus === 'ABORTED') break;
-          attempts++;
-        }
-
-        if (runStatus === 'SUCCEEDED' && datasetId) {
-          const r = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_API_KEY}&limit=15&clean=true`);
-          const items = await r.json();
-          if (Array.isArray(items)) {
-            // Tag each post with the subreddit
-            items.forEach(p => { p._subreddit = sub; });
-            allPosts.push(...items);
-          }
-        }
-      } catch (subErr) {
-        console.log(`Error for r/${sub}:`, subErr.message);
-        continue;
+    // Single Apify run — search all Reddit, all time (same as manual test that returned 3 results)
+    const runResponse = await fetch(
+      `https://api.apify.com/v2/acts/harshmaur~reddit-scraper/runs?token=${APIFY_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          searchTerms: [searchTerm],
+          searchPosts: true,
+          searchComments: false,
+          searchCommunities: false,
+          searchSort: 'new',
+          searchTime: 'all',
+          maxPostsCount: 25,
+          includeNSFW: false,
+          fastMode: true,
+          crawlCommentsPerPost: false,
+          proxy: {
+            useApifyProxy: true,
+            apifyProxyGroups: ['RESIDENTIAL'],
+          },
+        })
       }
+    );
+
+    if (!runResponse.ok) {
+      const errText = await runResponse.text();
+      throw new Error(`Apify failed (${runResponse.status}): ${errText.slice(0, 200)}`);
     }
 
-    if (allPosts.length === 0) {
+    const runData = await runResponse.json();
+    const runId = runData.data?.id;
+    if (!runId) throw new Error('No run ID from Apify');
+
+    // Poll for completion — max 3 minutes
+    let attempts = 0;
+    let runStatus = 'RUNNING';
+    let datasetId = null;
+
+    while (attempts < 36 && (runStatus === 'RUNNING' || runStatus === 'READY')) {
+      await new Promise(r => setTimeout(r, 5000));
+      const s = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_API_KEY}`);
+      const sd = await s.json();
+      runStatus = sd.data?.status;
+      datasetId = sd.data?.defaultDatasetId;
+      if (runStatus === 'FAILED' || runStatus === 'ABORTED') throw new Error(`Apify run ${runStatus}`);
+      attempts++;
+    }
+
+    if (runStatus !== 'SUCCEEDED') throw new Error('Scrape timed out');
+
+    const r = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_API_KEY}&limit=50&clean=true`);
+    const rawItems = await r.json();
+
+    if (!rawItems || rawItems.length === 0) {
       return res.status(200).json({ success: true, posts: [], message: 'No posts found' });
     }
 
     // Filter posts only + no NSFW
-    const safePosts = allPosts.filter(p => {
+    const safePosts = rawItems.filter(p => {
       if (p.dataType && p.dataType !== 'post') return false;
       return !p.over18 && !p.nsfw && !p.isNsfw && (p.title || p.body);
     });
@@ -107,10 +92,9 @@ export default async function handler(req, res) {
     const otherPosts = safePosts.filter(p => !brandPosts.includes(p));
     const finalPosts = [...brandPosts, ...otherPosts].slice(0, 25);
 
-    // Normalise using exact field names from Apify output
     const posts = finalPosts.map(p => ({
       title: (p.title || p.body || 'Reddit Post').slice(0, 200),
-      subreddit: `r/${p.communityName || p._subreddit || 'reddit'}`,
+      subreddit: `r/${p.communityName || p.subreddit || p.community || 'reddit'}`,
       upvotes: p.upVotes || p.score || p.ups || 0,
       num_comments: p.commentsCount || p.num_comments || 0,
       author: p.authorName || p.author || p.username || 'redditor',
@@ -128,7 +112,6 @@ export default async function handler(req, res) {
       posts,
       total: posts.length,
       brand_mentions: brandPosts.length,
-      subreddits: subList,
       scrapeDate: new Date().toISOString(),
     });
 
