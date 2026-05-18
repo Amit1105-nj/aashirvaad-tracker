@@ -166,14 +166,16 @@ export default async function handler(req, res) {
     const brandReviews = normalizeReviews(rawBrandItems, 'brand');
     const negativeReviews = normalizeReviews(rawNegativeItems, 'brand');
 
-    // Competitor reviews
+    // Competitor reviews - run in parallel
     const competitorReviews = {};
-    const compResults = await Promise.all(
-      competitorsToScrape.map(comp => scrapeReviews(COMPETITOR_ASINS[comp] || [], APIFY_API_KEY, ['allStars']))
-    );
-    competitorsToScrape.forEach((comp, i) => {
-      competitorReviews[comp] = normalizeReviews(compResults[i] || [], comp);
-    });
+    if (competitorsToScrape.length > 0) {
+      const compResults = await Promise.all(
+        competitorsToScrape.map(comp => scrapeReviews(COMPETITOR_ASINS[comp] || [], APIFY_API_KEY, ['allStars']))
+      );
+      competitorsToScrape.forEach((comp, i) => {
+        competitorReviews[comp] = normalizeReviews(compResults[i] || [], comp);
+      });
+    }
 
     if (brandReviews.length === 0) {
       return res.status(200).json({ success: true, reviews: [], message: 'No reviews found' });
