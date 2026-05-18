@@ -97,6 +97,9 @@ export default function Home(){
   const [history,setHistory]=useState([]);
   const [status,setStatus]=useState('idle');
   const [sidebarOpen,setSidebarOpen]=useState(false);
+  const [amazonData,setAmazonData]=useState(null);
+  const [amazonLoading,setAmazonLoading]=useState(false);
+  const [activeTab,setActiveTab]=useState('reddit'); // 'reddit' or 'amazon'
   const logRef=useRef(null);
   const reportRef=useRef(null);
 
@@ -216,6 +219,24 @@ export default function Home(){
       a.click();URL.revokeObjectURL(url);
       addLog('PowerPoint downloaded ✓','ok');
     }catch(err){addLog('PPT error: '+err.message,'error');}
+  };
+
+  const fetchAmazon=async()=>{
+    if(!brand) return;
+    setAmazonLoading(true);
+    addLog(`Fetching Amazon reviews for ${brand}...`,'step');
+    try{
+      const res=await fetch('/api/amazon',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({brand})});
+      const data=await res.json();
+      if(!data.success) throw new Error(data.error||'Amazon fetch failed');
+      setAmazonData(data);
+      addLog(`Amazon: ${data.total} reviews · Avg rating: ${data.avgRating}★`,'ok');
+      setActiveTab('amazon');
+    }catch(err){
+      addLog('Amazon error: '+err.message,'error');
+    }
+    setAmazonLoading(false);
   };
 
   const stepLabels={s1:'Reddit scrape',s2:'AI analysis',s3:'Sentiment',s4:'Keywords',s5:'Insights',s6:'Build report'};
@@ -496,8 +517,89 @@ export default function Home(){
               </div>
             )}
 
+            {/* TAB SWITCHER */}
+            {(report||amazonData)&&(
+              <div style={{display:'flex',gap:8,marginBottom:12}}>
+                <button onClick={()=>setActiveTab('reddit')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
+                  background:activeTab==='reddit'?C.acc:'transparent',color:activeTab==='reddit'?'white':C.muted,
+                  border:`1px solid ${activeTab==='reddit'?C.acc:C.border}`}}>
+                  🔴 Reddit Report
+                </button>
+                <button onClick={()=>setActiveTab('amazon')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
+                  background:activeTab==='amazon'?'#f59e0b':'transparent',color:activeTab==='amazon'?'white':C.muted,
+                  border:`1px solid ${activeTab==='amazon'?'#f59e0b':C.border}`}}>
+                  ⭐ Amazon Reviews {amazonData?`(${amazonData.total})`:''}
+                </button>
+              </div>
+            )}
+
+            {/* AMAZON PANEL */}
+            {activeTab==='amazon'&&amazonData&&(
+              <div>
+                <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',border:'1px solid rgba(245,158,11,0.3)',borderRadius:12,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
+                  <div>
+                    <h2 style={{fontSize:16,fontWeight:700}}>⭐ {brand} · Amazon Reviews</h2>
+                    <p style={{fontSize:11,color:C.muted,marginTop:3}}>{amazonData.total} reviews analysed · Scraped {new Date(amazonData.scrapeDate).toLocaleDateString('en-IN')}</p>
+                  </div>
+                  <span style={{fontSize:24,fontWeight:800,color:'#f59e0b'}}>{amazonData.avgRating}★</span>
+                </div>
+
+                {/* Rating distribution */}
+                <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,marginBottom:10,overflow:'hidden'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',borderBottom:`1px solid ${C.border}`}}>
+                    <span style={{fontSize:10,fontWeight:700,background:'rgba(245,158,11,0.1)',color:'#f59e0b',padding:'2px 7px',borderRadius:4}}>RATINGS</span>
+                    <span style={{fontSize:13,fontWeight:600}}>Rating Distribution</span>
+                  </div>
+                  <div style={{padding:'13px 14px'}}>
+                    {[5,4,3,2,1].map(star=>{
+                      const count=amazonData.ratingDistribution[star]||0;
+                      const total=Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
+                      const pct=total>0?Math.round((count/total)*100):0;
+                      const color=star>=4?C.grn:star===3?C.ylw:C.red;
+                      return(
+                        <div key={star} style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
+                          <span style={{fontSize:12,color:C.muted,minWidth:30}}>{star}★</span>
+                          <div style={{flex:1,height:8,background:'rgba(255,255,255,0.06)',borderRadius:4,overflow:'hidden'}}>
+                            <div style={{width:`${pct}%`,height:'100%',background:color,borderRadius:4}}/>
+                          </div>
+                          <span style={{fontSize:11,color:C.muted,minWidth:40}}>{pct}%</span>
+                          <span style={{fontSize:11,color:C.muted,minWidth:30}}>{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Reviews list */}
+                <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',borderBottom:`1px solid ${C.border}`}}>
+                    <span style={{fontSize:10,fontWeight:700,background:'rgba(245,158,11,0.1)',color:'#f59e0b',padding:'2px 7px',borderRadius:4}}>REVIEWS</span>
+                    <span style={{fontSize:13,fontWeight:600}}>Latest Customer Reviews</span>
+                  </div>
+                  <div style={{padding:'13px 14px'}}>
+                    {amazonData.reviews.slice(0,10).map((r,i)=>{
+                      const rColor=r.rating>=4?C.grn:r.rating>=3?C.ylw:C.red;
+                      return(
+                        <div key={i} style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${C.border}`,borderRadius:8,padding:12,marginBottom:8}}>
+                          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6,flexWrap:'wrap'}}>
+                            <span style={{fontSize:14,color:rColor,fontWeight:700}}>{'★'.repeat(Math.round(r.rating))}{'☆'.repeat(5-Math.round(r.rating))}</span>
+                            <span style={{fontSize:11,fontWeight:600,color:C.text}}>{r.title}</span>
+                            {r.verified&&<span style={{fontSize:10,background:'rgba(34,197,94,0.1)',color:C.grn,padding:'1px 6px',borderRadius:5}}>✓ Verified</span>}
+                            <span style={{fontSize:10,color:C.muted,marginLeft:'auto'}}>{r.author}</span>
+                          </div>
+                          {r.product&&<div style={{fontSize:10,color:'#f59e0b',marginBottom:4}}>📦 {r.product}</div>}
+                          <div style={{fontSize:11,color:C.muted,lineHeight:1.6}}>{r.body}</div>
+                          {r.date&&<div style={{fontSize:10,color:C.muted,marginTop:4}}>{r.date}</div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* REPORT */}
-            {report&&(
+            {activeTab==='reddit'&&report&&(
               <div ref={reportRef}>
                 <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',border:'1px solid rgba(255,69,0,0.22)',
                   borderRadius:12,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',
