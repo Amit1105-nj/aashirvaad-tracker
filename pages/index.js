@@ -459,6 +459,12 @@ export default function Home(){
                     fontSize:13,fontWeight:600,cursor:running?'not-allowed':'pointer',opacity:running?0.4:1,whiteSpace:'nowrap'}}>
                   {running?'⏳ Running...':'▶ Run Now'}
                 </button>
+                <button onClick={fetchAmazon} disabled={amazonLoading}
+                  style={{color:'#f59e0b',border:'1px solid rgba(245,158,11,0.4)',borderRadius:7,padding:'10px 16px',
+                    fontSize:12,cursor:amazonLoading?'not-allowed':'pointer',background:'rgba(245,158,11,0.1)',
+                    whiteSpace:'nowrap',fontWeight:600,opacity:amazonLoading?0.5:1}}>
+                  {amazonLoading?'⏳ Amazon...':'⭐ Amazon Reviews'}
+                </button>
                 <button onClick={downloadPPT} disabled={!report}
                   style={{color:report?C.pur:C.muted,border:`1px solid ${report?'rgba(167,139,250,0.4)':C.border}`,
                     borderRadius:7,padding:'10px 16px',fontSize:12,cursor:report?'pointer':'not-allowed',
