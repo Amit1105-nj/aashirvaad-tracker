@@ -263,8 +263,8 @@ export default function Home(){
   const sidebarContent = (
     <div style={{display:'flex',flexDirection:'column',gap:5,height:'100%'}}>
       <div style={{display:'flex',alignItems:'center',gap:9,padding:'4px 6px',marginBottom:16}}>
-        <div style={{width:32,height:32,background:'#1a1a2e',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid rgba(255,69,0,0.4)'}}>
-          <span style={{fontSize:18}}>📡</span>
+        <div style={{width:36,height:36,borderRadius:7,overflow:'hidden',flexShrink:0,background:'white',display:'flex',alignItems:'center',justifyContent:'center',padding:2}}>
+          <img src="/itc.png" alt="ITC" style={{width:'100%',height:'100%',objectFit:'contain'}}/>
         </div>
         <div>
           <div style={{fontSize:13,fontWeight:600}}>ITC Brand Radar</div>
@@ -467,25 +467,29 @@ export default function Home(){
                 ))}
               </div>
 
-              {/* Subreddits + Competitors — only shown for Reddit mode */}
-              {(runMode==='reddit'||runMode==='both')&&<div className="sub-comp-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
+              {/* Subreddits — only for Reddit, Competitors always visible */}
+              <div className="sub-comp-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
                 <div>
                   <div style={{fontSize:11,color:C.muted,fontWeight:500,marginBottom:6}}>
-                    Subreddits for {brand}
+                    Subreddits for {brand} {runMode==='amazon'&&<span style={{color:C.muted,fontStyle:'italic'}}>(Reddit only)</span>}
                   </div>
-                  <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-                    {brandConfig.subreddits.map(s=>{
-                      const on=activeSubs.has(s);
-                      return(
-                        <button key={s} onClick={()=>toggleSub(s)} style={{fontSize:10,padding:'3px 8px',borderRadius:4,cursor:'pointer',
-                          border:`1px solid ${on?'rgba(255,69,0,0.4)':'rgba(255,255,255,0.08)'}`,
-                          color:on?C.acc:C.muted,
-                          background:on?'rgba(255,69,0,0.1)':'transparent'}}>
-                          {s}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {runMode!=='amazon'?(
+                    <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+                      {brandConfig.subreddits.map(s=>{
+                        const on=activeSubs.has(s);
+                        return(
+                          <button key={s} onClick={()=>toggleSub(s)} style={{fontSize:10,padding:'3px 8px',borderRadius:4,cursor:'pointer',
+                            border:`1px solid ${on?'rgba(255,69,0,0.4)':'rgba(255,255,255,0.08)'}`,
+                            color:on?C.acc:C.muted,
+                            background:on?'rgba(255,69,0,0.1)':'transparent'}}>
+                            {s}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ):(
+                    <div style={{fontSize:11,color:C.muted,fontStyle:'italic',padding:'6px 0'}}>Select Reddit or Both mode to configure subreddits</div>
+                  )}
                 </div>
                 <div>
                   <div style={{fontSize:11,color:C.muted,fontWeight:500,marginBottom:6}}>
@@ -504,7 +508,7 @@ export default function Home(){
                     })}
                   </div>
                 </div>
-              </div>}
+              </div>
 
               {/* Run row */}
               <div className="run-row" style={{display:'flex',alignItems:'center',gap:10,paddingTop:14,borderTop:`1px solid ${C.border}`,flexWrap:'wrap'}}>
@@ -588,16 +592,26 @@ export default function Home(){
 
             {/* TAB SWITCHER */}
             {(report||amazonData)&&(
-              <div style={{display:'flex',gap:8,marginBottom:12}}>
-                <button onClick={()=>setActiveTab('reddit')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
-                  background:activeTab==='reddit'?C.acc:'transparent',color:activeTab==='reddit'?'white':C.muted,
-                  border:`1px solid ${activeTab==='reddit'?C.acc:C.border}`}}>
-                  🔴 Reddit Report
-                </button>
-                <button onClick={()=>setActiveTab('amazon')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
-                  background:activeTab==='amazon'?'#f59e0b':'transparent',color:activeTab==='amazon'?'white':C.muted,
-                  border:`1px solid ${activeTab==='amazon'?'#f59e0b':C.border}`}}>
-                  ⭐ Amazon Reviews {amazonData?`(${amazonData.total})`:''}
+              <div style={{display:'flex',gap:8,marginBottom:12,alignItems:'center',flexWrap:'wrap'}}>
+                {report&&(
+                  <button onClick={()=>setActiveTab('reddit')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
+                    background:activeTab==='reddit'?C.acc:'transparent',color:activeTab==='reddit'?'white':C.muted,
+                    border:`1px solid ${activeTab==='reddit'?C.acc:C.border}`,display:'flex',alignItems:'center',gap:6}}>
+                    <img src="/reddit.png" style={{width:16,height:16,objectFit:'contain'}}/> Reddit Report
+                  </button>
+                )}
+                {amazonData&&(
+                  <button onClick={()=>setActiveTab('amazon')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
+                    background:activeTab==='amazon'?'#f59e0b':'transparent',color:activeTab==='amazon'?'white':C.muted,
+                    border:`1px solid ${activeTab==='amazon'?'#f59e0b':C.border}`,display:'flex',alignItems:'center',gap:6}}>
+                    <img src="/amazon.png" style={{width:16,height:16,objectFit:'contain',filter:'brightness(0) invert(1)'}}/> Amazon {amazonData?`(${amazonData.total})`:''}
+                  </button>
+                )}
+                <button onClick={downloadPPT} disabled={!report}
+                  style={{marginLeft:'auto',color:report?C.pur:C.muted,border:`1px solid ${report?'rgba(167,139,250,0.4)':C.border}`,
+                    borderRadius:7,padding:'7px 14px',fontSize:12,cursor:report?'pointer':'not-allowed',
+                    background:report?'rgba(167,139,250,0.1)':'transparent',fontWeight:report?600:400}}>
+                  ↓ Download PPT
                 </button>
               </div>
             )}
@@ -609,7 +623,10 @@ export default function Home(){
                 <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',border:'1px solid rgba(245,158,11,0.3)',
                   borderRadius:12,padding:'16px 20px',marginBottom:12,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
                   <div>
-                    <h2 style={{fontSize:16,fontWeight:700}}>⭐ {brand} · Amazon Intelligence Report</h2>
+                    <div style={{display:'flex',alignItems:'center',gap:8}}>
+                      <img src="/amazon.png" style={{width:24,height:16,objectFit:'contain'}}/>
+                      <h2 style={{fontSize:16,fontWeight:700}}>{brand} · Amazon Intelligence Report</h2>
+                    </div>
                     <p style={{fontSize:11,color:C.muted,marginTop:3}}>{amazonData.total} reviews · {amazonData.subCategory} · {new Date(amazonData.scrapeDate).toLocaleDateString('en-IN')}</p>
                   </div>
                   <div style={{display:'flex',gap:16,alignItems:'center'}}>
@@ -789,7 +806,10 @@ export default function Home(){
                       <div style={{width:36,height:36,borderRadius:7,overflow:'hidden',background:brandConfig.logoBg,flexShrink:0}}>
                         <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
                       </div>
+                      <div style={{display:'flex',alignItems:'center',gap:8}}>
+                      <img src="/reddit.png" style={{width:20,height:20,objectFit:'contain'}}/>
                       <h2 style={{fontSize:16,fontWeight:700}}>{brand} · Reddit Intelligence Report</h2>
+                    </div>
                     </div>
                     <p style={{fontSize:11,color:C.muted,marginTop:3}}>
                       {report.meta.fromDate} → {report.meta.toDate} · {report.meta.category} · {report.summary.total_posts} posts · {report.summary.total_comments} comments
