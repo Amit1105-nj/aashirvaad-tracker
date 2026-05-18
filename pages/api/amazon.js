@@ -44,28 +44,26 @@ export default async function handler(req, res) {
     let productUrls = [];
 
     if (config.mode === 'asins') {
-      // Direct product review pages using productUrls format
-      productUrls = config.asins.map(asin => ({
-        url: `https://www.amazon.in/product-reviews/${asin}/?sortBy=recent&pageSize=20`,
+      // Use clean product page URLs — no tracking params
+      productUrls = config.asins.slice(0, 5).map(asin => ({
+        url: `https://www.amazon.in/dp/${asin}`,
       }));
     } else {
-      // For keyword brands — use search page URLs
-      productUrls = config.keywords.map(kw => ({
+      // Keyword search on Amazon.in
+      productUrls = config.keywords.slice(0, 3).map(kw => ({
         url: `https://www.amazon.in/s?k=${encodeURIComponent(kw)}`,
       }));
     }
 
-    // Use junglee/amazon-reviews-scraper with correct productUrls field
+    // Use junglee/amazon-reviews-scraper with correct startUrls format
     const runResponse = await fetch(
       `https://api.apify.com/v2/acts/junglee~amazon-reviews-scraper/runs?token=${APIFY_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          productUrls,
-          maxReviews: 50,
-          filterByRating: 'all_stars',
-          sortBy: 'recent',
+          startUrls: productUrls,
+          maxReviews: 30,
           proxy: {
             useApifyProxy: true,
             apifyProxyGroups: ['RESIDENTIAL'],
