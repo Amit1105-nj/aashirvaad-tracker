@@ -49,7 +49,7 @@ export default async function handler(req, res) {
   try {
     // Exact format required by junglee/amazon-reviews-scraper
     const productUrls = asins.slice(0, 6).map(asin => ({
-      url: `https://www.amazon.in/product-reviews/${asin}/?sortBy=recent&pageSize=20`,
+      url: `https://www.amazon.in/dp/${asin}`,
     }));
 
     const runResponse = await fetch(
