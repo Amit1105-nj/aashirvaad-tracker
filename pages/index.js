@@ -413,24 +413,45 @@ export default function Home(){
             <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:13,padding:18,marginBottom:16}}>
               <div style={{fontSize:13,fontWeight:600,marginBottom:14}}>⚙ Run Configuration</div>
 
-              {/* Brand + Dates */}
-              <div className="config-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14,marginBottom:14}}>
+              {/* ROW 1: Brand + Sub-category */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:12}}>
                 <div style={{display:'flex',flexDirection:'column',gap:5}}>
                   <label style={{fontSize:11,color:C.muted,fontWeight:500}}>Brand</label>
                   <div style={{position:'relative'}}>
-                  <select value={brand} onChange={e=>handleBrandChange(e.target.value)}
-                    style={{background:C.card,border:`1px solid ${C.acc}`,borderRadius:6,padding:'7px 10px 7px 44px',
-                      fontSize:12,color:C.acc,fontWeight:600,fontFamily:'inherit',outline:'none',cursor:'pointer',width:'100%'}}>
-                    {Object.entries(BRANDS).map(([b,cfg])=>(
-                      <option key={b} value={b}>{b} — {cfg.category}</option>
-                    ))}
-                  </select>
-                  <div style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',
-                    width:28,height:28,borderRadius:5,overflow:'hidden',background:brandConfig.logoBg,pointerEvents:'none'}}>
-                    <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                    <select value={brand} onChange={e=>handleBrandChange(e.target.value)}
+                      style={{background:C.card,border:`1px solid ${C.acc}`,borderRadius:6,padding:'7px 10px 7px 44px',
+                        fontSize:12,color:C.acc,fontWeight:600,fontFamily:'inherit',outline:'none',cursor:'pointer',width:'100%'}}>
+                      {Object.entries(BRANDS).map(([b,cfg])=>(
+                        <option key={b} value={b}>{b} — {cfg.category}</option>
+                      ))}
+                    </select>
+                    <div style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',
+                      width:28,height:28,borderRadius:5,overflow:'hidden',background:brandConfig.logoBg,pointerEvents:'none'}}>
+                      <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                    </div>
                   </div>
                 </div>
+                <div style={{display:'flex',flexDirection:'column',gap:5}}>
+                  <label style={{fontSize:11,color:C.muted,fontWeight:500}}>
+                    Amazon Category {(AMAZON_SUB_CATS[brand]||[]).length <= 1 ? '(All Products)' : ''}
+                  </label>
+                  {(AMAZON_SUB_CATS[brand]||[]).length > 1 ? (
+                    <select value={amazonSubCategory} onChange={e=>setAmazonSubCategory(e.target.value)}
+                      style={{background:C.card,border:'1px solid rgba(245,158,11,0.4)',borderRadius:6,padding:'7px 10px',
+                        fontSize:12,color:'#f59e0b',fontFamily:'inherit',outline:'none',cursor:'pointer',width:'100%'}}>
+                      {(AMAZON_SUB_CATS[brand]||[]).map(s=>(
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:'7px 10px',
+                      fontSize:12,color:C.muted}}>All {brand} Products</div>
+                  )}
                 </div>
+              </div>
+
+              {/* ROW 2: Dates */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:12}}>
                 {[['From date',fromDate,setFromDate],['To date',toDate,setToDate]].map(([lbl,val,fn])=>(
                   <div key={lbl} style={{display:'flex',flexDirection:'column',gap:5}}>
                     <label style={{fontSize:11,color:C.muted,fontWeight:500}}>{lbl}</label>
@@ -482,30 +503,22 @@ export default function Home(){
 
               {/* Run row */}
               <div className="run-row" style={{display:'flex',alignItems:'center',gap:10,paddingTop:14,borderTop:`1px solid ${C.border}`,flexWrap:'wrap'}}>
-  
+
+                {/* Reddit + Amazon side by side */}
                 <button onClick={runAgent} disabled={running}
                   style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',
                     fontSize:13,fontWeight:600,cursor:running?'not-allowed':'pointer',opacity:running?0.4:1,whiteSpace:'nowrap'}}>
-                  {running?'⏳ Running...':'▶ Run Now'}
+                  {running?'⏳ Running...':'▶ Reddit'}
                 </button>
-                {(AMAZON_SUB_CATS[brand]||[]).length > 1 && (
-                  <select value={amazonSubCategory} onChange={e=>setAmazonSubCategory(e.target.value)}
-                    style={{background:C.card,border:'1px solid rgba(245,158,11,0.4)',borderRadius:7,padding:'7px 10px',
-                      fontSize:11,color:'#f59e0b',fontFamily:'inherit',outline:'none',cursor:'pointer'}}>
-                    {(AMAZON_SUB_CATS[brand]||['All Products']).map(s=>(
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                )}
                 <button onClick={fetchAmazon} disabled={amazonLoading}
-                  style={{color:'#f59e0b',border:'1px solid rgba(245,158,11,0.4)',borderRadius:7,padding:'10px 16px',
-                    fontSize:12,cursor:amazonLoading?'not-allowed':'pointer',background:'rgba(245,158,11,0.1)',
-                    whiteSpace:'nowrap',fontWeight:600,opacity:amazonLoading?0.5:1}}>
-                  {amazonLoading?'⏳ Amazon...':'⭐ Amazon Reviews'}
+                  style={{color:'#f59e0b',border:'1px solid rgba(245,158,11,0.4)',borderRadius:7,padding:'10px 18px',
+                    fontSize:13,fontWeight:600,cursor:amazonLoading?'not-allowed':'pointer',background:'rgba(245,158,11,0.1)',
+                    whiteSpace:'nowrap',opacity:amazonLoading?0.5:1}}>
+                  {amazonLoading?'⏳ Amazon...':'⭐ Amazon'}
                 </button>
                 <button onClick={downloadPPT} disabled={!report}
                   style={{color:report?C.pur:C.muted,border:`1px solid ${report?'rgba(167,139,250,0.4)':C.border}`,
-                    borderRadius:7,padding:'10px 16px',fontSize:12,cursor:report?'pointer':'not-allowed',
+                    borderRadius:7,padding:'10px 16px',fontSize:13,cursor:report?'pointer':'not-allowed',
                     background:report?'rgba(167,139,250,0.1)':'transparent',whiteSpace:'nowrap',fontWeight:report?600:400}}>
                   ↓ Download PPT
                 </button>
