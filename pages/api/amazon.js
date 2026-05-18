@@ -66,7 +66,7 @@ const COMPETITOR_ASINS = {
   'Lindt':          ['B07RKVCR8R'],
 };
 
-async function scrapeReviews(asins, token) {
+async function scrapeReviews(asins, token, filterByRatings = ['allStars']) {
   if (!asins || asins.length === 0) return [];
 
   const productUrls = asins.slice(0, 4).map(asin => ({
@@ -81,10 +81,10 @@ async function scrapeReviews(asins, token) {
       body: JSON.stringify({
         productUrls,
         maxReviews: 30,
-        filterByRating: 'all_stars',
+        filterByRating: filterByRatings.includes('oneStar') ? 'critical' : 'all_stars',
         sortBy: 'recent',
         proxy: { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'] },
-        filterByRatings: ['allStars'],
+        filterByRatings,
         deduplicateRedirectedAsins: true,
         scrapeProductDetails: false,
       })
@@ -145,9 +145,12 @@ export default async function handler(req, res) {
   const brandAsins = brandConfig[selectedSub] || brandConfig['All Products'];
 
   try {
-    // Scrape brand + competitors simultaneously
+    // Scrape brand (all stars) + negative reviews separately + competitors
     const competitorList = competitors || [];
-    const scrapePromises = [scrapeReviews(brandAsins, APIFY_API_KEY)];
+    const scrapePromises = [
+      scrapeReviews(brandAsins, APIFY_API_KEY, ['allStars']),
+      scrapeReviews(brandAsins, APIFY_API_KEY, ['oneStar', 'twoStar']), // critical only
+    ];
 
     // Add competitor scraping (max 3 competitors to keep cost low)
     const competitorsToScrape = competitorList.slice(0, 3);
@@ -159,12 +162,17 @@ export default async function handler(req, res) {
 
     const results = await Promise.all(scrapePromises);
     const rawBrandItems = results[0] || [];
+    const rawNegativeItems = results[1] || [];
     const brandReviews = normalizeReviews(rawBrandItems, 'brand');
+    const negativeReviews = normalizeReviews(rawNegativeItems, 'brand');
 
     // Competitor reviews
     const competitorReviews = {};
+    const compResults = await Promise.all(
+      competitorsToScrape.map(comp => scrapeReviews(COMPETITOR_ASINS[comp] || [], APIFY_API_KEY, ['allStars']))
+    );
     competitorsToScrape.forEach((comp, i) => {
-      competitorReviews[comp] = normalizeReviews(results[i + 1] || [], comp);
+      competitorReviews[comp] = normalizeReviews(compResults[i] || [], comp);
     });
 
     if (brandReviews.length === 0) {
@@ -180,9 +188,11 @@ export default async function handler(req, res) {
 
     // Top positive + negative
     const sortedDesc = [...brandReviews].filter(r => r.rating > 0).sort((a, b) => b.rating - a.rating);
-    const sortedAsc = [...brandReviews].filter(r => r.rating > 0).sort((a, b) => a.rating - b.rating);
     const top5Positive = sortedDesc.slice(0, 5);
-    const top5Negative = sortedAsc.slice(0, 5); // lowest rated first
+    // Use dedicated negative scrape for critical reviews
+    const top5Negative = negativeReviews.length > 0
+      ? negativeReviews.slice(0, 5)
+      : [...brandReviews].filter(r => r.rating > 0 && r.rating <= 3).sort((a, b) => a.rating - b.rating).slice(0, 5);
 
     // Competitor avg ratings
     const competitorStats = {};
