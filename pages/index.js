@@ -295,6 +295,22 @@ export default function Home(){
         <div style={{fontSize:10,color:C.muted,marginBottom:6}}>{brandConfig.category}</div>
         <div style={{fontSize:10,color:C.muted,marginBottom:4}}>Tracking {brandConfig.subreddits.length} subreddits</div>
         <div style={{fontSize:10,color:C.muted}}>vs {brandConfig.competitors.length} competitors</div>
+
+        {(AMAZON_SUB_CATS[brand]||[]).length > 1 && (
+          <div style={{marginTop:10,paddingTop:10,borderTop:`1px solid ${C.border}`}}>
+            <div style={{fontSize:10,color:C.muted,fontWeight:600,marginBottom:5,letterSpacing:'0.05em'}}>AMAZON CATEGORY</div>
+            {(AMAZON_SUB_CATS[brand]||[]).map(s=>(
+              <button key={s} onClick={()=>setAmazonSubCategory(s)}
+                style={{display:'block',width:'100%',textAlign:'left',padding:'5px 8px',borderRadius:5,fontSize:11,cursor:'pointer',marginBottom:2,
+                  background:amazonSubCategory===s?'rgba(245,158,11,0.15)':'transparent',
+                  color:amazonSubCategory===s?'#f59e0b':C.muted,
+                  border:`1px solid ${amazonSubCategory===s?'rgba(245,158,11,0.4)':'transparent'}`,
+                  fontWeight:amazonSubCategory===s?600:400}}>
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={{marginTop:'auto',background:C.card,borderRadius:9,padding:10}}>
