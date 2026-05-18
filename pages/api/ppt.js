@@ -66,11 +66,12 @@ function addKpiBox(slide, x, y, w, h, value, label, valueColor) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { data, meta } = req.body;
-  if (!data || !meta) return res.status(400).json({ error: 'Missing data' });
+  const { data, meta, amazonData } = req.body;
+  if (!meta) return res.status(400).json({ error: 'Missing meta' });
+  if (!data && !amazonData) return res.status(400).json({ error: 'Missing report data' });
 
   const { fromDate, toDate, brand } = meta;
-  const sn  = data.sentiment_breakdown;
+  const sn  = data?.sentiment_breakdown || { positive: 0, neutral: 0, negative: 0 };
   const now = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
   try {
