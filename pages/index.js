@@ -99,7 +99,18 @@ export default function Home(){
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [amazonData,setAmazonData]=useState(null);
   const [amazonLoading,setAmazonLoading]=useState(false);
-  const [activeTab,setActiveTab]=useState('reddit'); // 'reddit' or 'amazon'
+  const [activeTab,setActiveTab]=useState('reddit');
+  const [amazonSubCategory,setAmazonSubCategory]=useState('All Products');
+
+  // Sub-categories per brand
+  const AMAZON_SUB_CATS = {
+    Aashirvaad: ['All Products','Atta & Flour','Basic Spices','Whole Spices','Ghee & Dairy'],
+    Sunfeast: ['All Products','Dark Fantasy',"Mom's Magic",'Farmlite','Marie & Others','Cakes'],
+    Yippee: ['All Products','Noodles','Pasta'],
+    Bingo: ['All Products'],
+    Candyman: ['All Products'],
+    Fabelle: ['All Products'],
+  }; // 'reddit' or 'amazon'
   const logRef=useRef(null);
   const reportRef=useRef(null);
 
@@ -117,6 +128,8 @@ export default function Home(){
     setActiveSubs(new Set(BRANDS[newBrand].subreddits));
     setActiveComps(new Set(BRANDS[newBrand].competitors));
     setReport(null);
+    setAmazonData(null);
+    setAmazonSubCategory('All Products');
   };
 
   const addLog=(msg,type='info')=>{
@@ -227,7 +240,7 @@ export default function Home(){
     addLog(`Fetching Amazon reviews for ${brand}...`,'step');
     try{
       const res=await fetch('/api/amazon',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({brand})});
+        body:JSON.stringify({brand,subCategory:amazonSubCategory})});
       const data=await res.json();
       if(!data.success) throw new Error(data.error||'Amazon fetch failed');
       setAmazonData(data);
@@ -459,6 +472,15 @@ export default function Home(){
                     fontSize:13,fontWeight:600,cursor:running?'not-allowed':'pointer',opacity:running?0.4:1,whiteSpace:'nowrap'}}>
                   {running?'⏳ Running...':'▶ Run Now'}
                 </button>
+                {(AMAZON_SUB_CATS[brand]||[]).length > 1 && (
+                  <select value={amazonSubCategory} onChange={e=>setAmazonSubCategory(e.target.value)}
+                    style={{background:C.card,border:'1px solid rgba(245,158,11,0.4)',borderRadius:7,padding:'7px 10px',
+                      fontSize:11,color:'#f59e0b',fontFamily:'inherit',outline:'none',cursor:'pointer'}}>
+                    {(AMAZON_SUB_CATS[brand]||['All Products']).map(s=>(
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                )}
                 <button onClick={fetchAmazon} disabled={amazonLoading}
                   style={{color:'#f59e0b',border:'1px solid rgba(245,158,11,0.4)',borderRadius:7,padding:'10px 16px',
                     fontSize:12,cursor:amazonLoading?'not-allowed':'pointer',background:'rgba(245,158,11,0.1)',
