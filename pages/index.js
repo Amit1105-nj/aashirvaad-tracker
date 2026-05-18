@@ -224,7 +224,7 @@ export default function Home(){
     try{
       const payload = report
         ? {data:report, meta:report.meta, amazonData}
-        : {data:null, meta:{brand,fromDate,toDate,category:brandConfig.category,emoji:brandConfig.emoji}, amazonData};
+        : {data:null, meta:{brand,fromDate,toDate,category:brandConfig.category}, amazonData};
       const res=await fetch('/api/ppt',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify(payload)});
       if(!res.ok) throw new Error('PPT generation failed');
