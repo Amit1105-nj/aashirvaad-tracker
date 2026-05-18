@@ -219,17 +219,20 @@ export default function Home(){
   };
 
   const downloadPPT=async()=>{
-    if(!report) return;
+    if(!report&&!amazonData) return;
     addLog('Generating PowerPoint...','step');
     try{
+      const payload = report
+        ? {data:report, meta:report.meta, amazonData}
+        : {data:null, meta:{brand,fromDate,toDate,category:brandConfig.category,emoji:brandConfig.emoji}, amazonData};
       const res=await fetch('/api/ppt',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({data:report,meta:report.meta})});
+        body:JSON.stringify(payload)});
       if(!res.ok) throw new Error('PPT generation failed');
       const blob=await res.blob();
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
       a.href=url;
-      a.download=`${brand}_Reddit_${fromDate}_to_${toDate}.pptx`;
+      a.download=`${brand}_Report_${fromDate}_to_${toDate}.pptx`;
       a.click();URL.revokeObjectURL(url);
       addLog('PowerPoint downloaded ✓','ok');
     }catch(err){addLog('PPT error: '+err.message,'error');}
