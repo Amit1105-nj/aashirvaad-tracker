@@ -411,7 +411,7 @@ export default function Home(){
               <h1 className="page-title" style={{fontSize:19,fontWeight:600}}>{brand} Intelligence Dashboard</h1>
             </div>
             <p style={{fontSize:12,color:C.muted,marginBottom:18}}>
-              {brandConfig.category} · Live Reddit data via Apify → AI analysis → 9-slide report + PPT
+              {brandConfig.category} · Reddit + Amazon intelligence · Apify scraping → Claude AI → Reports + PPT
             </p>
 
             {/* CONFIG PANEL */}
@@ -532,10 +532,13 @@ export default function Home(){
                     opacity:(running||amazonLoading)?0.4:1,whiteSpace:'nowrap'}}>
                   {(running||amazonLoading)?'⏳ Running...':'▶ Run Now'}
                 </button>
-                <button onClick={downloadPPT} disabled={!report}
-                  style={{color:report?C.pur:C.muted,border:`1px solid ${report?'rgba(167,139,250,0.4)':C.border}`,
-                    borderRadius:7,padding:'10px 16px',fontSize:13,cursor:report?'pointer':'not-allowed',
-                    background:report?'rgba(167,139,250,0.1)':'transparent',whiteSpace:'nowrap',fontWeight:report?600:400}}>
+                <button onClick={downloadPPT} disabled={!report&&!amazonData}
+                  style={{color:(report||amazonData)?C.pur:C.muted,
+                    border:`1px solid ${(report||amazonData)?'rgba(167,139,250,0.4)':C.border}`,
+                    borderRadius:7,padding:'10px 16px',fontSize:13,
+                    cursor:(report||amazonData)?'pointer':'not-allowed',
+                    background:(report||amazonData)?'rgba(167,139,250,0.1)':'transparent',
+                    whiteSpace:'nowrap',fontWeight:(report||amazonData)?600:400}}>
                   ↓ Download PPT
                 </button>
                 <div className="prog-wrap" style={{flex:1,minWidth:80}}>
@@ -607,16 +610,7 @@ export default function Home(){
                     <img src="/amazon.png" style={{width:16,height:16,objectFit:'contain',filter:'brightness(0) invert(1)'}}/> Amazon {amazonData?`(${amazonData.total})`:''}
                   </button>
                 )}
-                <button onClick={downloadPPT} disabled={!report&&!amazonData}
-                  style={{marginLeft:'auto',
-                    color:(report||amazonData)?C.pur:C.muted,
-                    border:`1px solid ${(report||amazonData)?'rgba(167,139,250,0.4)':C.border}`,
-                    borderRadius:7,padding:'7px 14px',fontSize:12,
-                    cursor:(report||amazonData)?'pointer':'not-allowed',
-                    background:(report||amazonData)?'rgba(167,139,250,0.1)':'transparent',
-                    fontWeight:(report||amazonData)?600:400}}>
-                  ↓ Download PPT
-                </button>
+
               </div>
             )}
 
