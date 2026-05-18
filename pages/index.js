@@ -264,7 +264,7 @@ export default function Home(){
     <div style={{display:'flex',flexDirection:'column',gap:5,height:'100%'}}>
       <div style={{display:'flex',alignItems:'center',gap:9,padding:'4px 6px',marginBottom:16}}>
         <div style={{width:44,height:44,borderRadius:8,flexShrink:0,overflow:'hidden',border:'2px solid rgba(255,255,255,0.3)',background:'white'}}>
-          <img src="/itc.jpg" alt="ITC" style={{width:'100%',height:'100%',objectFit:'contain',display:'block'}}/>
+          <img src="/ITC.jpg" alt="ITC" style={{width:'100%',height:'100%',objectFit:'contain',display:'block'}}/>
         </div>
         <div>
           <div style={{fontSize:13,fontWeight:600}}>ITC Brand Radar</div>
