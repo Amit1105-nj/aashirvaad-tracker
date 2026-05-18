@@ -607,10 +607,14 @@ export default function Home(){
                     <img src="/amazon.png" style={{width:16,height:16,objectFit:'contain',filter:'brightness(0) invert(1)'}}/> Amazon {amazonData?`(${amazonData.total})`:''}
                   </button>
                 )}
-                <button onClick={downloadPPT} disabled={!report}
-                  style={{marginLeft:'auto',color:report?C.pur:C.muted,border:`1px solid ${report?'rgba(167,139,250,0.4)':C.border}`,
-                    borderRadius:7,padding:'7px 14px',fontSize:12,cursor:report?'pointer':'not-allowed',
-                    background:report?'rgba(167,139,250,0.1)':'transparent',fontWeight:report?600:400}}>
+                <button onClick={downloadPPT} disabled={!report&&!amazonData}
+                  style={{marginLeft:'auto',
+                    color:(report||amazonData)?C.pur:C.muted,
+                    border:`1px solid ${(report||amazonData)?'rgba(167,139,250,0.4)':C.border}`,
+                    borderRadius:7,padding:'7px 14px',fontSize:12,
+                    cursor:(report||amazonData)?'pointer':'not-allowed',
+                    background:(report||amazonData)?'rgba(167,139,250,0.1)':'transparent',
+                    fontWeight:(report||amazonData)?600:400}}>
                   ↓ Download PPT
                 </button>
               </div>
