@@ -101,16 +101,22 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reviews: [], message: 'No reviews found' });
     }
 
+    // Log first item keys for debugging
+    if (rawItems.length > 0) {
+      console.log('Amazon item keys:', Object.keys(rawItems[0]));
+      console.log('Amazon first item sample:', JSON.stringify(rawItems[0]).slice(0, 500));
+    }
+
     const reviews = rawItems.map(item => ({
-      title: (item.reviewTitle || item.title || '').slice(0, 200),
-      body: (item.reviewBody || item.body || item.text || '').slice(0, 500),
-      rating: parseFloat(item.ratingScore || item.rating || item.stars || 0),
-      author: item.reviewerName || item.userName || item.author || 'Verified Buyer',
-      date: item.reviewedIn || item.date || item.publishedDate || '',
-      verified: item.isVerifiedPurchase || item.verified || false,
-      helpful: item.helpfulCount || item.foundHelpful || 0,
-      product: (item.productName || item.asin || brand).slice(0, 100),
-      url: item.reviewUrl || item.url || '',
+      title: (item.reviewTitle || item.title || item.heading || '').slice(0, 200),
+      body: (item.reviewBody || item.body || item.text || item.review || item.reviewText || item.content || '').slice(0, 500),
+      rating: parseFloat(item.ratingScore || item.rating || item.stars || item.starRating || item.reviewRating || 0),
+      author: item.reviewerName || item.userName || item.author || item.name || item.reviewer || 'Verified Buyer',
+      date: item.reviewedIn || item.date || item.publishedDate || item.reviewDate || item.datePublished || '',
+      verified: item.isVerifiedPurchase || item.verified || item.verifiedPurchase || false,
+      helpful: item.helpfulCount || item.foundHelpful || item.helpfulVotes || 0,
+      product: (item.productName || item.productTitle || item.asin || brand).slice(0, 100),
+      url: item.reviewUrl || item.url || item.link || '',
     })).filter(r => r.body || r.title);
 
     const ratings = reviews.filter(r => r.rating > 0).map(r => r.rating);
