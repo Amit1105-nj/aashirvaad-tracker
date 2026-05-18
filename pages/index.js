@@ -101,6 +101,7 @@ export default function Home(){
   const [amazonLoading,setAmazonLoading]=useState(false);
   const [activeTab,setActiveTab]=useState('reddit');
   const [amazonSubCategory,setAmazonSubCategory]=useState('All Products');
+  const [runMode,setRunMode]=useState('reddit'); // 'reddit' | 'amazon' | 'both'
 
   // Sub-categories per brand
   const AMAZON_SUB_CATS = {
@@ -240,7 +241,7 @@ export default function Home(){
     addLog(`Fetching Amazon reviews for ${brand}...`,'step');
     try{
       const res=await fetch('/api/amazon',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({brand,subCategory:amazonSubCategory})});
+        body:JSON.stringify({brand,subCategory:amazonSubCategory,competitors:[...activeComps]})});
       const data=await res.json();
       if(!data.success) throw new Error(data.error||'Amazon fetch failed');
       setAmazonData(data);
@@ -250,6 +251,10 @@ export default function Home(){
       addLog('Amazon error: '+err.message,'error');
     }
     setAmazonLoading(false);
+  };
+
+  const runBoth=async()=>{
+    await Promise.all([runAgent(), fetchAmazon()]);
   };
 
   const stepLabels={s1:'Reddit scrape',s2:'AI analysis',s3:'Sentiment',s4:'Keywords',s5:'Insights',s6:'Build report'};
@@ -462,8 +467,8 @@ export default function Home(){
                 ))}
               </div>
 
-              {/* Subreddits + Competitors */}
-              <div className="sub-comp-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
+              {/* Subreddits + Competitors — only shown for Reddit mode */}
+              {(runMode==='reddit'||runMode==='both')&&<div className="sub-comp-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
                 <div>
                   <div style={{fontSize:11,color:C.muted,fontWeight:500,marginBottom:6}}>
                     Subreddits for {brand}
@@ -499,22 +504,29 @@ export default function Home(){
                     })}
                   </div>
                 </div>
-              </div>
+              </div>}
 
               {/* Run row */}
               <div className="run-row" style={{display:'flex',alignItems:'center',gap:10,paddingTop:14,borderTop:`1px solid ${C.border}`,flexWrap:'wrap'}}>
 
-                {/* Reddit + Amazon side by side */}
-                <button onClick={runAgent} disabled={running}
+                {/* Mode selector */}
+                <div style={{display:'flex',background:C.card,borderRadius:7,overflow:'hidden',border:`1px solid ${C.border}`}}>
+                  {[['reddit','🔴 Reddit'],['amazon','⭐ Amazon'],['both','⚡ Both']].map(([mode,label])=>(
+                    <button key={mode} onClick={()=>setRunMode(mode)}
+                      style={{padding:'8px 14px',fontSize:12,fontWeight:600,border:'none',cursor:'pointer',
+                        background:runMode===mode?C.acc:'transparent',
+                        color:runMode===mode?'white':C.muted}}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={runMode==='reddit'?runAgent:runMode==='amazon'?fetchAmazon:()=>{runAgent();fetchAmazon();}}
+                  disabled={running||amazonLoading}
                   style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',
-                    fontSize:13,fontWeight:600,cursor:running?'not-allowed':'pointer',opacity:running?0.4:1,whiteSpace:'nowrap'}}>
-                  {running?'⏳ Running...':'▶ Reddit'}
-                </button>
-                <button onClick={fetchAmazon} disabled={amazonLoading}
-                  style={{color:'#f59e0b',border:'1px solid rgba(245,158,11,0.4)',borderRadius:7,padding:'10px 18px',
-                    fontSize:13,fontWeight:600,cursor:amazonLoading?'not-allowed':'pointer',background:'rgba(245,158,11,0.1)',
-                    whiteSpace:'nowrap',opacity:amazonLoading?0.5:1}}>
-                  {amazonLoading?'⏳ Amazon...':'⭐ Amazon'}
+                    fontSize:13,fontWeight:600,cursor:(running||amazonLoading)?'not-allowed':'pointer',
+                    opacity:(running||amazonLoading)?0.4:1,whiteSpace:'nowrap'}}>
+                  {(running||amazonLoading)?'⏳ Running...':'▶ Run Now'}
                 </button>
                 <button onClick={downloadPPT} disabled={!report}
                   style={{color:report?C.pur:C.muted,border:`1px solid ${report?'rgba(167,139,250,0.4)':C.border}`,
@@ -593,65 +605,176 @@ export default function Home(){
             {/* AMAZON PANEL */}
             {activeTab==='amazon'&&amazonData&&(
               <div>
-                <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',border:'1px solid rgba(245,158,11,0.3)',borderRadius:12,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
+                {/* Header */}
+                <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',border:'1px solid rgba(245,158,11,0.3)',
+                  borderRadius:12,padding:'16px 20px',marginBottom:12,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
                   <div>
-                    <h2 style={{fontSize:16,fontWeight:700}}>⭐ {brand} · Amazon Reviews</h2>
-                    <p style={{fontSize:11,color:C.muted,marginTop:3}}>{amazonData.total} reviews analysed · Scraped {new Date(amazonData.scrapeDate).toLocaleDateString('en-IN')}</p>
+                    <h2 style={{fontSize:16,fontWeight:700}}>⭐ {brand} · Amazon Intelligence Report</h2>
+                    <p style={{fontSize:11,color:C.muted,marginTop:3}}>{amazonData.total} reviews · {amazonData.subCategory} · {new Date(amazonData.scrapeDate).toLocaleDateString('en-IN')}</p>
                   </div>
-                  <span style={{fontSize:24,fontWeight:800,color:'#f59e0b'}}>{amazonData.avgRating}★</span>
-                </div>
-
-                {/* Rating distribution */}
-                <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,marginBottom:10,overflow:'hidden'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',borderBottom:`1px solid ${C.border}`}}>
-                    <span style={{fontSize:10,fontWeight:700,background:'rgba(245,158,11,0.1)',color:'#f59e0b',padding:'2px 7px',borderRadius:4}}>RATINGS</span>
-                    <span style={{fontSize:13,fontWeight:600}}>Rating Distribution</span>
-                  </div>
-                  <div style={{padding:'13px 14px'}}>
-                    {[5,4,3,2,1].map(star=>{
-                      const count=amazonData.ratingDistribution[star]||0;
-                      const total=Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
-                      const pct=total>0?Math.round((count/total)*100):0;
-                      const color=star>=4?C.grn:star===3?C.ylw:C.red;
-                      return(
-                        <div key={star} style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
-                          <span style={{fontSize:12,color:C.muted,minWidth:30}}>{star}★</span>
-                          <div style={{flex:1,height:8,background:'rgba(255,255,255,0.06)',borderRadius:4,overflow:'hidden'}}>
-                            <div style={{width:`${pct}%`,height:'100%',background:color,borderRadius:4}}/>
-                          </div>
-                          <span style={{fontSize:11,color:C.muted,minWidth:40}}>{pct}%</span>
-                          <span style={{fontSize:11,color:C.muted,minWidth:30}}>{count}</span>
-                        </div>
-                      );
-                    })}
+                  <div style={{display:'flex',gap:16,alignItems:'center'}}>
+                    <div style={{textAlign:'center'}}>
+                      <div style={{fontSize:28,fontWeight:800,color:'#f59e0b'}}>{amazonData.avgRating}★</div>
+                      <div style={{fontSize:10,color:C.muted}}>Avg Rating</div>
+                    </div>
+                    <div style={{textAlign:'center'}}>
+                      <div style={{fontSize:28,fontWeight:800,color:amazonData.sentimentScore>=70?C.grn:amazonData.sentimentScore>=50?C.ylw:C.red}}>{amazonData.sentimentScore}</div>
+                      <div style={{fontSize:10,color:C.muted}}>Sentiment/100</div>
+                    </div>
+                    <div style={{textAlign:'center'}}>
+                      <div style={{fontSize:16,fontWeight:700,color:C.text}}>{amazonData.sentimentLabel}</div>
+                      <div style={{fontSize:10,color:C.muted}}>Overall mood</div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Reviews list */}
-                <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',borderBottom:`1px solid ${C.border}`}}>
-                    <span style={{fontSize:10,fontWeight:700,background:'rgba(245,158,11,0.1)',color:'#f59e0b',padding:'2px 7px',borderRadius:4}}>REVIEWS</span>
-                    <span style={{fontSize:13,fontWeight:600}}>Latest Customer Reviews</span>
-                  </div>
-                  <div style={{padding:'13px 14px'}}>
-                    {amazonData.reviews.slice(0,10).map((r,i)=>{
-                      const rColor=r.rating>=4?C.grn:r.rating>=3?C.ylw:C.red;
-                      return(
-                        <div key={i} style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${C.border}`,borderRadius:8,padding:12,marginBottom:8}}>
-                          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6,flexWrap:'wrap'}}>
-                            <span style={{fontSize:14,color:rColor,fontWeight:700}}>{'★'.repeat(Math.round(r.rating))}{'☆'.repeat(5-Math.round(r.rating))}</span>
-                            <span style={{fontSize:11,fontWeight:600,color:C.text}}>{r.title}</span>
-                            {r.verified&&<span style={{fontSize:10,background:'rgba(34,197,94,0.1)',color:C.grn,padding:'1px 6px',borderRadius:5}}>✓ Verified</span>}
-                            <span style={{fontSize:10,color:C.muted,marginLeft:'auto'}}>{r.author}</span>
+                {/* KPI row */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:12}}>
+                  {[
+                    {l:'Total Reviews',v:amazonData.total,c:C.acc},
+                    {l:'Avg Rating',v:`${amazonData.avgRating}★`,c:'#f59e0b'},
+                    {l:'Sentiment Score',v:`${amazonData.sentimentScore}/100`,c:amazonData.sentimentScore>=70?C.grn:amazonData.sentimentScore>=50?C.ylw:C.red},
+                    {l:'5★ Reviews',v:`${Math.round(((amazonData.ratingDistribution[5]||0)/amazonData.total)*100)}%`,c:C.grn},
+                  ].map(({l,v,c})=>(
+                    <div key={l} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:12,textAlign:'center'}}>
+                      <div style={{fontSize:10,color:C.muted,marginBottom:4}}>{l}</div>
+                      <div style={{fontSize:20,fontWeight:700,color:c}}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Rating distribution + Sentiment bar */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+                  <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden'}}>
+                    <div style={{padding:'10px 14px',borderBottom:`1px solid ${C.border}`,fontSize:12,fontWeight:600}}>⭐ Rating Distribution</div>
+                    <div style={{padding:'12px 14px'}}>
+                      {[5,4,3,2,1].map(star=>{
+                        const count=amazonData.ratingDistribution[star]||0;
+                        const total=Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
+                        const pct=total>0?Math.round((count/total)*100):0;
+                        const color=star>=4?C.grn:star===3?C.ylw:C.red;
+                        return(
+                          <div key={star} style={{display:'flex',alignItems:'center',gap:8,marginBottom:7}}>
+                            <span style={{fontSize:11,color:C.muted,minWidth:25}}>{star}★</span>
+                            <div style={{flex:1,height:7,background:'rgba(255,255,255,0.06)',borderRadius:3,overflow:'hidden'}}>
+                              <div style={{width:`${pct}%`,height:'100%',background:color,borderRadius:3}}/>
+                            </div>
+                            <span style={{fontSize:10,color:C.muted,minWidth:35}}>{pct}% ({count})</span>
                           </div>
-                          {r.product&&<div style={{fontSize:10,color:'#f59e0b',marginBottom:4}}>📦 {r.product}</div>}
-                          <div style={{fontSize:11,color:C.muted,lineHeight:1.6}}>{r.body}</div>
-                          {r.date&&<div style={{fontSize:10,color:C.muted,marginTop:4}}>{r.date}</div>}
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {/* Themes */}
+                  <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden'}}>
+                    <div style={{padding:'10px 14px',borderBottom:`1px solid ${C.border}`,fontSize:12,fontWeight:600}}>🔍 Key Themes from Reviews</div>
+                    <div style={{padding:'12px 14px'}}>
+                      {(amazonData.themes||[]).map((t,i)=>(
+                        <div key={i} style={{display:'flex',alignItems:'flex-start',gap:8,marginBottom:8,paddingBottom:8,
+                          borderBottom:i<(amazonData.themes||[]).length-1?`1px solid ${C.border}`:'none'}}>
+                          <span style={{fontSize:10,padding:'2px 6px',borderRadius:5,fontWeight:600,flexShrink:0,
+                            background:t.sentiment==='positive'?'rgba(34,197,94,0.1)':t.sentiment==='negative'?'rgba(239,68,68,0.1)':'rgba(245,158,11,0.1)',
+                            color:t.sentiment==='positive'?C.grn:t.sentiment==='negative'?C.red:C.ylw}}>
+                            {t.sentiment==='positive'?'👍':t.sentiment==='negative'?'👎':'😐'}
+                          </span>
+                          <div>
+                            <div style={{fontSize:12,fontWeight:500}}>{t.theme}</div>
+                            <div style={{fontSize:10,color:C.muted,fontStyle:'italic'}}>"{t.example}"</div>
+                          </div>
                         </div>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
                 </div>
+
+                {/* Top 5 Positive + Negative */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+                  {[
+                    {title:'👍 Top 5 Positive Reviews',reviews:amazonData.top5Positive||[],color:C.grn,bg:'rgba(34,197,94,0.05)',border:'rgba(34,197,94,0.2)'},
+                    {title:'👎 Top 5 Critical Reviews',reviews:amazonData.top5Negative||[],color:C.red,bg:'rgba(239,68,68,0.05)',border:'rgba(239,68,68,0.2)'},
+                  ].map(({title,reviews,color,bg,border})=>(
+                    <div key={title} style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden'}}>
+                      <div style={{padding:'10px 14px',borderBottom:`1px solid ${C.border}`,fontSize:12,fontWeight:600}}>{title}</div>
+                      <div style={{padding:'12px 14px'}}>
+                        {reviews.map((r,i)=>(
+                          <div key={i} style={{background:bg,border:`1px solid ${border}`,borderRadius:7,padding:10,marginBottom:7}}>
+                            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:5}}>
+                              <span style={{fontSize:12,color,fontWeight:700}}>{'★'.repeat(Math.round(r.rating))}</span>
+                              {r.verified&&<span style={{fontSize:9,color:C.grn}}>✓ Verified</span>}
+                              <span style={{fontSize:10,color:C.muted,marginLeft:'auto'}}>{r.author}</span>
+                            </div>
+                            <div style={{fontSize:11,fontWeight:500,marginBottom:3}}>{r.title}</div>
+                            <div style={{fontSize:11,color:C.muted,lineHeight:1.5}}>{r.body?.slice(0,120)}...</div>
+                            {r.url&&<a href={r.url} target="_blank" rel="noopener noreferrer"
+                              style={{fontSize:10,color:color,textDecoration:'none',marginTop:4,display:'block'}}>
+                              🔗 View on Amazon
+                            </a>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Insights + Recommendations */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+                  <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden'}}>
+                    <div style={{padding:'10px 14px',borderBottom:`1px solid ${C.border}`,fontSize:12,fontWeight:600}}>💡 AI Insights</div>
+                    <div style={{padding:'12px 14px'}}>
+                      {(amazonData.insights||[]).map((ins,i)=>(
+                        <div key={i} style={{background:'rgba(167,139,250,0.06)',border:'1px solid rgba(167,139,250,0.17)',borderRadius:7,padding:10,marginBottom:7}}>
+                          <div style={{fontSize:10,color:C.pur,fontWeight:700,marginBottom:3}}>INSIGHT {i+1}</div>
+                          <div style={{fontSize:12,lineHeight:1.6}}>{ins}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden'}}>
+                    <div style={{padding:'10px 14px',borderBottom:`1px solid ${C.border}`,fontSize:12,fontWeight:600}}>🎯 Recommendations</div>
+                    <div style={{padding:'12px 14px'}}>
+                      {(amazonData.recommendations||[]).map((rec,i)=>(
+                        <div key={i} style={{background:'rgba(34,197,94,0.05)',border:'1px solid rgba(34,197,94,0.2)',borderRadius:7,padding:10,marginBottom:7}}>
+                          <div style={{fontSize:10,color:C.grn,fontWeight:700,marginBottom:3}}>ACTION {i+1}</div>
+                          <div style={{fontSize:12,lineHeight:1.6}}>{rec}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Competitor comparison */}
+                {Object.keys(amazonData.competitorStats||{}).length>0&&(
+                  <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,overflow:'hidden',marginBottom:10}}>
+                    <div style={{padding:'10px 14px',borderBottom:`1px solid ${C.border}`,fontSize:12,fontWeight:600}}>⚔️ Amazon Competitor Ratings vs {brand}</div>
+                    <div style={{padding:'12px 14px'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10,padding:'8px 10px',
+                        background:'rgba(255,69,0,0.08)',border:'1px solid rgba(255,69,0,0.2)',borderRadius:7}}>
+                        <span style={{fontSize:12,fontWeight:600,flex:1}}>{brand} (You)</span>
+                        <span style={{fontSize:16,fontWeight:800,color:'#f59e0b'}}>{amazonData.avgRating}★</span>
+                        <div style={{flex:2,height:6,background:'rgba(255,255,255,0.06)',borderRadius:3,overflow:'hidden'}}>
+                          <div style={{width:`${(amazonData.avgRating/5)*100}%`,height:'100%',background:C.acc,borderRadius:3}}/>
+                        </div>
+                      </div>
+                      {Object.entries(amazonData.competitorStats).map(([comp,stats])=>{
+                        const diff=amazonData.avgRating-stats.avgRating;
+                        const winning=diff>0;
+                        return(
+                          <div key={comp} style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
+                            <span style={{fontSize:12,flex:1,color:C.muted}}>{comp}</span>
+                            <span style={{fontSize:14,fontWeight:700,color:winning?C.grn:C.red}}>{stats.avgRating}★</span>
+                            <div style={{flex:2,height:6,background:'rgba(255,255,255,0.06)',borderRadius:3,overflow:'hidden'}}>
+                              <div style={{width:`${(stats.avgRating/5)*100}%`,height:'100%',background:winning?C.grn:C.red,borderRadius:3}}/>
+                            </div>
+                            <span style={{fontSize:10,color:winning?C.grn:C.red,minWidth:60,textAlign:'right'}}>
+                              {winning?`+${diff.toFixed(1)} ↑`:`${diff.toFixed(1)} ↓`}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
               </div>
             )}
 
