@@ -263,8 +263,9 @@ export default function Home(){
   const sidebarContent = (
     <div style={{display:'flex',flexDirection:'column',gap:5,height:'100%'}}>
       <div style={{display:'flex',alignItems:'center',gap:9,padding:'4px 6px',marginBottom:16}}>
-        <div style={{width:40,height:40,borderRadius:8,flexShrink:0,background:'white',display:'flex',alignItems:'center',justifyContent:'center',padding:4,border:'1px solid rgba(255,255,255,0.15)'}}>
-          <img src="/itc.png" alt="ITC" style={{width:32,height:32,objectFit:'contain'}}/>
+        <div style={{width:40,height:40,borderRadius:8,flexShrink:0,background:'#1a3a6e',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',border:'1px solid rgba(255,255,255,0.2)'}}>
+          <div style={{fontSize:11,fontWeight:900,color:'white',letterSpacing:'0.05em',lineHeight:1}}>ITC</div>
+          <div style={{fontSize:6,color:'rgba(255,255,255,0.6)',letterSpacing:'0.08em',marginTop:1}}>LIMITED</div>
         </div>
         <div>
           <div style={{fontSize:13,fontWeight:600}}>ITC Brand Radar</div>
