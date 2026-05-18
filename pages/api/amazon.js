@@ -7,67 +7,49 @@ export default async function handler(req, res) {
   const APIFY_API_KEY = process.env.APIFY_API_KEY;
   if (!APIFY_API_KEY) return res.status(500).json({ error: 'APIFY_API_KEY not configured' });
 
-  // Keyword-based config — searches Amazon for each keyword
-  const BRAND_KEYWORDS = {
+  // All ASIN-based — junglee actor requires productUrls with /product-reviews/ URLs
+  const BRAND_ASINS = {
     Aashirvaad: {
-      subCategories: {
-        'All Products':   ['Aashirvaad atta','Aashirvaad spices','Aashirvaad ghee','Aashirvaad besan'],
-        'Atta & Flour':   ['Aashirvaad shudh chakki atta','Aashirvaad multigrain atta','Aashirvaad select atta','Aashirvaad organic atta','Aashirvaad sugar release control','Aashirvaad gluten free','Aashirvaad besan'],
-        'Basic Spices':   ['Aashirvaad chilli powder','Aashirvaad turmeric powder','Aashirvaad coriander powder','Aashirvaad garam masala','Aashirvaad sambar powder','Aashirvaad kashmiri mirch'],
-        'Whole Spices':   ['Aashirvaad cumin seeds','Aashirvaad black pepper','Aashirvaad cardamom','Aashirvaad kasuri methi','Aashirvaad whole spices'],
-        'Ghee & Dairy':   ['Aashirvaad Svasti ghee','Aashirvaad cow ghee','Aashirvaad organic ghee'],
-      },
-      defaultSubCategory: 'All Products',
+      'All Products':  ['B00HUJQIZK','B0CZP8LYWC','B07D3CXH7H','B0154J82KG','B00K0LUSSS','B0CL6K4KGX','B0D9417QJB','B09V37R6F2'],
+      'Atta & Flour':  ['B00HUJQIZK','B00K0LUSSS','B09V37R6F2','B0CZP8LYWC'],
+      'Basic Spices':  ['B0154J82KG','B0CL6K4KGX'],
+      'Whole Spices':  ['B0CL6K4KGX','B0154J82KG'],
+      'Ghee & Dairy':  ['B07D3CXH7H','B09V37R6F2'],
     },
     Sunfeast: {
-      subCategories: {
-        'All Products':   ['Dark Fantasy biscuits','Sunfeast Mom Magic','Sunfeast Farmlite','Sunfeast Marie Light','Sunfeast Bounce','Sunfeast cake'],
-        'Dark Fantasy':   ['Dark Fantasy Choco Fills','Dark Fantasy Bourbon','Dark Fantasy Yumfills'],
-        'Mom\'s Magic':   ['Sunfeast Mom Magic cashew','Sunfeast Mom Magic butter'],
-        'Farmlite':       ['Sunfeast Farmlite digestive','Sunfeast Farmlite 5 grain'],
-        'Marie & Others': ['Sunfeast Marie Light','Sunfeast Bounce cream','Sunfeast Shines'],
-        'Cakes':          ['Sunfeast Caker cake','Sunfeast Dark Fantasy cake'],
-      },
-      defaultSubCategory: 'All Products',
+      'All Products':  ['B08B987DBL','B0D83Z6DFQ','B0DGKVSM76','B06WGM2HK2','B0BSX9N69D','B0DYF5KKZZ'],
+      'Dark Fantasy':  ['B0D83Z6DFQ','B0DGKVSM76','B0BSX9N69D'],
+      "Mom's Magic":   ['B08B987DBL','B0DYF5KKZZ'],
+      'Farmlite':      ['B08B987DBL'],
+      'Marie & Others':['B08B987DBL','B06WGM2HK2'],
+      'Cakes':         ['B06WGM2HK2'],
     },
     Yippee: {
-      subCategories: {
-        'All Products':   ['Yippee noodles','Yippee pasta'],
-        'Noodles':        ['Yippee Magic Masala noodles','Yippee Mood Masala','Yippee Power Up atta noodles'],
-        'Pasta':          ['Yippee pasta treat','Yippee tricolor pasta'],
-      },
-      defaultSubCategory: 'All Products',
+      'All Products':  ['B08GY5DRXB','B079GXGN8K','B00MHO7YX8','B079GX9DT2'],
+      'Noodles':       ['B08GY5DRXB','B00MHO7YX8','B079GX9DT2'],
+      'Pasta':         ['B079GXGN8K'],
     },
     Bingo: {
-      subCategories: {
-        'All Products':   ['Bingo chips','Bingo Mad Angles','Bingo Tedhe Medhe','Bingo Nachos','Bingo Curlz'],
-      },
-      defaultSubCategory: 'All Products',
+      'All Products':  ['B00NPT3WZ8','B07RQKHTCK','B00NPU8R1Q','B07QQ2T6NV','B00XJEUIEM','B00TZS0UR6'],
     },
     Candyman: {
-      subCategories: {
-        'All Products':   ['Candyman eclairs','Candyman toffee','ITC Candyman'],
-      },
-      defaultSubCategory: 'All Products',
+      'All Products':  ['B01IKD32B2','B079GXVSKC','B07QR6YYM8','B07216MWSY','B072QM6L75'],
     },
     Fabelle: {
-      subCategories: {
-        'All Products':   ['Fabelle chocolate','Fabelle exquisite chocolates','ITC Fabelle'],
-      },
-      defaultSubCategory: 'All Products',
+      'All Products':  ['B07Z8ZBTRB','B07Z8Z53WM','B07RKVCR8R','B07RQR9RQ3','B07RLPF9BF','B07SBTSD91','B07Z8ZXKJQ'],
     },
   };
 
-  const brandConfig = BRAND_KEYWORDS[brand];
+  const brandConfig = BRAND_ASINS[brand];
   if (!brandConfig) return res.status(400).json({ error: 'Brand not configured' });
 
-  const selectedSub = subCategory || brandConfig.defaultSubCategory;
-  const keywords = brandConfig.subCategories[selectedSub] || brandConfig.subCategories[brandConfig.defaultSubCategory];
+  const selectedSub = subCategory || 'All Products';
+  const asins = brandConfig[selectedSub] || brandConfig['All Products'];
 
   try {
-    // Build startUrls from Amazon search keywords
-    const startUrls = keywords.slice(0, 4).map(kw => ({
-      url: `https://www.amazon.in/s?k=${encodeURIComponent(kw)}&i=grocery`,
+    // Exact format required by junglee/amazon-reviews-scraper
+    const productUrls = asins.slice(0, 6).map(asin => ({
+      url: `https://www.amazon.in/product-reviews/${asin}/?sortBy=recent&pageSize=20`,
     }));
 
     const runResponse = await fetch(
@@ -76,11 +58,12 @@ export default async function handler(req, res) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          startUrls,
+          productUrls,
           maxReviews: 50,
           filterByRating: 'all_stars',
           sortBy: 'recent',
           proxy: { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'] },
+          includeGdprSensitive: false,
           filterByRatings: ['allStars'],
           deduplicateRedirectedAsins: true,
           scrapeProductDetails: false,
@@ -143,7 +126,6 @@ export default async function handler(req, res) {
       avgRating,
       ratingDistribution: dist,
       subCategory: selectedSub,
-      keywords,
       scrapeDate: new Date().toISOString(),
     });
 
@@ -152,15 +134,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: error.message });
   }
 }
-
-// Return sub-categories for a brand — used by frontend
-export const BRAND_SUB_CATEGORIES = {
-  Aashirvaad: ['All Products','Atta & Flour','Basic Spices','Whole Spices','Ghee & Dairy'],
-  Sunfeast: ['All Products','Dark Fantasy','Mom\'s Magic','Farmlite','Marie & Others','Cakes'],
-  Yippee: ['All Products','Noodles','Pasta'],
-  Bingo: ['All Products'],
-  Candyman: ['All Products'],
-  Fabelle: ['All Products'],
-};
 
 export const config = { api: { bodyParser: { sizeLimit: '2mb' }, responseLimit: '10mb' } };
