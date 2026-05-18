@@ -27,7 +27,7 @@ function addBg(slide) {
 }
 
 // Slide header strip with accent bar
-function addSlideHeader(slide, slideNum, title) {
+function addSlideHeader(slide, slideNum, title, brandLogo, platform) {
   // Orange accent bar at top
   slide.addShape('rect', { x: 0, y: 0, w: '100%', h: 0.07, fill: { color: CLR.acc } });
   // Slide number badge
@@ -38,9 +38,12 @@ function addSlideHeader(slide, slideNum, title) {
   });
   // Title
   slide.addText(title, {
-    x: 1.35, y: 0.15, w: 8.3, h: 0.35,
+    x: 1.35, y: 0.15, w: 7.5, h: 0.35,
     fontSize: 16, bold: true, color: CLR.white, valign: 'middle', margin: 0
   });
+  // Platform logo (Reddit) top right
+  const baseUrl = process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000';
+  try { slide.addImage({ path: `${baseUrl}/reddit.png`, x: 8.9, y: 0.12, w: 0.7, h: 0.35, sizing: { type: 'contain' } }); } catch(e) {}
   // Divider line
   slide.addShape('line', { x: 0.4, y: 0.57, w: 9.2, h: 0, line: { color: '2D3A55', width: 1 } });
 }
@@ -48,7 +51,7 @@ function addSlideHeader(slide, slideNum, title) {
 // Footer
 function addFooter(slide, brand, date) {
   slide.addShape('rect', { x: 0, y: 5.45, w: '100%', h: 0.18, fill: { color: CLR.dark } });
-  slide.addText(`${brand} Reddit Intelligence Agent  ·  Powered by Claude AI  ·  ${date}`, {
+  slide.addText(`ITC ${brand}  ·  Reddit Intelligence  ·  Powered by Claude AI  ·  ${date}`, {
     x: 0.4, y: 5.45, w: 9.2, h: 0.18,
     fontSize: 7, color: CLR.muted, align: 'center', valign: 'middle', margin: 0
   });
@@ -85,6 +88,11 @@ export default async function handler(req, res) {
       s.addShape('rect', { x: 0, y: 0, w: 0.18, h: '100%', fill: { color: CLR.acc } });
       // Subtle grid pattern via rectangles
       s.addShape('rect', { x: 0.18, y: 0, w: '100%', h: '100%', fill: { color: CLR.bg } });
+
+      // ITC logo top left
+      try { s.addImage({ path: `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000'}/itc.png`, x: 0.3, y: 0.2, w: 0.8, h: 0.8, sizing: { type: 'contain' } }); } catch(e) {}
+      // Reddit logo top right
+      try { s.addImage({ path: `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000'}/reddit.png`, x: 8.5, y: 0.2, w: 1.2, h: 0.8, sizing: { type: 'contain' } }); } catch(e) {}
 
       s.addText('REDDIT BRAND INTELLIGENCE', {
         x: 0.5, y: 1.2, w: 9, h: 0.4,
