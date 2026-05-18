@@ -179,9 +179,10 @@ export default async function handler(req, res) {
     ratings.forEach(r => { const k = Math.round(r); if (dist[k] !== undefined) dist[k]++; });
 
     // Top positive + negative
-    const sorted = [...brandReviews].filter(r => r.rating > 0).sort((a, b) => b.rating - a.rating);
-    const top5Positive = sorted.slice(0, 5);
-    const top5Negative = sorted.slice(-5).reverse();
+    const sortedDesc = [...brandReviews].filter(r => r.rating > 0).sort((a, b) => b.rating - a.rating);
+    const sortedAsc = [...brandReviews].filter(r => r.rating > 0).sort((a, b) => a.rating - b.rating);
+    const top5Positive = sortedDesc.slice(0, 5);
+    const top5Negative = sortedAsc.slice(0, 5); // lowest rated first
 
     // Competitor avg ratings
     const competitorStats = {};
