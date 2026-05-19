@@ -1,4 +1,5 @@
 import PptxGenJS from 'pptxgenjs';
+import { LOGO_AASHIRVAAD, LOGO_BINGO, LOGO_CANDYMAN, LOGO_SUNFEAST, LOGO_YIPPEE, LOGO_FABELLE, LOGO_ITC, LOGO_AMAZON, LOGO_REDDIT } from './logos.js';
 
 // Color palette
 const CLR = {
@@ -42,8 +43,7 @@ function addSlideHeader(slide, slideNum, title, brandLogo, platform) {
     fontSize: 16, bold: true, color: CLR.white, valign: 'middle', margin: 0
   });
   // Platform logo (Reddit) top right
-  const baseUrl = process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000';
-  try { slide.addImage({ path: `${baseUrl}/reddit.png`, x: 8.9, y: 0.12, w: 0.7, h: 0.35, sizing: { type: 'contain' } }); } catch(e) {}
+  try { slide.addImage({ data: LOGO_REDDIT, x: 8.9, y: 0.12, w: 0.7, h: 0.35, sizing: { type: 'contain' } }); } catch(e) {}
   // Divider line
   slide.addShape('line', { x: 0.4, y: 0.57, w: 9.2, h: 0, line: { color: '2D3A55', width: 1 } });
 }
@@ -82,14 +82,13 @@ export default async function handler(req, res) {
       pres.author = brand;
       pres.title  = `${brand} Amazon Intelligence Report`;
 
-      const baseUrl = process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000';
       const brandLogoMap = {
-        Aashirvaad: `${baseUrl}/Aashirvaad.png`,
-        Bingo: `${baseUrl}/Bingo.png`,
-        Candyman: `${baseUrl}/Candyman (1).jpg`,
-        Sunfeast: `${baseUrl}/Sunfeast.png`,
-        Yippee: `${baseUrl}/Yippee.webp`,
-        Fabelle: `${baseUrl}/Fabelle.jpg`,
+        Aashirvaad: LOGO_AASHIRVAAD,
+        Bingo: LOGO_BINGO,
+        Candyman: LOGO_CANDYMAN,
+        Sunfeast: LOGO_SUNFEAST,
+        Yippee: LOGO_YIPPEE,
+        Fabelle: LOGO_FABELLE,
       };
       const brandLogo = brandLogoMap[brand];
       const totalRatings = Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
@@ -110,16 +109,16 @@ export default async function handler(req, res) {
       // Large brand logo — centered in header
       if (brandLogo) {
         try {
-          s1.addImage({ path: brandLogo, x: 3.5, y: 0.2, w: 3.0, h: 1.9, sizing: { type: 'contain', align: 'center' } });
+          s1.addImage({ data: brandLogo, x: 3.5, y: 0.2, w: 3.0, h: 1.9, sizing: { type: 'contain', align: 'center' } });
         } catch(e) {
           s1.addText(brand, { x: 0.5, y: 0.5, w: 9, h: 1.4, fontSize: 48, bold: true, color: CLR.white, align: 'center' });
         }
       }
 
       // ITC logo small top-left
-      try { s1.addImage({ path: `${baseUrl}/ITC.jpg`, x: 0.25, y: 0.15, w: 0.7, h: 0.7, sizing: { type: 'contain' } }); } catch(e) {}
+      try { s1.addImage({ data: LOGO_ITC, x: 0.25, y: 0.15, w: 0.7, h: 0.7, sizing: { type: 'contain' } }); } catch(e) {}
       // Amazon logo small top-right
-      try { s1.addImage({ path: `${baseUrl}/amazon.png`, x: 8.8, y: 0.2, w: 0.95, h: 0.5, sizing: { type: 'contain' } }); } catch(e) {}
+      try { s1.addImage({ data: LOGO_AMAZON, x: 8.8, y: 0.2, w: 0.95, h: 0.5, sizing: { type: 'contain' } }); } catch(e) {}
 
       // Report title
       s1.addText('AMAZON CUSTOMER INTELLIGENCE REPORT', {
@@ -153,7 +152,7 @@ export default async function handler(req, res) {
       // Helper: add brand logo small to slide corner
       const addBrandLogoCorner = (slide) => {
         if (brandLogo) {
-          try { slide.addImage({ path: brandLogo, x: 8.7, y: 0.1, w: 0.8, h: 0.45, sizing: { type: 'contain' } }); } catch(e) {}
+          try { slide.addImage({ data: brandLogo, x: 8.7, y: 0.1, w: 0.8, h: 0.45, sizing: { type: 'contain' } }); } catch(e) {}
         }
       };
 
@@ -334,9 +333,9 @@ export default async function handler(req, res) {
       s.addShape('rect', { x: 0.18, y: 0, w: '100%', h: '100%', fill: { color: CLR.bg } });
 
       // ITC logo top left
-      try { s.addImage({ path: `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000'}/itc.png`, x: 0.3, y: 0.2, w: 0.8, h: 0.8, sizing: { type: 'contain' } }); } catch(e) {}
+      try { s.addImage({ data: LOGO_ITC, x: 0.3, y: 0.2, w: 0.8, h: 0.8, sizing: { type: 'contain' } }); } catch(e) {}
       // Reddit logo top right
-      try { s.addImage({ path: `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000'}/reddit.png`, x: 8.5, y: 0.2, w: 1.2, h: 0.8, sizing: { type: 'contain' } }); } catch(e) {}
+      try { s.addImage({ data: LOGO_REDDIT, x: 8.5, y: 0.2, w: 1.2, h: 0.8, sizing: { type: 'contain' } }); } catch(e) {}
 
       s.addText('REDDIT BRAND INTELLIGENCE', {
         x: 0.5, y: 1.2, w: 9, h: 0.4,
