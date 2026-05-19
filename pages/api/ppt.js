@@ -82,138 +82,230 @@ export default async function handler(req, res) {
       pres.author = brand;
       pres.title  = `${brand} Amazon Intelligence Report`;
 
-      // Cover
+      const baseUrl = process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000';
+      const brandLogoMap = {
+        Aashirvaad: `${baseUrl}/Aashirvaad.png`,
+        Bingo: `${baseUrl}/Bingo.png`,
+        Candyman: `${baseUrl}/Candyman (1).jpg`,
+        Sunfeast: `${baseUrl}/Sunfeast.png`,
+        Yippee: `${baseUrl}/Yippee.webp`,
+        Fabelle: `${baseUrl}/Fabelle.jpg`,
+      };
+      const brandLogo = brandLogoMap[brand];
+      const totalRatings = Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
+      const promoters = amazonData.ratingDistribution[5] || 0;
+      const detractors = (amazonData.ratingDistribution[1]||0) + (amazonData.ratingDistribution[2]||0);
+      const verifiedCount = (amazonData.reviews||[]).filter(r=>r.verified).length;
+      const verifiedPct = amazonData.total > 0 ? Math.round((verifiedCount/amazonData.total)*100) : 0;
+      const healthScore = Math.round((amazonData.avgRating/5*50) + (amazonData.sentimentScore/100*50));
+
+      // ── SLIDE 1: COVER ──
       const s1 = pres.addSlide();
       addBg(s1);
-      s1.addShape('rect', { x: 0, y: 0, w: 0.18, h: '100%', fill: { color: 'F59E0B' } });
-      s1.addText('AMAZON BRAND INTELLIGENCE', { x: 0.5, y: 1.2, w: 9, h: 0.4, fontSize: 11, bold: true, color: 'F59E0B', charSpacing: 4, align: 'center' });
-      s1.addText(brand, { x: 0.5, y: 1.7, w: 9, h: 1.1, fontSize: 54, bold: true, color: CLR.white, align: 'center' });
-      s1.addText('Customer Reviews · Sentiment · Competitor Analysis', { x: 0.5, y: 2.85, w: 9, h: 0.35, fontSize: 14, color: CLR.muted, align: 'center' });
-      s1.addShape('line', { x: 3.5, y: 3.35, w: 3, h: 0, line: { color: 'F59E0B', width: 2 } });
-      s1.addText(`${fromDate} → ${toDate}  ·  ${amazonData.total} reviews  ·  ${amazonData.avgRating}★`, { x: 0.5, y: 3.55, w: 9, h: 0.28, fontSize: 11, color: CLR.muted, align: 'center' });
+      // Dark header band
+      s1.addShape('rect', { x: 0, y: 0, w: '100%', h: 2.4, fill: { color: '0d1117' } });
+      // Amber accent line
+      s1.addShape('rect', { x: 0, y: 2.4, w: '100%', h: 0.06, fill: { color: 'F59E0B' } });
+
+      // Large brand logo — centered in header
+      if (brandLogo) {
+        try {
+          s1.addImage({ path: brandLogo, x: 3.5, y: 0.2, w: 3.0, h: 1.9, sizing: { type: 'contain', align: 'center' } });
+        } catch(e) {
+          s1.addText(brand, { x: 0.5, y: 0.5, w: 9, h: 1.4, fontSize: 48, bold: true, color: CLR.white, align: 'center' });
+        }
+      }
+
+      // ITC logo small top-left
+      try { s1.addImage({ path: `${baseUrl}/ITC.jpg`, x: 0.25, y: 0.15, w: 0.7, h: 0.7, sizing: { type: 'contain' } }); } catch(e) {}
+      // Amazon logo small top-right
+      try { s1.addImage({ path: `${baseUrl}/amazon.png`, x: 8.8, y: 0.2, w: 0.95, h: 0.5, sizing: { type: 'contain' } }); } catch(e) {}
+
+      // Report title
+      s1.addText('AMAZON CUSTOMER INTELLIGENCE REPORT', {
+        x: 0.5, y: 2.55, w: 9, h: 0.35, fontSize: 11, bold: true, color: 'F59E0B', charSpacing: 3, align: 'center'
+      });
+      s1.addText(brand, {
+        x: 0.5, y: 2.95, w: 9, h: 0.9, fontSize: 44, bold: true, color: CLR.white, align: 'center'
+      });
+
+      // Health score badge
+      const hsColor = healthScore >= 75 ? CLR.grn : healthScore >= 55 ? CLR.ylw : CLR.red;
+      s1.addShape('rect', { x: 3.8, y: 3.9, w: 2.4, h: 0.7, fill: { color: CLR.card }, rectRadius: 0.12, line: { color: hsColor, width: 1.5 } });
+      s1.addText('BRAND HEALTH', { x: 3.8, y: 3.95, w: 2.4, h: 0.22, fontSize: 7, bold: true, color: CLR.muted, align: 'center', charSpacing: 2 });
+      s1.addText(`${healthScore}/100`, { x: 3.8, y: 4.15, w: 2.4, h: 0.38, fontSize: 22, bold: true, color: hsColor, align: 'center' });
+
+      // Stats row
+      [
+        [`${amazonData.total}`, 'Reviews'],
+        [`${amazonData.avgRating}★`, 'Avg Rating'],
+        [`${amazonData.sentimentScore}/100`, 'Sentiment'],
+        [`${verifiedPct}%`, 'Verified'],
+      ].forEach(([v, l], i) => {
+        const x = 0.4 + i * 2.4;
+        s1.addShape('rect', { x, y: 4.72, w: 2.1, h: 0.58, fill: { color: CLR.card }, rectRadius: 0.08 });
+        s1.addText(v, { x, y: 4.76, w: 2.1, h: 0.3, fontSize: 16, bold: true, color: 'F59E0B', align: 'center' });
+        s1.addText(l, { x, y: 5.06, w: 2.1, h: 0.18, fontSize: 8, color: CLR.muted, align: 'center' });
+      });
+
       addFooter(s1, brand, now);
 
-      // Amazon Summary Slide
+      // Helper: add brand logo small to slide corner
+      const addBrandLogoCorner = (slide) => {
+        if (brandLogo) {
+          try { slide.addImage({ path: brandLogo, x: 8.7, y: 0.1, w: 0.8, h: 0.45, sizing: { type: 'contain' } }); } catch(e) {}
+        }
+      };
+
+      // ── SLIDE 2: REVIEW SUMMARY ──
       const s2 = pres.addSlide();
       addBg(s2);
-      addSlideHeader(s2, 1, 'Amazon Review Summary');
-      addKpiBox(s2, 0.4, 0.75, 2.1, 1.2, amazonData.total, 'Total Reviews', 'F59E0B');
-      addKpiBox(s2, 2.65, 0.75, 2.1, 1.2, `${amazonData.avgRating}★`, 'Avg Rating', 'F59E0B');
-      addKpiBox(s2, 4.9, 0.75, 2.1, 1.2, amazonData.sentimentScore, 'Sentiment Score', amazonData.sentimentScore >= 70 ? CLR.grn : amazonData.sentimentScore >= 50 ? CLR.ylw : CLR.red);
-      addKpiBox(s2, 7.15, 0.75, 2.1, 1.2, amazonData.sentimentLabel, 'Overall Mood', CLR.white);
+      addSlideHeader(s2, 1, 'Review Summary & Sentiment Analysis');
+      addBrandLogoCorner(s2);
 
-      // Rating bars
-      s2.addText('Rating Distribution', { x: 0.4, y: 2.1, w: 4, h: 0.25, fontSize: 11, bold: true, color: CLR.text });
-      const totalRatings = Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
+      // KPI boxes
+      [
+        { v: amazonData.total, l: 'Total Reviews', c: 'F59E0B' },
+        { v: `${amazonData.avgRating}★`, l: 'Avg Rating', c: 'F59E0B' },
+        { v: `${amazonData.sentimentScore}/100`, l: 'Sentiment Score', c: amazonData.sentimentScore>=70?CLR.grn:amazonData.sentimentScore>=50?CLR.ylw:CLR.red },
+        { v: amazonData.sentimentLabel, l: 'Overall Mood', c: CLR.white },
+        { v: `${promoters}`, l: '5★ Promoters', c: CLR.grn },
+        { v: `${detractors}`, l: '1-2★ Detractors', c: CLR.red },
+      ].forEach(({v,l,c}, i) => {
+        const x = 0.4 + (i%3)*3.1;
+        const y = i < 3 ? 0.72 : 1.62;
+        s2.addShape('rect', { x, y, w: 2.8, h: 0.72, fill: { color: CLR.card }, rectRadius: 0.08 });
+        s2.addText(String(v), { x, y: y+0.06, w: 2.8, h: 0.36, fontSize: 18, bold: true, color: c, align: 'center' });
+        s2.addText(l, { x, y: y+0.44, w: 2.8, h: 0.2, fontSize: 8, color: CLR.muted, align: 'center' });
+      });
+
+      // Rating distribution
+      s2.addText('Rating Distribution', { x: 0.4, y: 2.5, w: 4.2, h: 0.25, fontSize: 10, bold: true, color: CLR.text });
       [5,4,3,2,1].forEach((star, i) => {
         const count = amazonData.ratingDistribution[star] || 0;
         const pct = totalRatings > 0 ? count/totalRatings : 0;
-        const yPos = 2.45 + i * 0.42;
-        const barColor = star >= 4 ? CLR.grn : star === 3 ? CLR.ylw : CLR.red;
-        s2.addText(`${star}★`, { x: 0.4, y: yPos, w: 0.4, h: 0.3, fontSize: 9, color: CLR.muted, align: 'right' });
-        s2.addShape('rect', { x: 0.85, y: yPos + 0.08, w: 3.5, h: 0.15, fill: { color: '2D3A55' } });
-        if (pct > 0) s2.addShape('rect', { x: 0.85, y: yPos + 0.08, w: 3.5 * pct, h: 0.15, fill: { color: barColor } });
-        s2.addText(`${Math.round(pct*100)}% (${count})`, { x: 4.45, y: yPos, w: 1.2, h: 0.3, fontSize: 9, color: CLR.muted });
+        const y = 2.82 + i * 0.42;
+        const barColor = star>=4?CLR.grn:star===3?CLR.ylw:CLR.red;
+        s2.addText(`${star}★`, { x: 0.4, y, w: 0.4, h: 0.28, fontSize: 9, color: CLR.muted, align: 'right' });
+        s2.addShape('rect', { x: 0.88, y: y+0.06, w: 3.5, h: 0.16, fill: { color: '2D3A55' }, rectRadius: 0.03 });
+        if (pct>0) s2.addShape('rect', { x: 0.88, y: y+0.06, w: 3.5*pct, h: 0.16, fill: { color: barColor }, rectRadius: 0.03 });
+        s2.addText(`${Math.round(pct*100)}% (${count})`, { x: 4.45, y, w: 1.2, h: 0.28, fontSize: 8, color: CLR.muted });
       });
 
-      // Top themes
-      s2.addText('Key Themes', { x: 5.2, y: 2.1, w: 4.3, h: 0.25, fontSize: 11, bold: true, color: CLR.text });
-      (amazonData.themes || []).slice(0,5).forEach((t, i) => {
-        const yPos = 2.45 + i * 0.55;
-        const tColor = t.sentiment === 'positive' ? CLR.grn : t.sentiment === 'negative' ? CLR.red : CLR.ylw;
-        s2.addShape('rect', { x: 5.2, y: yPos, w: 4.3, h: 0.45, fill: { color: CLR.card }, rectRadius: 0.05 });
-        s2.addText(t.theme, { x: 5.35, y: yPos + 0.03, w: 3.8, h: 0.2, fontSize: 9, bold: true, color: tColor });
-        s2.addText(`"${t.example}"`, { x: 5.35, y: yPos + 0.23, w: 3.8, h: 0.18, fontSize: 8, color: CLR.muted, italic: true });
+      // Themes
+      s2.addText('Key Themes', { x: 5.7, y: 2.5, w: 3.9, h: 0.25, fontSize: 10, bold: true, color: CLR.text });
+      (amazonData.themes||[]).slice(0,5).forEach((t,i) => {
+        const y = 2.82 + i*0.44;
+        const tColor = t.sentiment==='positive'?CLR.grn:t.sentiment==='negative'?CLR.red:CLR.ylw;
+        s2.addShape('rect', { x: 5.7, y, w: 3.9, h: 0.38, fill: { color: CLR.card }, rectRadius: 0.05 });
+        s2.addText(t.theme, { x: 5.85, y: y+0.04, w: 3.4, h: 0.16, fontSize: 8, bold: true, color: tColor });
+        s2.addText(`"${(t.example||'').slice(0,60)}"`, { x: 5.85, y: y+0.2, w: 3.4, h: 0.14, fontSize: 7, color: CLR.muted, italic: true });
       });
       addFooter(s2, brand, now);
 
-      // Slide 3 — Top Positive Reviews
+      // ── SLIDE 3: POSITIVE + NEGATIVE (side by side) ──
       const s3 = pres.addSlide();
       addBg(s3);
-      addSlideHeader(s3, 2, 'Top 5 Positive Reviews');
-      (amazonData.top5Positive || []).slice(0, 5).forEach((r, i) => {
-        const yPos = 0.72 + i * 0.92;
-        s3.addShape('rect', { x: 0.4, y: yPos, w: 9.2, h: 0.82, fill: { color: CLR.card }, rectRadius: 0.06, line: { color: '22c55e', width: 0.5 } });
-        const stars = '★'.repeat(Math.round(r.rating)) + '☆'.repeat(5 - Math.round(r.rating));
-        s3.addText(stars, { x: 0.55, y: yPos + 0.05, w: 1.2, h: 0.22, fontSize: 10, color: CLR.grn, bold: true });
-        if (r.verified) s3.addText('✓ Verified', { x: 1.85, y: yPos + 0.06, w: 0.8, h: 0.18, fontSize: 7, color: CLR.grn });
-        s3.addText(r.author || 'Buyer', { x: 7.5, y: yPos + 0.06, w: 2.0, h: 0.18, fontSize: 7, color: CLR.muted, align: 'right' });
-        s3.addText(r.title || '', { x: 0.55, y: yPos + 0.28, w: 8.8, h: 0.2, fontSize: 9, bold: true, color: CLR.text });
-        s3.addText((r.body || '').slice(0, 120), { x: 0.55, y: yPos + 0.5, w: 8.8, h: 0.22, fontSize: 8, color: CLR.muted, italic: true });
+      addSlideHeader(s3, 2, 'Customer Voice — Positive & Critical Reviews');
+      addBrandLogoCorner(s3);
+
+      // Positive header
+      s3.addShape('rect', { x: 0.3, y: 0.7, w: 4.5, h: 0.28, fill: { color: '0d2b1a' }, rectRadius: 0.05, line: { color: CLR.grn, width: 0.8 } });
+      s3.addText('👍  TOP POSITIVE REVIEWS', { x: 0.3, y: 0.7, w: 4.5, h: 0.28, fontSize: 9, bold: true, color: CLR.grn, align: 'center', valign: 'middle' });
+
+      // Negative header
+      s3.addShape('rect', { x: 5.2, y: 0.7, w: 4.5, h: 0.28, fill: { color: '2b0d0d' }, rectRadius: 0.05, line: { color: CLR.red, width: 0.8 } });
+      s3.addText('👎  TOP CRITICAL REVIEWS', { x: 5.2, y: 0.7, w: 4.5, h: 0.28, fontSize: 9, bold: true, color: CLR.red, align: 'center', valign: 'middle' });
+
+      // Positive reviews (left)
+      (amazonData.top5Positive||[]).slice(0,4).forEach((r,i) => {
+        const y = 1.08 + i*1.08;
+        s3.addShape('rect', { x: 0.3, y, w: 4.5, h: 0.95, fill: { color: CLR.card }, rectRadius: 0.06, line: { color: '1a3d24', width: 0.5 } });
+        const stars = '★'.repeat(Math.round(r.rating||5));
+        s3.addText(stars, { x: 0.45, y: y+0.06, w: 1.5, h: 0.2, fontSize: 9, color: CLR.grn, bold: true });
+        if(r.verified) s3.addText('✓', { x: 2.1, y: y+0.07, w: 0.3, h: 0.18, fontSize: 8, color: CLR.grn, bold: true });
+        s3.addText(r.author||'Buyer', { x: 3.0, y: y+0.06, w: 1.65, h: 0.18, fontSize: 7, color: CLR.muted, align: 'right' });
+        s3.addText((r.title||'').slice(0,45), { x: 0.45, y: y+0.28, w: 4.2, h: 0.2, fontSize: 8, bold: true, color: CLR.text });
+        s3.addText((r.body||r.title||'').slice(0,100), { x: 0.45, y: y+0.5, w: 4.2, h: 0.35, fontSize: 7.5, color: CLR.muted, italic: true, wrap: true });
       });
+
+      // Negative reviews (right)
+      const critReviews = amazonData.top5Negative||[];
+      if (critReviews.length === 0) {
+        s3.addText('No critical reviews found.', { x: 5.2, y: 2.5, w: 4.5, h: 0.4, fontSize: 11, color: CLR.muted, align: 'center' });
+      } else {
+        critReviews.slice(0,4).forEach((r,i) => {
+          const y = 1.08 + i*1.08;
+          s3.addShape('rect', { x: 5.2, y, w: 4.5, h: 0.95, fill: { color: CLR.card }, rectRadius: 0.06, line: { color: '3d1a1a', width: 0.5 } });
+          const stars = '★'.repeat(Math.round(r.rating||1));
+          s3.addText(stars, { x: 5.35, y: y+0.06, w: 1.5, h: 0.2, fontSize: 9, color: CLR.red, bold: true });
+          if(r.verified) s3.addText('✓', { x: 7.0, y: y+0.07, w: 0.3, h: 0.18, fontSize: 8, color: CLR.grn, bold: true });
+          s3.addText(r.author||'Buyer', { x: 7.9, y: y+0.06, w: 1.65, h: 0.18, fontSize: 7, color: CLR.muted, align: 'right' });
+          s3.addText((r.title||'').slice(0,45), { x: 5.35, y: y+0.28, w: 4.2, h: 0.2, fontSize: 8, bold: true, color: CLR.text });
+          s3.addText((r.body||r.title||'').slice(0,100), { x: 5.35, y: y+0.5, w: 4.2, h: 0.35, fontSize: 7.5, color: CLR.muted, italic: true, wrap: true });
+        });
+      }
       addFooter(s3, brand, now);
 
-      // Slide 4 — Top Critical Reviews
+      // ── SLIDE 4: COMPETITOR COMPARISON ──
       const s4 = pres.addSlide();
       addBg(s4);
-      addSlideHeader(s4, 3, 'Top 5 Critical Reviews');
-      const criticalReviews = amazonData.top5Negative || [];
-      if (criticalReviews.length === 0) {
-        s4.addText('No critical reviews found for this period.', { x: 0.4, y: 2.5, w: 9.2, h: 0.4, fontSize: 14, color: CLR.muted, align: 'center' });
+      addSlideHeader(s4, 3, `Competitor Rating Comparison — ${brand} vs Market`);
+      addBrandLogoCorner(s4);
+
+      const compStats = amazonData.competitorStats || {};
+      const hasComps = Object.keys(compStats).length > 0;
+
+      // Brand row
+      s4.addShape('rect', { x: 0.4, y: 0.72, w: 9.2, h: 0.6, fill: { color: '1e1040' }, rectRadius: 0.07, line: { color: CLR.acc, width: 1 } });
+      s4.addText(`${brand}  (You)`, { x: 0.6, y: 0.84, w: 3.5, h: 0.32, fontSize: 12, bold: true, color: CLR.text });
+      s4.addText(`${amazonData.avgRating}★`, { x: 4.2, y: 0.84, w: 0.8, h: 0.32, fontSize: 14, bold: true, color: 'F59E0B', align: 'center' });
+      const bW = (amazonData.avgRating/5)*4.2;
+      s4.addShape('rect', { x: 5.1, y: 0.94, w: 4.2, h: 0.18, fill: { color: '2D3A55' }, rectRadius: 0.04 });
+      if(bW>0) s4.addShape('rect', { x: 5.1, y: 0.94, w: bW, h: 0.18, fill: { color: CLR.acc }, rectRadius: 0.04 });
+      s4.addText(`${Math.round((amazonData.avgRating/5)*100)}%`, { x: 9.0, y: 0.84, w: 0.5, h: 0.32, fontSize: 9, color: CLR.muted, align: 'right' });
+
+      if (!hasComps) {
+        s4.addText('Run with competitors selected to see comparison.', { x: 0.4, y: 2.8, w: 9.2, h: 0.4, fontSize: 12, color: CLR.muted, align: 'center' });
       } else {
-        criticalReviews.slice(0, 5).forEach((r, i) => {
-          const yPos = 0.72 + i * 0.92;
-          s4.addShape('rect', { x: 0.4, y: yPos, w: 9.2, h: 0.82, fill: { color: CLR.card }, rectRadius: 0.06, line: { color: 'ef4444', width: 0.5 } });
-          const stars = '★'.repeat(Math.round(r.rating)) + '☆'.repeat(5 - Math.round(r.rating));
-          s4.addText(stars, { x: 0.55, y: yPos + 0.05, w: 1.2, h: 0.22, fontSize: 10, color: CLR.red, bold: true });
-          if (r.verified) s4.addText('✓ Verified', { x: 1.85, y: yPos + 0.06, w: 0.8, h: 0.18, fontSize: 7, color: CLR.grn });
-          s4.addText(r.author || 'Buyer', { x: 7.5, y: yPos + 0.06, w: 2.0, h: 0.18, fontSize: 7, color: CLR.muted, align: 'right' });
-          s4.addText(r.title || '', { x: 0.55, y: yPos + 0.28, w: 8.8, h: 0.2, fontSize: 9, bold: true, color: CLR.text });
-          s4.addText((r.body || '').slice(0, 120), { x: 0.55, y: yPos + 0.5, w: 8.8, h: 0.22, fontSize: 8, color: CLR.muted, italic: true });
+        Object.entries(compStats).forEach(([comp, stats], i) => {
+          const y = 1.45 + i * 0.75;
+          const winning = amazonData.avgRating >= stats.avgRating;
+          const barColor = winning ? CLR.grn : CLR.red;
+          s4.addShape('rect', { x: 0.4, y, w: 9.2, h: 0.62, fill: { color: CLR.card }, rectRadius: 0.07 });
+          s4.addText(comp, { x: 0.6, y: y+0.16, w: 3.5, h: 0.28, fontSize: 11, color: CLR.muted });
+          s4.addText(`${stats.avgRating}★`, { x: 4.2, y: y+0.14, w: 0.8, h: 0.3, fontSize: 13, bold: true, color: barColor, align: 'center' });
+          const cW = (stats.avgRating/5)*4.2;
+          s4.addShape('rect', { x: 5.1, y: y+0.22, w: 4.2, h: 0.16, fill: { color: '2D3A55' }, rectRadius: 0.04 });
+          if(cW>0) s4.addShape('rect', { x: 5.1, y: y+0.22, w: cW, h: 0.16, fill: { color: barColor }, rectRadius: 0.04 });
+          const diff = (amazonData.avgRating - stats.avgRating).toFixed(1);
+          s4.addText(winning?`+${diff} ↑`:`${diff} ↓`, { x: 8.85, y: y+0.16, w: 0.65, h: 0.28, fontSize: 10, bold: true, color: barColor, align: 'right' });
         });
       }
       addFooter(s4, brand, now);
 
-      // Slide 5 — Competitor Comparison
+      // ── SLIDE 5: INSIGHTS + RECOMMENDATIONS ──
       const s5 = pres.addSlide();
       addBg(s5);
-      addSlideHeader(s5, 4, `Competitor Rating Comparison — ${brand} vs Market`);
-      const compStats = amazonData.competitorStats || {};
-      const hasComps = Object.keys(compStats).length > 0;
-      // Brand bar
-      s5.addShape('rect', { x: 0.4, y: 0.75, w: 9.2, h: 0.55, fill: { color: '1e1040' }, rectRadius: 0.06, line: { color: CLR.acc, width: 1 } });
-      s5.addText(`${brand} (You)`, { x: 0.6, y: 0.85, w: 3, h: 0.3, fontSize: 11, bold: true, color: CLR.text });
-      s5.addText(`${amazonData.avgRating}★`, { x: 3.8, y: 0.85, w: 1, h: 0.3, fontSize: 14, bold: true, color: 'F59E0B', align: 'center' });
-      const brandBarW = (amazonData.avgRating / 5) * 4.5;
-      s5.addShape('rect', { x: 5.0, y: 0.92, w: 4.5, h: 0.2, fill: { color: '2D3A55' }, rectRadius: 0.03 });
-      if (brandBarW > 0) s5.addShape('rect', { x: 5.0, y: 0.92, w: brandBarW, h: 0.2, fill: { color: CLR.acc }, rectRadius: 0.03 });
+      addSlideHeader(s5, 4, 'AI Insights & Strategic Recommendations');
+      addBrandLogoCorner(s5);
+
+      s5.addText('💡 Insights', { x: 0.4, y: 0.72, w: 4.4, h: 0.26, fontSize: 10, bold: true, color: CLR.pur });
+      (amazonData.insights||[]).slice(0,4).forEach((ins,i) => {
+        const y = 1.02 + i*1.06;
+        s5.addShape('rect', { x: 0.4, y, w: 4.4, h: 0.95, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: '6d28d9', width: 0.8 } });
+        s5.addText(`INSIGHT ${i+1}`, { x: 0.55, y: y+0.07, w: 1.5, h: 0.18, fontSize: 7, bold: true, color: CLR.pur, charSpacing: 1 });
+        s5.addText(ins, { x: 0.55, y: y+0.28, w: 4.1, h: 0.6, fontSize: 8.5, color: CLR.text, wrap: true });
+      });
+
+      s5.addText('🎯 Recommendations', { x: 5.1, y: 0.72, w: 4.5, h: 0.26, fontSize: 10, bold: true, color: CLR.grn });
+      (amazonData.recommendations||[]).slice(0,3).forEach((rec,i) => {
+        const y = 1.02 + i*1.42;
+        s5.addShape('rect', { x: 5.1, y, w: 4.5, h: 1.3, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: '15803d', width: 0.8 } });
+        s5.addText(`ACTION ${i+1}`, { x: 5.25, y: y+0.07, w: 1.5, h: 0.18, fontSize: 7, bold: true, color: CLR.grn, charSpacing: 1 });
+        s5.addText(rec, { x: 5.25, y: y+0.28, w: 4.2, h: 0.95, fontSize: 8.5, color: CLR.text, wrap: true });
+      });
       addFooter(s5, brand, now);
-
-      if (hasComps) {
-        Object.entries(compStats).forEach(([comp, stats], i) => {
-          const yPos = 1.45 + i * 0.72;
-          const winning = amazonData.avgRating >= stats.avgRating;
-          const barColor = winning ? CLR.grn : CLR.red;
-          s5.addShape('rect', { x: 0.4, y: yPos, w: 9.2, h: 0.6, fill: { color: CLR.card }, rectRadius: 0.06 });
-          s5.addText(comp, { x: 0.6, y: yPos + 0.15, w: 3, h: 0.28, fontSize: 10, color: CLR.muted });
-          s5.addText(`${stats.avgRating}★`, { x: 3.8, y: yPos + 0.12, w: 1, h: 0.3, fontSize: 13, bold: true, color: barColor, align: 'center' });
-          const compBarW = (stats.avgRating / 5) * 4.5;
-          s5.addShape('rect', { x: 5.0, y: yPos + 0.2, w: 4.5, h: 0.18, fill: { color: '2D3A55' }, rectRadius: 0.03 });
-          if (compBarW > 0) s5.addShape('rect', { x: 5.0, y: yPos + 0.2, w: compBarW, h: 0.18, fill: { color: barColor }, rectRadius: 0.03 });
-          const diff = (amazonData.avgRating - stats.avgRating).toFixed(1);
-          s5.addText(winning ? `+${diff} ↑` : `${diff} ↓`, { x: 8.7, y: yPos + 0.15, w: 0.8, h: 0.28, fontSize: 10, bold: true, color: barColor, align: 'right' });
-        });
-      } else {
-        s5.addText('Run with competitors selected to see comparison', { x: 0.4, y: 2.5, w: 9.2, h: 0.4, fontSize: 12, color: CLR.muted, align: 'center' });
-      }
-
-      // Insights slide
-      const s6 = pres.addSlide();
-      addBg(s6);
-      addSlideHeader(s6, 5, 'AI Insights & Recommendations');
-      (amazonData.insights || []).slice(0,4).forEach((ins, i) => {
-        const yPos = 0.75 + i * 1.1;
-        s6.addShape('rect', { x: 0.4, y: yPos, w: 4.3, h: 0.95, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: '7C3AED', width: 1 } });
-        s6.addText(`INSIGHT ${i+1}`, { x: 0.55, y: yPos + 0.08, w: 1.2, h: 0.2, fontSize: 7, bold: true, color: CLR.pur });
-        s6.addText(ins, { x: 0.55, y: yPos + 0.3, w: 4.0, h: 0.58, fontSize: 9, color: CLR.text, wrap: true });
-      });
-      (amazonData.recommendations || []).slice(0,3).forEach((rec, i) => {
-        const yPos = 0.75 + i * 1.4;
-        s6.addShape('rect', { x: 4.9, y: yPos, w: 4.6, h: 1.2, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: CLR.grn, width: 1 } });
-        s6.addText(`ACTION ${i+1}`, { x: 5.05, y: yPos + 0.08, w: 1.5, h: 0.2, fontSize: 7, bold: true, color: CLR.grn });
-        s6.addText(rec, { x: 5.05, y: yPos + 0.3, w: 4.2, h: 0.82, fontSize: 9, color: CLR.text, wrap: true });
-      });
-      addFooter(s6, brand, now);
 
       const buf = await pres.write({ outputType: 'nodebuffer' });
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
@@ -221,7 +313,7 @@ export default async function handler(req, res) {
       return res.send(buf);
     } catch(e) {
       console.error('Amazon PPT error:', e.message);
-      return res.status(500).json({ error: 'Amazon PPT generation failed: ' + e.message });
+      return res.status(500).json({ error: 'Amazon PPT failed: ' + e.message });
     }
   }
 
