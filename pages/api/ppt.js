@@ -74,6 +74,87 @@ export default async function handler(req, res) {
   const sn  = data?.sentiment_breakdown || { positive: 0, neutral: 0, negative: 0 };
   const now = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
+  // If no Reddit data, generate Amazon-only PPT
+  if (!data && amazonData) {
+    try {
+      const pres = new PptxGenJS();
+      pres.layout = 'LAYOUT_16x9';
+      pres.author = brand;
+      pres.title  = `${brand} Amazon Intelligence Report`;
+
+      // Cover
+      const s1 = pres.addSlide();
+      addBg(s1);
+      s1.addShape('rect', { x: 0, y: 0, w: 0.18, h: '100%', fill: { color: 'F59E0B' } });
+      s1.addText('AMAZON BRAND INTELLIGENCE', { x: 0.5, y: 1.2, w: 9, h: 0.4, fontSize: 11, bold: true, color: 'F59E0B', charSpacing: 4, align: 'center' });
+      s1.addText(brand, { x: 0.5, y: 1.7, w: 9, h: 1.1, fontSize: 54, bold: true, color: CLR.white, align: 'center' });
+      s1.addText('Customer Reviews · Sentiment · Competitor Analysis', { x: 0.5, y: 2.85, w: 9, h: 0.35, fontSize: 14, color: CLR.muted, align: 'center' });
+      s1.addShape('line', { x: 3.5, y: 3.35, w: 3, h: 0, line: { color: 'F59E0B', width: 2 } });
+      s1.addText(`${fromDate} → ${toDate}  ·  ${amazonData.total} reviews  ·  ${amazonData.avgRating}★`, { x: 0.5, y: 3.55, w: 9, h: 0.28, fontSize: 11, color: CLR.muted, align: 'center' });
+      addFooter(s1, brand, now);
+
+      // Amazon Summary Slide
+      const s2 = pres.addSlide();
+      addBg(s2);
+      addSlideHeader(s2, 1, 'Amazon Review Summary');
+      addKpiBox(s2, 0.4, 0.75, 2.1, 1.2, amazonData.total, 'Total Reviews', 'F59E0B');
+      addKpiBox(s2, 2.65, 0.75, 2.1, 1.2, `${amazonData.avgRating}★`, 'Avg Rating', 'F59E0B');
+      addKpiBox(s2, 4.9, 0.75, 2.1, 1.2, amazonData.sentimentScore, 'Sentiment Score', amazonData.sentimentScore >= 70 ? CLR.grn : amazonData.sentimentScore >= 50 ? CLR.ylw : CLR.red);
+      addKpiBox(s2, 7.15, 0.75, 2.1, 1.2, amazonData.sentimentLabel, 'Overall Mood', CLR.white);
+
+      // Rating bars
+      s2.addText('Rating Distribution', { x: 0.4, y: 2.1, w: 4, h: 0.25, fontSize: 11, bold: true, color: CLR.text });
+      const totalRatings = Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
+      [5,4,3,2,1].forEach((star, i) => {
+        const count = amazonData.ratingDistribution[star] || 0;
+        const pct = totalRatings > 0 ? count/totalRatings : 0;
+        const yPos = 2.45 + i * 0.42;
+        const barColor = star >= 4 ? CLR.grn : star === 3 ? CLR.ylw : CLR.red;
+        s2.addText(`${star}★`, { x: 0.4, y: yPos, w: 0.4, h: 0.3, fontSize: 9, color: CLR.muted, align: 'right' });
+        s2.addShape('rect', { x: 0.85, y: yPos + 0.08, w: 3.5, h: 0.15, fill: { color: '2D3A55' } });
+        if (pct > 0) s2.addShape('rect', { x: 0.85, y: yPos + 0.08, w: 3.5 * pct, h: 0.15, fill: { color: barColor } });
+        s2.addText(`${Math.round(pct*100)}% (${count})`, { x: 4.45, y: yPos, w: 1.2, h: 0.3, fontSize: 9, color: CLR.muted });
+      });
+
+      // Top themes
+      s2.addText('Key Themes', { x: 5.2, y: 2.1, w: 4.3, h: 0.25, fontSize: 11, bold: true, color: CLR.text });
+      (amazonData.themes || []).slice(0,5).forEach((t, i) => {
+        const yPos = 2.45 + i * 0.55;
+        const tColor = t.sentiment === 'positive' ? CLR.grn : t.sentiment === 'negative' ? CLR.red : CLR.ylw;
+        s2.addShape('rect', { x: 5.2, y: yPos, w: 4.3, h: 0.45, fill: { color: CLR.card }, rectRadius: 0.05 });
+        s2.addText(t.theme, { x: 5.35, y: yPos + 0.03, w: 3.8, h: 0.2, fontSize: 9, bold: true, color: tColor });
+        s2.addText(`"${t.example}"`, { x: 5.35, y: yPos + 0.23, w: 3.8, h: 0.18, fontSize: 8, color: CLR.muted, italic: true });
+      });
+      addFooter(s2, brand, now);
+
+      // Insights slide
+      const s3 = pres.addSlide();
+      addBg(s3);
+      addSlideHeader(s3, 2, 'AI Insights & Recommendations');
+      (amazonData.insights || []).slice(0,4).forEach((ins, i) => {
+        const yPos = 0.75 + i * 1.1;
+        s3.addShape('rect', { x: 0.4, y: yPos, w: 4.3, h: 0.95, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: '7C3AED', width: 1 } });
+        s3.addText(`INSIGHT ${i+1}`, { x: 0.55, y: yPos + 0.08, w: 1.2, h: 0.2, fontSize: 7, bold: true, color: CLR.pur });
+        s3.addText(ins, { x: 0.55, y: yPos + 0.3, w: 4.0, h: 0.58, fontSize: 9, color: CLR.text, wrap: true });
+      });
+      (amazonData.recommendations || []).slice(0,3).forEach((rec, i) => {
+        const yPos = 0.75 + i * 1.4;
+        s3.addShape('rect', { x: 4.9, y: yPos, w: 4.6, h: 1.2, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: CLR.grn, width: 1 } });
+        s3.addText(`ACTION ${i+1}`, { x: 5.05, y: yPos + 0.08, w: 1.5, h: 0.2, fontSize: 7, bold: true, color: CLR.grn });
+        s3.addText(rec, { x: 5.05, y: yPos + 0.3, w: 4.2, h: 0.82, fontSize: 9, color: CLR.text, wrap: true });
+      });
+      addFooter(s3, brand, now);
+
+      const buf = await pres.write({ outputType: 'nodebuffer' });
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+      res.setHeader('Content-Disposition', `attachment; filename="${brand}_Amazon_Report.pptx"`);
+      return res.send(buf);
+    } catch(e) {
+      console.error('Amazon PPT error:', e.message);
+      return res.status(500).json({ error: 'Amazon PPT generation failed: ' + e.message });
+    }
+  }
+
   try {
     const pres = new PptxGenJS();
     pres.layout  = 'LAYOUT_16x9';
