@@ -146,33 +146,25 @@ export default async function handler(req, res) {
 
   try {
     // Scrape brand (all stars) + negative reviews separately + competitors
-    const competitorList = competitors || [];
-    const scrapePromises = [
+    const competitorList = (competitors || []).slice(0, 3);
+
+    // Run brand (all stars) + negative reviews simultaneously
+    const [rawBrandItems, rawNegativeItems] = await Promise.all([
       scrapeReviews(brandAsins, APIFY_API_KEY, ['allStars']),
-      scrapeReviews(brandAsins, APIFY_API_KEY, ['oneStar', 'twoStar']), // critical only
-    ];
+      scrapeReviews(brandAsins, APIFY_API_KEY, ['oneStar', 'twoStar']),
+    ]);
 
-    // Add competitor scraping (max 3 competitors to keep cost low)
-    const competitorsToScrape = competitorList.slice(0, 3);
-    for (const comp of competitorsToScrape) {
-      const compAsins = COMPETITOR_ASINS[comp];
-      if (compAsins) scrapePromises.push(scrapeReviews(compAsins, APIFY_API_KEY));
-      else scrapePromises.push(Promise.resolve([]));
-    }
-
-    const results = await Promise.all(scrapePromises);
-    const rawBrandItems = results[0] || [];
-    const rawNegativeItems = results[1] || [];
     const brandReviews = normalizeReviews(rawBrandItems, 'brand');
     const negativeReviews = normalizeReviews(rawNegativeItems, 'brand');
+    const competitorsToScrape = competitorList;
 
-    // Competitor reviews - run in parallel
+    // Competitor reviews
     const competitorReviews = {};
-    if (competitorsToScrape.length > 0) {
+    if (competitorList.length > 0) {
       const compResults = await Promise.all(
-        competitorsToScrape.map(comp => scrapeReviews(COMPETITOR_ASINS[comp] || [], APIFY_API_KEY, ['allStars']))
+        competitorList.map(comp => scrapeReviews(COMPETITOR_ASINS[comp] || [], APIFY_API_KEY, ['allStars']))
       );
-      competitorsToScrape.forEach((comp, i) => {
+      competitorList.forEach((comp, i) => {
         competitorReviews[comp] = normalizeReviews(compResults[i] || [], comp);
       });
     }
