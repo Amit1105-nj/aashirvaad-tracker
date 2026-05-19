@@ -1,5 +1,31 @@
 import PptxGenJS from 'pptxgenjs';
-import { LOGO_AASHIRVAAD, LOGO_BINGO, LOGO_CANDYMAN, LOGO_SUNFEAST, LOGO_YIPPEE, LOGO_FABELLE, LOGO_ITC, LOGO_AMAZON, LOGO_REDDIT } from './logos.js';
+import path from 'path';
+import fs from 'fs';
+
+// Load logos from public folder as base64
+function loadLogo(filename) {
+  try {
+    const filePath = path.join(process.cwd(), 'public', filename);
+    const data = fs.readFileSync(filePath);
+    const ext = filename.split('.').pop().toLowerCase();
+    const mime = ext === 'jpg' || ext === 'jpeg' ? 'jpeg' : ext === 'webp' ? 'webp' : 'png';
+    return `data:image/${mime};base64,${data.toString('base64')}`;
+  } catch(e) {
+    return null;
+  }
+}
+
+const LOGO_ITC = loadLogo('ITC.jpg');
+const LOGO_AMAZON = loadLogo('amazon.png');
+const LOGO_REDDIT = loadLogo('Reddit.png');
+const BRAND_LOGOS = {
+  Aashirvaad: loadLogo('Aashirvaad.png'),
+  Bingo: loadLogo('Bingo.png'),
+  Candyman: loadLogo('Candyman (1).jpg'),
+  Sunfeast: loadLogo('Sunfeast.png'),
+  Yippee: loadLogo('Yippee.webp'),
+  Fabelle: loadLogo('Fabelle.jpg'),
+};
 
 // Color palette
 const CLR = {
@@ -82,15 +108,7 @@ export default async function handler(req, res) {
       pres.author = brand;
       pres.title  = `${brand} Amazon Intelligence Report`;
 
-      const brandLogoMap = {
-        Aashirvaad: LOGO_AASHIRVAAD,
-        Bingo: LOGO_BINGO,
-        Candyman: LOGO_CANDYMAN,
-        Sunfeast: LOGO_SUNFEAST,
-        Yippee: LOGO_YIPPEE,
-        Fabelle: LOGO_FABELLE,
-      };
-      const brandLogo = brandLogoMap[brand];
+      const brandLogo = BRAND_LOGOS[brand];
       const totalRatings = Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
       const promoters = amazonData.ratingDistribution[5] || 0;
       const detractors = (amazonData.ratingDistribution[1]||0) + (amazonData.ratingDistribution[2]||0);
