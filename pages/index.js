@@ -532,7 +532,7 @@ export default function Home(){
                   ))}
                 </div>
                 <button
-                  onClick={runMode==='reddit'?runAgent:runMode==='amazon'?fetchAmazon:()=>{runAgent();fetchAmazon();}}
+                  onClick={runMode==='reddit'?runAgent:runMode==='amazon'?fetchAmazon:async()=>{await Promise.all([runAgent(),fetchAmazon()])}}
                   disabled={running||amazonLoading}
                   style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',
                     fontSize:13,fontWeight:600,cursor:(running||amazonLoading)?'not-allowed':'pointer',
