@@ -373,7 +373,7 @@ export default async function handler(req, res) {
       // Orange divider
       s.addShape('line', { x: 3.5, y: 3.35, w: 3, h: 0, line: { color: CLR.acc, width: 2 } });
       // Meta chips
-      const chips = [`📅 ${fromDate} → ${toDate}`, `📊 ${data.summary.total_posts} Posts`, `💬 ${data.summary.total_comments} Comments`, `🗓 Generated: ${now}`];
+      const chips = [`📅 ${fromDate} → ${toDate}`, `📊 ${data?.summary.total_posts} Posts`, `💬 ${data?.summary.total_comments} Comments`, `🗓 Generated: ${now}`];
       chips.forEach((chip, i) => {
         const cx = 0.5 + i * 2.35;
         s.addShape('rect', { x: cx, y: 3.6, w: 2.15, h: 0.38, fill: { color: CLR.card }, rectRadius: 0.06, line: { color: '2D3A55', width: 1 } });
@@ -388,12 +388,12 @@ export default async function handler(req, res) {
       addBg(s);
       addSlideHeader(s, 2, 'Executive Summary');
 
-      const sColor = data.summary.sentiment_score >= 70 ? CLR.grn : data.summary.sentiment_score >= 50 ? CLR.ylw : CLR.red;
+      const sColor = data?.summary.sentiment_score >= 70 ? CLR.grn : data?.summary.sentiment_score >= 50 ? CLR.ylw : CLR.red;
       const kpis = [
-        { v: data.summary.total_posts,     l: 'Posts Found',      c: CLR.acc },
-        { v: data.summary.total_comments,  l: 'Comments',         c: CLR.pur },
-        { v: data.summary.sentiment_score + '/100', l: 'Sentiment Score', c: sColor },
-        { v: data.summary.sentiment_label, l: 'Overall Mood',     c: CLR.text },
+        { v: data?.summary.total_posts,     l: 'Posts Found',      c: CLR.acc },
+        { v: data?.summary.total_comments,  l: 'Comments',         c: CLR.pur },
+        { v: data?.summary.sentiment_score + '/100', l: 'Sentiment Score', c: sColor },
+        { v: data?.summary.sentiment_label, l: 'Overall Mood',     c: CLR.text },
       ];
       kpis.forEach((k, i) => addKpiBox(s, 0.4 + i * 2.35, 0.72, 2.15, 1.1, k.v, k.l, k.c));
 
@@ -416,12 +416,12 @@ export default async function handler(req, res) {
 
       // Top subreddit
       s.addShape('rect', { x: 0.4, y: 3.0, w: 9.2, h: 0.42, fill: { color: CLR.card }, rectRadius: 0.06, line: { color: '2D3A55', width: 1 } });
-      s.addText(`Top community: ${data.summary.top_subreddit}  ·  Date range: ${fromDate} → ${toDate}`, {
+      s.addText(`Top community: ${data?.summary.top_subreddit}  ·  Date range: ${fromDate} → ${toDate}`, {
         x: 0.5, y: 3.0, w: 9, h: 0.42, fontSize: 10, color: CLR.text, align: 'center', valign: 'middle', margin: 0
       });
 
       // Sample quote
-      const q = data.top_themes[0];
+      const q = data?.top_themes[0];
       if (q) {
         s.addShape('rect', { x: 0.4, y: 3.55, w: 9.2, h: 0.7, fill: { color: CLR.surf }, rectRadius: 0.06, line: { color: CLR.acc, width: 2 } });
         s.addText(`${q.icon}  "${q.example}"`, { x: 0.55, y: 3.6, w: 8.9, h: 0.6, fontSize: 10, italic: true, color: 'CBD5E1', valign: 'middle', margin: 0 });
@@ -435,7 +435,7 @@ export default async function handler(req, res) {
       addBg(s);
       addSlideHeader(s, 3, 'Hot Topics & Themes');
 
-      data.top_themes.forEach((t, i) => {
+      data?.top_themes.forEach((t, i) => {
         const rowY = 0.72 + i * 0.88;
         const sc = sentClr(t.sentiment);
         // Row bg
@@ -464,7 +464,7 @@ export default async function handler(req, res) {
       addSlideHeader(s, 4, 'Keyword Associations — What is ' + brand + ' Linked To?');
 
       // Bubble cloud (top half)
-      const kws = data.keyword_associations || [];
+      const kws = data?.keyword_associations || [];
       const maxF = Math.max(...kws.map(k => k.frequency), 1);
       // Place bubbles in a grid
       kws.slice(0, 8).forEach((k, i) => {
@@ -514,7 +514,7 @@ export default async function handler(req, res) {
       addBg(s);
       addSlideHeader(s, 5, 'Top Reddit Posts — Click titles to open on Reddit');
 
-      data.top_posts.slice(0, 4).forEach((p, i) => {
+      data?.top_posts.slice(0, 4).forEach((p, i) => {
         const py = 0.72 + i * 1.18;
         const sc = sentClr(p.sentiment);
         s.addShape('rect', { x: 0.4, y: py, w: 9.2, h: 1.05, fill: { color: CLR.surf }, rectRadius: 0.07, line: { color: '2D3A55', width: 1 } });
@@ -560,7 +560,7 @@ export default async function handler(req, res) {
         hx += cws[i];
       });
 
-      data.competitors_mentioned.forEach((c, i) => {
+      data?.competitors_mentioned.forEach((c, i) => {
         const ry = 1.07 + i * 0.68;
         const fill = i % 2 === 0 ? CLR.card : CLR.surf;
         const col = c.vs_aashirvaad === 'favorable' ? CLR.grn : c.vs_aashirvaad === 'unfavorable' ? CLR.red : CLR.ylw;
@@ -582,7 +582,7 @@ export default async function handler(req, res) {
       addBg(s);
       addSlideHeader(s, 7, 'Strategic AI Insights');
 
-      data.insights.forEach((ins, i) => {
+      data?.insights.forEach((ins, i) => {
         const iy = 0.72 + i * 0.92;
         s.addShape('rect', { x: 0.4, y: iy, w: 9.2, h: 0.78, fill: { color: CLR.pur + '10' }, rectRadius: 0.07, line: { color: CLR.pur + '40', width: 1 } });
         s.addShape('rect', { x: 0.4, y: iy, w: 0.06, h: 0.78, fill: { color: CLR.pur }, rectRadius: 0.03 });
@@ -599,7 +599,7 @@ export default async function handler(req, res) {
       addBg(s);
       addSlideHeader(s, 8, 'Signal Alerts & Recommendations');
 
-      data.signal_alerts.forEach((sig, i) => {
+      data?.signal_alerts.forEach((sig, i) => {
         const sy = 0.72 + i * 1.42;
         const uc = urgClr(sig.urgency);
         s.addShape('rect', { x: 0.4, y: sy, w: 9.2, h: 1.25, fill: { color: uc + '12' }, rectRadius: 0.08, line: { color: uc + '44', width: 1 } });
@@ -630,16 +630,16 @@ export default async function handler(req, res) {
       // Brief card
       s.addShape('rect', { x: 0.4, y: 1.05, w: 9.2, h: 3.6, fill: { color: CLR.acc + '0D' }, rectRadius: 0.1, line: { color: CLR.acc + '44', width: 1.5 } });
 
-      const top = data.top_themes[0];
-      const sig = data.signal_alerts[0];
+      const top = data?.top_themes[0];
+      const sig = data?.signal_alerts[0];
       const lines = [
         { label: '🌾  Brand:', value: `${brand} Reddit Pulse  |  ${fromDate} → ${toDate}` },
-        { label: '📊  Sentiment:', value: `${data.summary.sentiment_score}/100  (${data.summary.sentiment_label})` },
-        { label: '📝  Posts:', value: `${data.summary.total_posts} analyzed across ${data.summary.top_subreddit}` },
+        { label: '📊  Sentiment:', value: `${data?.summary.sentiment_score}/100  (${data?.summary.sentiment_label})` },
+        { label: '📝  Posts:', value: `${data?.summary.total_posts} analyzed across ${data?.summary.top_subreddit}` },
         { label: '🔥  Top topic:', value: `${top?.theme} — "${top?.example}"` },
-        { label: '💡  Insight:', value: data.insights[0] || '—' },
+        { label: '💡  Insight:', value: data?.insights[0] || '—' },
         { label: '🚨  Alert:', value: `${sig?.signal || '—'} (${sig?.urgency || '—'} priority)` },
-        { label: '🔗  Top post:', value: data.top_posts[0]?.reddit_url || '—' },
+        { label: '🔗  Top post:', value: data?.top_posts[0]?.reddit_url || '—' },
       ];
 
       lines.forEach((l, i) => {
