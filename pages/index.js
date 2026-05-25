@@ -658,7 +658,7 @@ export default function Home(){
                     {l:'Total Reviews',v:amazonData.total,c:C.acc},
                     {l:'Avg Rating',v:`${amazonData.avgRating}★`,c:'#f59e0b'},
                     {l:'Sentiment Score',v:`${amazonData.sentimentScore}/100`,c:amazonData.sentimentScore>=70?C.grn:amazonData.sentimentScore>=50?C.ylw:C.red},
-                    {l:'5★ Reviews',v:`${Math.round(((amazonData.ratingDistribution[5]||0)/amazonData.total)*100)}%`,c:C.grn},
+                    {l:'5★ Reviews',v:`${Math.round((((amazonData.ratingDistribution||{})[5]||0)/amazonData.total)*100)}%`,c:C.grn},
                   ].map(({l,v,c})=>(
                     <div key={l} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:12,textAlign:'center'}}>
                       <div style={{fontSize:10,color:C.muted,marginBottom:4}}>{l}</div>
@@ -673,8 +673,8 @@ export default function Home(){
                     <div style={{padding:'10px 14px',borderBottom:`1px solid ${C.border}`,fontSize:12,fontWeight:600}}>⭐ Rating Distribution</div>
                     <div style={{padding:'12px 14px'}}>
                       {[5,4,3,2,1].map(star=>{
-                        const count=amazonData.ratingDistribution[star]||0;
-                        const total=Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
+                        const count=(amazonData.ratingDistribution||{})[star]||0;
+                        const total=Object.values(amazonData.ratingDistribution||{}).reduce((a,b)=>a+b,0);
                         const pct=total>0?Math.round((count/total)*100):0;
                         const color=star>=4?C.grn:star===3?C.ylw:C.red;
                         return(
@@ -779,7 +779,7 @@ export default function Home(){
                           <div style={{width:`${(amazonData.avgRating/5)*100}%`,height:'100%',background:C.acc,borderRadius:3}}/>
                         </div>
                       </div>
-                      {Object.entries(amazonData.competitorStats).map(([comp,stats])=>{
+                      {Object.entries(amazonData.competitorStats||{}).map(([comp,stats])=>{
                         const diff=amazonData.avgRating-stats.avgRating;
                         const winning=diff>0;
                         return(
