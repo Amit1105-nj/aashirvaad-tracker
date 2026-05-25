@@ -257,7 +257,9 @@ export default function Home(){
   };
 
   const runBoth=async()=>{
-    await Promise.all([runAgent(), fetchAmazon()]);
+    // Run both sequentially to avoid state conflicts
+    await runAgent();
+    await fetchAmazon();
   };
 
   const stepLabels={s1:'Reddit scrape',s2:'AI analysis',s3:'Sentiment',s4:'Keywords',s5:'Insights',s6:'Build report'};
@@ -532,7 +534,7 @@ export default function Home(){
                   ))}
                 </div>
                 <button
-                  onClick={runMode==='reddit'?runAgent:runMode==='amazon'?fetchAmazon:async()=>{await Promise.all([runAgent(),fetchAmazon()])}}
+                  onClick={runMode==='reddit'?runAgent:runMode==='amazon'?fetchAmazon:runBoth}
                   disabled={running||amazonLoading}
                   style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',
                     fontSize:13,fontWeight:600,cursor:(running||amazonLoading)?'not-allowed':'pointer',
