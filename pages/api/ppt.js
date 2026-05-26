@@ -2,14 +2,23 @@ import PptxGenJS from 'pptxgenjs';
 import path from 'path';
 import fs from 'fs';
 
-// Load logos from public folder as base64
+// Load logos from public folder or root
 function loadLogo(filename) {
   try {
-    const filePath = path.join(process.cwd(), 'public', filename);
-    const data = fs.readFileSync(filePath);
-    const ext = filename.split('.').pop().toLowerCase();
-    const mime = ext === 'jpg' || ext === 'jpeg' ? 'jpeg' : ext === 'webp' ? 'webp' : 'png';
-    return `data:image/${mime};base64,${data.toString('base64')}`;
+    // Try public folder first, then root
+    const locations = [
+      path.join(process.cwd(), 'public', filename),
+      path.join(process.cwd(), filename),
+    ];
+    for (const filePath of locations) {
+      try {
+        const data = fs.readFileSync(filePath);
+        const ext = filename.split('.').pop().toLowerCase().replace('webp','webp');
+        const mime = ext === 'jpg' || ext === 'jpeg' ? 'jpeg' : ext === 'webp' ? 'webp' : 'png';
+        return `data:image/${mime};base64,${data.toString('base64')}`;
+      } catch(e) { continue; }
+    }
+    return null;
   } catch(e) {
     return null;
   }
@@ -667,4 +676,4 @@ export default async function handler(req, res) {
   }
 }
 
-export const config = { api: { bodyParser: { sizeLimit: '2mb' }, responseLimit: '10mb' } };
+export const config = { api: { bodyParser: { sizeLimit: '10mb' }, responseLimit: '20mb' } };
