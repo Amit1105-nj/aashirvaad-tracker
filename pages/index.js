@@ -222,9 +222,24 @@ export default function Home(){
     if(!report&&!amazonData) return;
     addLog('Generating PowerPoint...','step');
     try{
+      // Slim amazonData for PPT - only what's needed
+      const slimAmazon = amazonData ? {
+        total: amazonData.total,
+        avgRating: amazonData.avgRating,
+        sentimentScore: amazonData.sentimentScore,
+        sentimentLabel: amazonData.sentimentLabel,
+        ratingDistribution: amazonData.ratingDistribution,
+        themes: amazonData.themes,
+        insights: amazonData.insights,
+        recommendations: amazonData.recommendations,
+        top5Positive: (amazonData.top5Positive||[]).map(r=>({title:r.title,body:(r.body||'').slice(0,150),rating:r.rating,author:r.author,verified:r.verified,url:r.url})),
+        top5Negative: (amazonData.top5Negative||[]).map(r=>({title:r.title,body:(r.body||'').slice(0,150),rating:r.rating,author:r.author,verified:r.verified,url:r.url})),
+        competitorStats: amazonData.competitorStats,
+        subCategory: amazonData.subCategory,
+      } : null;
       const payload = report
-        ? {data:report, meta:report.meta, amazonData}
-        : {data:null, meta:{brand,fromDate,toDate,category:brandConfig.category}, amazonData};
+        ? {data:report, meta:report.meta, amazonData:slimAmazon}
+        : {data:null, meta:{brand,fromDate,toDate,category:brandConfig.category}, amazonData:slimAmazon};
       const res=await fetch('/api/ppt',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify(payload)});
       if(!res.ok) throw new Error('PPT generation failed');
