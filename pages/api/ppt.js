@@ -107,8 +107,8 @@ export default async function handler(req, res) {
       pres.title  = `${brand} Amazon Intelligence Report`;
 
       const brandLogo = BRAND_LOGOS[brand];
-      const totalRatings = Object.values(amazonData.ratingDistribution).reduce((a,b)=>a+b,0);
-      const promoters = amazonData.ratingDistribution[5] || 0;
+      const totalRatings = Object.values(amazonData.ratingDistribution||{}).reduce((a,b)=>a+b,0);
+      const promoters = (amazonData.ratingDistribution||{})[5] || 0;
       const detractors = (amazonData.ratingDistribution[1]||0) + (amazonData.ratingDistribution[2]||0);
       const verifiedCount = (amazonData.reviews||[]).filter(r=>r.verified).length;
       const verifiedPct = amazonData.total > 0 ? Math.round((verifiedCount/amazonData.total)*100) : 0;
@@ -202,7 +202,7 @@ export default async function handler(req, res) {
       // Rating distribution
       s2.addText('Rating Distribution', { x: 0.4, y: 2.5, w: 4.2, h: 0.25, fontSize: 10, bold: true, color: CLR.text });
       [5,4,3,2,1].forEach((star, i) => {
-        const count = amazonData.ratingDistribution[star] || 0;
+        const count = (amazonData.ratingDistribution||{})[star] || 0;
         const pct = totalRatings > 0 ? count/totalRatings : 0;
         const y = 2.82 + i * 0.42;
         const barColor = star>=4?CLR.grn:star===3?CLR.ylw:CLR.red;
@@ -214,7 +214,7 @@ export default async function handler(req, res) {
 
       // Themes
       s2.addText('Key Themes', { x: 5.7, y: 2.5, w: 3.9, h: 0.25, fontSize: 10, bold: true, color: CLR.text });
-      (amazonData.themes||[]).slice(0,5).forEach((t,i) => {
+      (amazonData?.themes||[]).slice(0,5).forEach((t,i) => {
         const y = 2.82 + i*0.44;
         const tColor = t.sentiment==='positive'?CLR.grn:t.sentiment==='negative'?CLR.red:CLR.ylw;
         s2.addShape('rect', { x: 5.7, y, w: 3.9, h: 0.38, fill: { color: CLR.card }, rectRadius: 0.05 });
@@ -238,7 +238,7 @@ export default async function handler(req, res) {
       s3.addText('👎  TOP CRITICAL REVIEWS', { x: 5.2, y: 0.7, w: 4.5, h: 0.28, fontSize: 9, bold: true, color: CLR.red, align: 'center', valign: 'middle' });
 
       // Positive reviews (left)
-      (amazonData.top5Positive||[]).slice(0,4).forEach((r,i) => {
+      (amazonData?.top5Positive||[]).slice(0,4).forEach((r,i) => {
         const y = 1.08 + i*1.08;
         s3.addShape('rect', { x: 0.3, y, w: 4.5, h: 0.95, fill: { color: CLR.card }, rectRadius: 0.06, line: { color: '1a3d24', width: 0.5 } });
         const stars = '★'.repeat(Math.round(r.rating||5));
@@ -250,7 +250,7 @@ export default async function handler(req, res) {
       });
 
       // Negative reviews (right)
-      const critReviews = amazonData.top5Negative||[];
+      const critReviews = amazonData?.top5Negative||[];
       if (critReviews.length === 0) {
         s3.addText('No critical reviews found.', { x: 5.2, y: 2.5, w: 4.5, h: 0.4, fontSize: 11, color: CLR.muted, align: 'center' });
       } else {
@@ -288,7 +288,7 @@ export default async function handler(req, res) {
       if (!hasComps) {
         s4.addText('Run with competitors selected to see comparison.', { x: 0.4, y: 2.8, w: 9.2, h: 0.4, fontSize: 12, color: CLR.muted, align: 'center' });
       } else {
-        Object.entries(compStats).forEach(([comp, stats], i) => {
+        Object.entries(compStats||{}).forEach(([comp, stats], i) => {
           const y = 1.45 + i * 0.75;
           const winning = amazonData.avgRating >= stats.avgRating;
           const barColor = winning ? CLR.grn : CLR.red;
@@ -311,7 +311,7 @@ export default async function handler(req, res) {
       addBrandLogoCorner(s5);
 
       s5.addText('💡 Insights', { x: 0.4, y: 0.72, w: 4.4, h: 0.26, fontSize: 10, bold: true, color: CLR.pur });
-      (amazonData.insights||[]).slice(0,4).forEach((ins,i) => {
+      (amazonData?.insights||[]).slice(0,4).forEach((ins,i) => {
         const y = 1.02 + i*1.06;
         s5.addShape('rect', { x: 0.4, y, w: 4.4, h: 0.95, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: '6d28d9', width: 0.8 } });
         s5.addText(`INSIGHT ${i+1}`, { x: 0.55, y: y+0.07, w: 1.5, h: 0.18, fontSize: 7, bold: true, color: CLR.pur, charSpacing: 1 });
@@ -319,7 +319,7 @@ export default async function handler(req, res) {
       });
 
       s5.addText('🎯 Recommendations', { x: 5.1, y: 0.72, w: 4.5, h: 0.26, fontSize: 10, bold: true, color: CLR.grn });
-      (amazonData.recommendations||[]).slice(0,3).forEach((rec,i) => {
+      (amazonData?.recommendations||[]).slice(0,3).forEach((rec,i) => {
         const y = 1.02 + i*1.42;
         s5.addShape('rect', { x: 5.1, y, w: 4.5, h: 1.3, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: '15803d', width: 0.8 } });
         s5.addText(`ACTION ${i+1}`, { x: 5.25, y: y+0.07, w: 1.5, h: 0.18, fontSize: 7, bold: true, color: CLR.grn, charSpacing: 1 });
