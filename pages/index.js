@@ -264,7 +264,8 @@ export default function Home(){
       if(!data.success) throw new Error(data.error||'Amazon fetch failed');
       setAmazonData(data);
       addLog(`Amazon: ${data.total} reviews · Avg rating: ${data.avgRating}★`,'ok');
-      setActiveTab('amazon');
+      // Only auto-switch to amazon if not in both mode
+      if (runMode !== 'both') setActiveTab('amazon');
     }catch(err){
       addLog('Amazon error: '+err.message,'error');
     }
@@ -272,9 +273,10 @@ export default function Home(){
   };
 
   const runBoth=async()=>{
-    // Run both sequentially to avoid state conflicts
-    await runAgent();
-    await fetchAmazon();
+    setActiveTab('reddit'); // Start on reddit tab
+    await runAgent();       // Reddit first
+    await fetchAmazon();    // Then Amazon
+    // Both done - user can switch between tabs
   };
 
   const stepLabels={s1:'Reddit scrape',s2:'AI analysis',s3:'Sentiment',s4:'Keywords',s5:'Insights',s6:'Build report'};
@@ -462,7 +464,7 @@ export default function Home(){
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:5}}>
                   <label style={{fontSize:11,color:C.muted,fontWeight:500}}>
-                    Amazon Category {(AMAZON_SUB_CATS[brand]||[]).length <= 1 ? '(All Products)' : ''}
+                    Category {(AMAZON_SUB_CATS[brand]||[]).length <= 1 ? '(All Products)' : ''}
                   </label>
                   {(AMAZON_SUB_CATS[brand]||[]).length > 1 ? (
                     <select value={amazonSubCategory} onChange={e=>setAmazonSubCategory(e.target.value)}
@@ -539,12 +541,16 @@ export default function Home(){
 
                 {/* Mode selector */}
                 <div style={{display:'flex',background:C.card,borderRadius:7,overflow:'hidden',border:`1px solid ${C.border}`}}>
-                  {[['reddit','🔴 Reddit'],['amazon','⭐ Amazon'],['both','⚡ Both']].map(([mode,label])=>(
+                  {[
+                    ['reddit', <img src="/Reddit.png" style={{width:16,height:16,objectFit:'contain',verticalAlign:'middle',marginRight:4}}/>, 'Reddit'],
+                    ['amazon', <div style={{display:'inline-block',background:'white',borderRadius:2,padding:'0 2px',verticalAlign:'middle',marginRight:4}}><img src="/amazon.png" style={{width:20,height:12,objectFit:'contain',display:'block'}}/></div>, 'Amazon'],
+                    ['both', '⚡', 'Both'],
+                  ].map(([mode, icon, label])=>(
                     <button key={mode} onClick={()=>setRunMode(mode)}
                       style={{padding:'8px 14px',fontSize:12,fontWeight:600,border:'none',cursor:'pointer',
                         background:runMode===mode?C.acc:'transparent',
-                        color:runMode===mode?'white':C.muted}}>
-                      {label}
+                        color:runMode===mode?'white':C.muted,display:'flex',alignItems:'center',gap:4}}>
+                      {icon}{label}
                     </button>
                   ))}
                 </div>
@@ -624,14 +630,17 @@ export default function Home(){
                   <button onClick={()=>setActiveTab('reddit')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
                     background:activeTab==='reddit'?C.acc:'transparent',color:activeTab==='reddit'?'white':C.muted,
                     border:`1px solid ${activeTab==='reddit'?C.acc:C.border}`,display:'flex',alignItems:'center',gap:6}}>
-                    <img src="/reddit.png" style={{width:16,height:16,objectFit:'contain'}}/> Reddit Report
+                    <img src="/Reddit.png" style={{width:18,height:18,objectFit:'contain',borderRadius:3}}/> Reddit Report
                   </button>
                 )}
                 {amazonData&&(
                   <button onClick={()=>setActiveTab('amazon')} style={{padding:'7px 18px',borderRadius:7,fontSize:12,fontWeight:600,cursor:'pointer',
                     background:activeTab==='amazon'?'#f59e0b':'transparent',color:activeTab==='amazon'?'white':C.muted,
                     border:`1px solid ${activeTab==='amazon'?'#f59e0b':C.border}`,display:'flex',alignItems:'center',gap:6}}>
-                    <img src="/amazon.png" style={{width:16,height:16,objectFit:'contain',filter:'brightness(0) invert(1)'}}/> Amazon {amazonData?`(${amazonData.total})`:''}
+                    <div style={{background:'white',borderRadius:3,padding:'1px 3px',display:'flex',alignItems:'center'}}>
+                      <img src="/amazon.png" style={{width:22,height:14,objectFit:'contain'}}/>
+                    </div>
+                    {amazonData?`(${amazonData.total})`:''} Reviews
                   </button>
                 )}
 
