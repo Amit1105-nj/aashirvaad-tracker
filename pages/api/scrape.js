@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const brandLower = brand.toLowerCase();
     const searchTerm = BRAND_SEARCH_TERMS[brand] || brand;
 
-    // Single Apify run — search all Reddit, all time (same as manual test that returned 3 results)
+    // Start Apify run
     const runResponse = await fetch(
       `https://api.apify.com/v2/acts/harshmaur~reddit-scraper/runs?token=${APIFY_API_KEY}`,
       {
@@ -37,10 +37,7 @@ export default async function handler(req, res) {
           includeNSFW: false,
           fastMode: true,
           crawlCommentsPerPost: false,
-          proxy: {
-            useApifyProxy: true,
-            apifyProxyGroups: ['RESIDENTIAL'],
-          },
+          proxy: { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'] },
         })
       }
     );
@@ -54,12 +51,12 @@ export default async function handler(req, res) {
     const runId = runData.data?.id;
     if (!runId) throw new Error('No run ID from Apify');
 
-    // Poll for completion — max 3 minutes
+    // Poll max 45 seconds (Vercel limit is 60s)
     let attempts = 0;
     let runStatus = 'RUNNING';
     let datasetId = null;
 
-    while (attempts < 36 && (runStatus === 'RUNNING' || runStatus === 'READY')) {
+    while (attempts < 9 && (runStatus === 'RUNNING' || runStatus === 'READY')) {
       await new Promise(r => setTimeout(r, 5000));
       const s = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_API_KEY}`);
       const sd = await s.json();
@@ -69,22 +66,31 @@ export default async function handler(req, res) {
       attempts++;
     }
 
-    if (runStatus !== 'SUCCEEDED') throw new Error('Scrape timed out');
+    // If still running after 45s — fetch whatever results exist so far
+    if (runStatus !== 'SUCCEEDED' && datasetId) {
+      console.log('Fetching partial results after timeout, status:', runStatus);
+    } else if (runStatus !== 'SUCCEEDED') {
+      throw new Error('Scrape timed out with no results');
+    }
 
     const r = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_API_KEY}&limit=50&clean=true`);
     const rawItems = await r.json();
+
+    console.log('Reddit raw items:', rawItems?.length || 0);
+    if (rawItems?.length > 0) {
+      console.log('Reddit first item keys:', Object.keys(rawItems[0]));
+    }
 
     if (!rawItems || rawItems.length === 0) {
       return res.status(200).json({ success: true, posts: [], message: 'No posts found' });
     }
 
-    // Filter posts only + no NSFW
+    // Filter NSFW
     const safePosts = rawItems.filter(p => {
       if (p.dataType && p.dataType !== 'post') return false;
       return !p.over18 && !p.nsfw && !p.isNsfw && (p.title || p.body);
     });
 
-    // Prioritise brand mentions
     const brandPosts = safePosts.filter(p =>
       (p.title || '').toLowerCase().includes(brandLower) ||
       (p.body || '').toLowerCase().includes(brandLower)
