@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "pages/api/amazon.js": {
+      "maxDuration": 300
+    },
+    "pages/api/scrape.js": {
+      "maxDuration": 300
+    },
+    "pages/api/ppt.js": {
+      "maxDuration": 60
+    }
+  }
+}
