@@ -108,7 +108,7 @@ export default function Home(){
     Aashirvaad: ['All Products','Atta & Flour','Basic Spices','Whole Spices','Ghee & Dairy'],
     Sunfeast: ['All Products','Dark Fantasy',"Mom's Magic",'Farmlite','Marie & Others','Cakes'],
     Yippee: ['All Products','Noodles','Pasta'],
-    Bingo: ['All Products'],
+    Bingo: ['All Products','Mad Angles','Tedhe Medhe','Chips'],
     Candyman: ['All Products'],
     Fabelle: ['All Products'],
   }; // 'reddit' or 'amazon'
