@@ -165,7 +165,6 @@ export default async function handler(req, res) {
     }
     const brandReviews = normalizeReviews(rawBrandItems, 'brand');
     const negativeReviews = normalizeReviews(rawNegativeItems, 'brand');
-    const competitorsToScrape = competitorList;
 
     // Competitor scraping removed — causes timeout
     const competitorReviews = {};
