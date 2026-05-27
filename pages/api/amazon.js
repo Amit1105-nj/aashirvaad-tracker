@@ -25,6 +25,9 @@ const BRAND_ASINS = {
   },
   Bingo: {
     'All Products':  ['B00NPT3WZ8','B07RQKHTCK','B00NPU8R1Q','B07QQ2T6NV','B00XJEUIEM'],
+    'Mad Angles':    ['B00NPT3WZ8','B07RQKHTCK'],
+    'Tedhe Medhe':   ['B00NPU8R1Q','B07QQ2T6NV'],
+    'Chips':         ['B00XJEUIEM','B00NPT3WZ8'],
   },
   Candyman: {
     'All Products':  ['B01IKD32B2','B079GXVSKC','B07QR6YYM8','B07216MWSY'],
@@ -164,16 +167,9 @@ export default async function handler(req, res) {
     const negativeReviews = normalizeReviews(rawNegativeItems, 'brand');
     const competitorsToScrape = competitorList;
 
-    // Competitor reviews
+    // Competitor scraping removed — causes timeout
     const competitorReviews = {};
-    if (competitorList.length > 0) {
-      const compResults = await Promise.all(
-        competitorList.map(comp => scrapeReviews(COMPETITOR_ASINS[comp] || [], APIFY_API_KEY, ['allStars']))
-      );
-      competitorList.forEach((comp, i) => {
-        competitorReviews[comp] = normalizeReviews(compResults[i] || [], comp);
-      });
-    }
+    const competitorsToScrape = [];
 
     if (brandReviews.length === 0) {
       return res.status(200).json({ success: true, reviews: [], message: 'No reviews found' });
