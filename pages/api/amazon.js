@@ -154,6 +154,12 @@ export default async function handler(req, res) {
       scrapeReviews(brandAsins, APIFY_API_KEY, ['oneStar', 'twoStar']),
     ]);
 
+    console.log('Raw brand items:', rawBrandItems?.length || 0);
+    console.log('Raw negative items:', rawNegativeItems?.length || 0);
+    if (rawBrandItems?.length > 0) {
+      console.log('First item keys:', Object.keys(rawBrandItems[0]));
+      console.log('First item sample:', JSON.stringify(rawBrandItems[0]).slice(0, 300));
+    }
     const brandReviews = normalizeReviews(rawBrandItems, 'brand');
     const negativeReviews = normalizeReviews(rawNegativeItems, 'brand');
     const competitorsToScrape = competitorList;
