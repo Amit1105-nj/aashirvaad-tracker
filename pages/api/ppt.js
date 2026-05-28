@@ -458,7 +458,7 @@ export default async function handler(req, res) {
         s.addText(`"${t.example}"`, { x: 1.2, y: rowY + 0.36, w: 5.5, h: 0.28, fontSize: 9, italic: true, color: CLR.muted, margin: 0 });
         // Count badge
         s.addShape('rect', { x: 7.1, y: rowY + 0.18, w: 0.7, h: 0.38, fill: { color: CLR.card }, rectRadius: 0.05 });
-        s.addText(`${t.count}×`, { x: 7.1, y: rowY + 0.18, w: 0.7, h: 0.38, fontSize: 10, bold: true, color: CLR.muted, align: 'center', valign: 'middle', margin: 0 });
+        s.addText(`${t.count} mentions`, { x: 6.5, y: rowY + 0.18, w: 1.3, h: 0.38, fontSize: 8, color: CLR.muted, align: 'center', valign: 'middle', margin: 0 });
         // Sentiment badge
         s.addShape('rect', { x: 7.95, y: rowY + 0.18, w: 1.5, h: 0.38, fill: { color: sc + '22' }, rectRadius: 0.05, line: { color: sc, width: 1 } });
         s.addText(t.sentiment.charAt(0).toUpperCase() + t.sentiment.slice(1), { x: 7.95, y: rowY + 0.18, w: 1.5, h: 0.38, fontSize: 9, bold: true, color: sc, align: 'center', valign: 'middle', margin: 0 });
@@ -559,28 +559,51 @@ export default async function handler(req, res) {
       addBg(s);
       addSlideHeader(s, 6, 'Competitor Landscape');
 
-      // Header row
-      const headers = ['Brand', 'Mentions', `vs ${brand}`, 'Assessment'];
-      const cws = [3.2, 1.6, 2.2, 2.2];
+      // Intro text explaining what this slide shows
+      s.addText(`How often competitors are mentioned on Reddit alongside ${brand} — and whether the context favours us or them.`, {
+        x: 0.4, y: 0.72, w: 9.2, h: 0.3, fontSize: 9, color: CLR.muted, italic: true
+      });
+
+      // Column headers
+      const headers = ['Competitor Brand', 'Reddit Mentions', 'Sentiment vs Us', 'What It Means'];
+      const cws = [2.8, 1.8, 2.0, 2.6];
       let hx = 0.4;
       headers.forEach((h, i) => {
-        s.addShape('rect', { x: hx, y: 0.72, w: cws[i], h: 0.32, fill: { color: CLR.surf }, line: { color: '2D3A55', width: 1 } });
-        s.addText(h, { x: hx + 0.05, y: 0.72, w: cws[i] - 0.1, h: 0.32, fontSize: 9, bold: true, color: CLR.muted, valign: 'middle', margin: 0 });
+        s.addShape('rect', { x: hx, y: 1.1, w: cws[i], h: 0.32, fill: { color: '1E3A5A' }, line: { color: '2D3A55', width: 1 } });
+        s.addText(h, { x: hx + 0.06, y: 1.1, w: cws[i] - 0.12, h: 0.32, fontSize: 8, bold: true, color: CLR.white, valign: 'middle', margin: 0 });
         hx += cws[i];
       });
 
-      data?.competitors_mentioned.forEach((c, i) => {
-        const ry = 1.07 + i * 0.68;
+      (data?.competitors_mentioned || []).forEach((comp, i) => {
+        const ry = 1.46 + i * 0.62;
         const fill = i % 2 === 0 ? CLR.card : CLR.surf;
-        const col = c.vs_aashirvaad === 'favorable' ? CLR.grn : c.vs_aashirvaad === 'unfavorable' ? CLR.red : CLR.ylw;
-        const lbl = c.vs_aashirvaad === 'favorable' ? 'We outperform' : c.vs_aashirvaad === 'unfavorable' ? 'They outperform' : 'Comparable';
+        // Determine sentiment color and plain English label
+        const vsKey = comp.vs_aashirvaad || comp.vs_brand || 'neutral';
+        const col = vsKey === 'favorable' ? CLR.grn : vsKey === 'unfavorable' ? CLR.red : CLR.ylw;
+        const sentLabel = vsKey === 'favorable' ? '🟢 Favourable' : vsKey === 'unfavorable' ? '🔴 Unfavourable' : '🟡 Mixed';
+        const meaning = vsKey === 'favorable'
+          ? `Consumers prefer ${brand} over ${comp.brand} in discussions`
+          : vsKey === 'unfavorable'
+          ? `${comp.brand} is mentioned more positively than ${brand}`
+          : `${comp.brand} and ${brand} are seen as similar options`;
+
         let rx = 0.4;
-        const vals = [c.brand, String(c.mentions), c.vs_aashirvaad, lbl];
-        vals.forEach((v, j) => {
-          s.addShape('rect', { x: rx, y: ry, w: cws[j], h: 0.56, fill: { color: fill }, line: { color: '2D3A55', width: 1 } });
-          s.addText(v, { x: rx + 0.06, y: ry, w: cws[j] - 0.12, h: 0.56, fontSize: j === 0 ? 11 : 10, bold: j === 0, color: j >= 2 ? col : CLR.white, valign: 'middle', margin: 0 });
+        [comp.brand, `${comp.mentions} mentions`, sentLabel, meaning].forEach((v, j) => {
+          s.addShape('rect', { x: rx, y: ry, w: cws[j], h: 0.5, fill: { color: fill }, line: { color: '2D3A55', width: 0.5 } });
+          s.addText(v, {
+            x: rx + 0.06, y: ry, w: cws[j] - 0.12, h: 0.5,
+            fontSize: j === 0 ? 11 : j === 3 ? 8 : 10,
+            bold: j === 0,
+            color: j === 2 ? col : j === 3 ? CLR.muted : CLR.white,
+            valign: 'middle', margin: 0, wrap: true
+          });
           rx += cws[j];
         });
+      });
+
+      // Legend at bottom
+      s.addText('🟢 Favourable = brand mentioned positively vs competitor   🔴 Unfavourable = competitor mentioned more positively   🟡 Mixed = both seen similarly', {
+        x: 0.4, y: 5.1, w: 9.2, h: 0.25, fontSize: 7.5, color: CLR.muted, italic: true
       });
       addFooter(s, brand, now);
     }
@@ -622,6 +645,9 @@ export default async function handler(req, res) {
         s.addShape('rect', { x: 0.6, y: sy + 0.55, w: 8.9, h: 0.58, fill: { color: CLR.card }, rectRadius: 0.05 });
         s.addText('→  Recommended action:', { x: 0.72, y: sy + 0.6, w: 2.1, h: 0.2, fontSize: 8, bold: true, color: CLR.muted, margin: 0 });
         s.addText(sig.action, { x: 0.72, y: sy + 0.8, w: 8.6, h: 0.28, fontSize: 9.5, color: CLR.text, valign: 'top', margin: 0 });
+        // Source context
+        const sourceNote = `Signal detected from Reddit discussions · Search "${sig.signal.split(' ').slice(0,4).join(' ')}" on r/${data?.summary?.top_subreddit?.replace('r/','') || 'india'} to verify`;
+        s.addText(sourceNote, { x: 0.72, y: sy + 1.1, w: 8.6, h: 0.18, fontSize: 7.5, color: CLR.muted, italic: true, valign: 'top', margin: 0 });
       });
       addFooter(s, brand, now);
     }
