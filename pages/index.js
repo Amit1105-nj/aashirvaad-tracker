@@ -101,7 +101,9 @@ export default function Home(){
   const [amazonLoading,setAmazonLoading]=useState(false);
   const [activeTab,setActiveTab]=useState('reddit');
   const [amazonSubCategory,setAmazonSubCategory]=useState('All Products');
-  const [runMode,setRunMode]=useState('reddit'); // 'reddit' | 'amazon' | 'both'
+  const [runMode,setRunMode]=useState('reddit');
+  const [customKeyword,setCustomKeyword]=useState('');
+  const [useCustomKeyword,setUseCustomKeyword]=useState(false); // 'reddit' | 'amazon' | 'both'
 
   // Sub-categories per brand
   const AMAZON_SUB_CATS = {
@@ -158,7 +160,7 @@ export default function Home(){
         addLog('Scraping real Reddit posts via Apify...','step');
         try{
           const scrapeRes = await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate})});
+            body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate,subCategory:amazonSubCategory,customKeyword:useCustomKeyword&&customKeyword?customKeyword:null})});
           const scrapeData = await scrapeRes.json();
           if(scrapeData.success && scrapeData.posts?.length > 0){
             realPosts = scrapeData.posts;
@@ -481,6 +483,29 @@ export default function Home(){
                 </div>
               </div>
 
+              {/* Custom keyword search */}
+              <div style={{marginBottom:12,padding:'10px 14px',background:'rgba(167,139,250,0.06)',
+                border:`1px solid rgba(167,139,250,0.2)`,borderRadius:8}}>
+                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+                  <span style={{fontSize:11,color:C.pur,fontWeight:600}}>🔍 Custom Keyword Search</span>
+                  <label style={{display:'flex',alignItems:'center',gap:4,cursor:'pointer',marginLeft:'auto'}}>
+                    <input type="checkbox" checked={useCustomKeyword} onChange={e=>setUseCustomKeyword(e.target.checked)}
+                      style={{cursor:'pointer'}}/>
+                    <span style={{fontSize:11,color:C.muted}}>Override brand search</span>
+                  </label>
+                </div>
+                <input
+                  value={customKeyword}
+                  onChange={e=>setCustomKeyword(e.target.value)}
+                  placeholder={`e.g. "dark chocolate", "healthy snacks", "instant noodles"`}
+                  style={{width:'100%',background:C.card,border:`1px solid ${useCustomKeyword?'rgba(167,139,250,0.5)':C.border}`,
+                    borderRadius:6,padding:'7px 10px',fontSize:12,color:C.text,fontFamily:'inherit',outline:'none'}}
+                />
+                {useCustomKeyword&&customKeyword&&<div style={{fontSize:10,color:C.pur,marginTop:4}}>
+                  ✓ Will search Reddit for "{customKeyword}" instead of {brand} keywords
+                </div>}
+              </div>
+
               {/* ROW 2: Dates */}
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:12}}>
                 {[['From date',fromDate,setFromDate],['To date',toDate,setToDate]].map(([lbl,val,fn])=>(
@@ -500,18 +525,41 @@ export default function Home(){
                     Subreddits for {brand} {runMode==='amazon'&&<span style={{color:C.muted,fontStyle:'italic'}}>(Reddit only)</span>}
                   </div>
                   {runMode!=='amazon'?(
-                    <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-                      {brandConfig.subreddits.map(s=>{
-                        const on=activeSubs.has(s);
-                        return(
+                    <div>
+                      <div style={{display:'flex',flexWrap:'wrap',gap:5,marginBottom:6}}>
+                        {[...activeSubs].map(s=>{
+                          const isCustom=!brandConfig.subreddits.includes(s);
+                          return(
+                            <button key={s} onClick={()=>toggleSub(s)} style={{fontSize:10,padding:'3px 8px',borderRadius:4,cursor:'pointer',
+                              border:`1px solid ${isCustom?'rgba(167,139,250,0.5)':'rgba(255,69,0,0.4)'}`,
+                              color:isCustom?C.pur:C.acc,
+                              background:isCustom?'rgba(167,139,250,0.1)':'rgba(255,69,0,0.1)'}}>
+                              {s} ×
+                            </button>
+                          );
+                        })}
+                        {brandConfig.subreddits.filter(s=>!activeSubs.has(s)).map(s=>(
                           <button key={s} onClick={()=>toggleSub(s)} style={{fontSize:10,padding:'3px 8px',borderRadius:4,cursor:'pointer',
-                            border:`1px solid ${on?'rgba(255,69,0,0.4)':'rgba(255,255,255,0.08)'}`,
-                            color:on?C.acc:C.muted,
-                            background:on?'rgba(255,69,0,0.1)':'transparent'}}>
+                            border:'1px solid rgba(255,255,255,0.08)',color:C.muted,background:'transparent'}}>
                             {s}
                           </button>
-                        );
-                      })}
+                        ))}
+                      </div>
+                      <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                        <input
+                          placeholder="+ Add subreddit (e.g. r/kerala)"
+                          onKeyDown={e=>{
+                            if(e.key==='Enter'&&e.target.value.trim()){
+                              const val=e.target.value.trim().startsWith('r/')?e.target.value.trim():'r/'+e.target.value.trim();
+                              setActiveSubs(prev=>new Set([...prev,val]));
+                              e.target.value='';
+                            }
+                          }}
+                          style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:5,padding:'4px 8px',
+                            fontSize:11,color:C.text,fontFamily:'inherit',outline:'none',width:180}}
+                        />
+                        <span style={{fontSize:10,color:C.muted}}>Press Enter to add</span>
+                      </div>
                     </div>
                   ):(
                     <div style={{fontSize:11,color:C.muted,fontStyle:'italic',padding:'6px 0'}}>Select Reddit or Both mode to configure subreddits</div>
