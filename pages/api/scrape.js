@@ -8,17 +8,53 @@ export default async function handler(req, res) {
   if (!APIFY_API_KEY) return res.status(500).json({ error: 'APIFY_API_KEY not configured' });
 
   const BRAND_SEARCH_TERMS = {
-    Aashirvaad: 'Aashirvaad atta',
-    Bingo: 'Bingo chips',
-    Candyman: 'Candyman eclairs',
-    Sunfeast: 'Sunfeast biscuit',
-    Yippee: 'Yippee noodles',
-    Fabelle: 'Fabelle chocolate',
+    Aashirvaad: {
+      default: 'Aashirvaad atta',
+      'All Products': 'Aashirvaad',
+      'Atta & Flour': 'Aashirvaad atta',
+      'Basic Spices': 'Aashirvaad spices',
+      'Whole Spices': 'Aashirvaad whole spices',
+      'Ghee & Dairy': 'Aashirvaad ghee',
+    },
+    Bingo: {
+      default: 'Bingo chips',
+      'All Products': 'Bingo snacks',
+      'Mad Angles': 'Bingo Mad Angles',
+      'Tedhe Medhe': 'Bingo Tedhe Medhe',
+      'Chips': 'Bingo chips',
+    },
+    Candyman: {
+      default: 'Candyman eclairs',
+      'All Products': 'Candyman ITC',
+    },
+    Sunfeast: {
+      default: 'Sunfeast biscuit',
+      'All Products': 'Sunfeast biscuit',
+      'Dark Fantasy': 'Sunfeast Dark Fantasy',
+      "Mom's Magic": "Sunfeast Mom's Magic",
+      'Farmlite': 'Sunfeast Farmlite',
+      'Marie & Others': 'Sunfeast Marie',
+      'Cakes': 'Sunfeast cake',
+    },
+    Yippee: {
+      default: 'Yippee noodles',
+      'All Products': 'Yippee noodles',
+      'Noodles': 'Yippee Magic Masala noodles',
+      'Pasta': 'Yippee pasta',
+    },
+    Fabelle: {
+      default: 'Fabelle chocolate',
+      'All Products': 'Fabelle chocolate ITC',
+    },
   };
 
   try {
     const brandLower = brand.toLowerCase();
-    const searchTerm = BRAND_SEARCH_TERMS[brand] || brand;
+    const subCat = req.body.subCategory || 'All Products';
+    const customKeyword = req.body.customKeyword;
+    const brandTerms = BRAND_SEARCH_TERMS[brand] || { default: brand };
+    const searchTerm = customKeyword || brandTerms[subCat] || brandTerms.default || brand;
+    console.log(`Searching: "${searchTerm}" for ${brand} / ${subCat}${customKeyword?' (custom keyword)':''}`);
 
     // Start Apify run
     const runResponse = await fetch(
