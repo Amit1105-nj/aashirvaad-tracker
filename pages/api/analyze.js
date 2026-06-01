@@ -15,7 +15,7 @@ const BRAND_CONFIG = {
     category: 'snacks and chips',
     description: "ITC's popular snack brand — includes Mad Angles, Tedhe Medhe, and various chip variants",
     subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
-    competitors: ['Lays','Kurkure','Haldirams','Too Yumm','Doritos'],
+    competitors: ['Lays Classic','Kurkure Masala Munch','Haldirams Bhujia','Too Yumm Veggie Stix','Doritos Nacho Cheese'],
     topics: 'flavour variety, crunchiness, value for money, packet size, availability, new flavours, oily vs dry snacks, gaming snacks, Bollywood munching, cricket match snacks',
   },
   Candyman: {
@@ -29,7 +29,7 @@ const BRAND_CONFIG = {
     category: 'biscuits, cookies and pasta',
     description: "ITC's biscuit and pasta brand — includes Dark Fantasy, Farmlite, Marie Light, and pasta range",
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian'],
-    competitors: ['Britannia','Parle-G','McVities','Oreo','Maggi','Unibic','Bonn','Bambino','Del Monte'],
+    competitors: ['Britannia Good Day','Oreo','McVities Digestive','Parle Hide&Seek','Unibic cookies','Bourbon biscuits'],
     topics: 'biscuit texture, cream filling, tea time biscuits, Dark Fantasy premium feel, pasta cooking time, Farmlite health claims, sugar-free biscuits, protein biscuits, fitness snacking',
   },
   Yippee: {
