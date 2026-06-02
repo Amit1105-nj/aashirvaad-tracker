@@ -919,6 +919,49 @@ export default function Home(){
                   ))}
                 </div>
 
+                {/* SOV WIDGET */}
+                {report?.data?.sov && (
+                  <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,marginBottom:10,overflow:'hidden'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',borderBottom:`1px solid ${C.border}`}}>
+                      <span style={{fontSize:10,fontWeight:700,background:'rgba(167,139,250,0.1)',color:C.pur,padding:'2px 7px',borderRadius:4}}>SHARE OF VOICE</span>
+                      <span style={{fontSize:13,fontWeight:600}}>Who Owns the Conversation?</span>
+                    </div>
+                    <div style={{padding:'13px 14px'}}>
+                      <div style={{display:'flex',height:28,borderRadius:6,overflow:'hidden',marginBottom:10,gap:1}}>
+                        <div style={{width:`${report.data.sov.brand_pct||0}%`,background:C.acc,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:'white',minWidth:30}}>
+                          {report.data.sov.brand_pct}%
+                        </div>
+                        {(report.data.sov.competitors||[]).map((comp,i)=>{
+                          const colors=['#2563eb','#7c3aed','#059669','#d97706','#dc2626'];
+                          return comp.pct>0&&(
+                            <div key={i} style={{width:`${comp.pct}%`,background:colors[i%colors.length],display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,color:'white',fontWeight:600,minWidth:20}}>
+                              {comp.pct>5?`${comp.pct}%`:''}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div style={{display:'flex',flexWrap:'wrap',gap:10,marginBottom:6}}>
+                        <div style={{display:'flex',alignItems:'center',gap:5}}>
+                          <div style={{width:10,height:10,borderRadius:2,background:C.acc}}/>
+                          <span style={{fontSize:11,fontWeight:600,color:C.text}}>{report.data.sov.brand_name} — {report.data.sov.brand_pct}% ({report.data.sov.brand_posts} posts)</span>
+                        </div>
+                        {(report.data.sov.competitors||[]).map((comp,i)=>{
+                          const colors=['#2563eb','#7c3aed','#059669','#d97706','#dc2626'];
+                          return(
+                            <div key={i} style={{display:'flex',alignItems:'center',gap:5}}>
+                              <div style={{width:10,height:10,borderRadius:2,background:colors[i%colors.length]}}/>
+                              <span style={{fontSize:11,color:C.muted}}>{comp.brand} — {comp.pct}% ({comp.posts} posts)</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div style={{fontSize:10,color:C.muted,fontStyle:'italic'}}>
+                        {report.data.sov.category_total} total posts analysed · Higher % = more conversation ownership on Reddit
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* SLIDE 01 */}
                 <SlideCard num="01" title="Executive Summary">
                   <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:10}}>
