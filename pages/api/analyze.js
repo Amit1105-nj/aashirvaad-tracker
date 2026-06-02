@@ -64,7 +64,7 @@ function makeRedditUrl(subreddit, title, postId) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { fromDate, toDate, brand, subreddits, callType, themes, realPosts } = req.body;
+  const { fromDate, toDate, brand, subreddits, callType, themes, realPosts, customKeyword } = req.body;
   if (!fromDate || !toDate || !brand) return res.status(400).json({ error: 'Missing required fields' });
 
   const config = BRAND_CONFIG[brand] || BRAND_CONFIG['Aashirvaad'];
@@ -103,8 +103,12 @@ Post ${i+1}:
 - Awards: ${p.awards || 0}
 `).join('')}
 
-Analyse these REAL posts to extract sentiment, themes, and competitor mentions. Use the actual post data.`
+Analyse these REAL posts to extract sentiment, themes, and competitor mentions relevant to "${brand}" (${config.category}).
+${customKeyword ? `Context: User searched for "${customKeyword}" — focus on how this topic relates to ${brand} specifically.` : ''}
+Only include posts where ${brand} or its direct competitors are relevant. Discard posts about unrelated topics.
+Use only the actual post data.`
         : `Simulate realistic Reddit data for "${brand}" (${config.description}) based on your training knowledge about Indian consumers discussing this brand on Reddit. Date: ${fromDate} to ${toDate}. Subreddits: ${allSubs}.`;
+      // This path no longer reached — no simulation allowed
 
       prompt = `You are a brand intelligence analyst. ${postsContext}
 
