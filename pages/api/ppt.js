@@ -636,7 +636,7 @@ export default async function handler(req, res) {
         const ry = 1.46 + i * 0.62;
         const fill = i % 2 === 0 ? CLR.card : CLR.surf;
         // Determine sentiment color and plain English label
-        const vsKey = comp.vs_aashirvaad || comp.vs_brand || 'neutral';
+        const vsKey = comp.vs_brand || comp.vs_brand || 'neutral';
         const col = vsKey === 'favorable' ? CLR.grn : vsKey === 'unfavorable' ? CLR.red : CLR.ylw;
         const sentLabel = vsKey === 'favorable' ? '🟢 Favourable' : vsKey === 'unfavorable' ? '🔴 Unfavourable' : '🟡 Mixed';
         const meaning = vsKey === 'favorable'
