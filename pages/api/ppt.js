@@ -438,6 +438,64 @@ export default async function handler(req, res) {
       addFooter(s, brand, now);
     }
 
+    // ── SLIDE 2B: SHARE OF VOICE ──────────────────────────────────
+    {
+      const sov = data?.sov;
+      if (sov) {
+        const s = pres.addSlide();
+        addBg(s);
+        addSlideHeader(s, 3, 'Share of Voice — Who Owns the Reddit Conversation?');
+
+        const brandPct = sov.brand_pct || 0;
+        const sovColor = brandPct >= 50 ? CLR.grn : brandPct >= 30 ? CLR.ylw : CLR.red;
+        const allBrands = [
+          { name: brand, pct: brandPct, posts: sov.brand_posts || 0 },
+          ...(sov.competitors || [])
+        ];
+        const barColors = [CLR.acc, '2563EB', '7C3AED', '059669', 'D97706', 'DC2626'];
+        const barW = 5.8;
+
+        // Brand big number card
+        s.addShape('rect', { x: 0.4, y: 0.75, w: 3.2, h: 2.3, fill: { color: CLR.card }, rectRadius: 0.12, line: { color: CLR.acc, width: 1.5 } });
+        s.addText('YOUR BRAND', { x: 0.4, y: 0.88, w: 3.2, h: 0.25, fontSize: 8, bold: true, color: CLR.acc, align: 'center', charSpacing: 2 });
+        s.addText(brand, { x: 0.4, y: 1.15, w: 3.2, h: 0.38, fontSize: 15, bold: true, color: CLR.white, align: 'center' });
+        s.addText(`${brandPct}%`, { x: 0.4, y: 1.55, w: 3.2, h: 0.72, fontSize: 50, bold: true, color: sovColor, align: 'center' });
+        s.addText(`${sov.brand_posts || 0} of ${sov.category_total || 0} posts`, { x: 0.4, y: 2.3, w: 3.2, h: 0.3, fontSize: 9, color: CLR.muted, align: 'center' });
+
+        // SOV bar
+        s.addText('Share of Voice Breakdown', { x: 3.8, y: 0.75, w: 5.8, h: 0.28, fontSize: 10, bold: true, color: CLR.text });
+        let barX = 3.8;
+        allBrands.forEach((b2, i) => {
+          const w = (b2.pct / 100) * barW;
+          if (w > 0) {
+            s.addShape('rect', { x: barX, y: 1.1, w, h: 0.4, fill: { color: barColors[i] } });
+            if (w > 0.35) s.addText(`${b2.pct}%`, { x: barX, y: 1.1, w, h: 0.4, fontSize: 8, bold: true, color: CLR.white, align: 'center', valign: 'middle', margin: 0 });
+            barX += w;
+          }
+        });
+
+        // Brand rows
+        allBrands.forEach((b2, i) => {
+          const ry = 1.65 + i * 0.58;
+          const rw = (b2.pct / 100) * 4.2;
+          s.addText(b2.name, { x: 3.8, y: ry + 0.08, w: 2.2, h: 0.28, fontSize: i===0?11:10, bold: i===0, color: i===0?CLR.white:CLR.muted });
+          s.addShape('rect', { x: 6.1, y: ry + 0.14, w: 4.2, h: 0.15, fill: { color: '2D3A55' }, rectRadius: 0.03 });
+          if (rw > 0) s.addShape('rect', { x: 6.1, y: ry + 0.14, w: rw, h: 0.15, fill: { color: barColors[i] }, rectRadius: 0.03 });
+          s.addText(`${b2.pct}% · ${b2.posts} posts`, { x: 10.5, y: ry + 0.08, w: 1.1, h: 0.28, fontSize: 9, color: i===0?sovColor:CLR.muted, align: 'right', bold: i===0 });
+        });
+
+        // Interpretation
+        const interp = brandPct >= 50
+          ? `${brand} dominates Reddit — strong brand presence in category discussions.`
+          : brandPct >= 30
+          ? `${brand} has solid presence but competitors are vocal. Monitor closely.`
+          : `${brand} is being outvoiced. Active engagement strategy recommended.`;
+        s.addShape('rect', { x: 0.4, y: 5.0, w: 9.2, h: 0.45, fill: { color: CLR.card }, rectRadius: 0.08, line: { color: sovColor, width: 0.8 } });
+        s.addText(`💡 ${interp}`, { x: 0.55, y: 5.02, w: 8.9, h: 0.4, fontSize: 9.5, color: CLR.white, valign: 'middle', wrap: true });
+        addFooter(s, brand, now);
+      }
+    }
+
     // ── SLIDE 3: HOT TOPICS & THEMES ─────────────────────────────────
     {
       const s = pres.addSlide();
