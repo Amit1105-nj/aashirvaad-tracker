@@ -239,7 +239,7 @@ export default function Home(){
       setProgress(25);
 
       const r1=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),callType:'core',realPosts})});
+        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),callType:'core',realPosts,customKeyword:useCustomKeyword&&customKeyword?customKeyword:null})});
       const j1=await r1.json();
       if(!j1.success) throw new Error(j1.error||'API call failed');
       if(j1.no_data){
@@ -300,7 +300,9 @@ export default function Home(){
         };
       };
 
-      const sov = calcSOV(realPosts, brand, BRANDS[brand]?.competitors || p1.brand_config?.competitors || []);
+      const sovCompetitors = p1?.brand_config?.competitors || BRANDS[brand]?.competitors || [];
+      const sov = calcSOV(realPosts, brand, sovCompetitors);
+      console.log('SOV calculated:', JSON.stringify(sov));
       const full={...p1,...p2,sov,meta:{fromDate,toDate,brand,category:BRANDS[brand].category,emoji:BRANDS[brand].emoji},allPosts:realPosts||[],is_real_data:true};
       setReport(full);
       setHistory(prev=>[{from:fromDate,to:toDate,score:p1.summary.sentiment_score,
@@ -1255,9 +1257,9 @@ export default function Home(){
                       <span style={{fontSize:13,fontWeight:600}}>Competitor Landscape</span>
                     </div>
                     <div style={{padding:'13px 14px'}}>
-                      {report.competitors_mentioned.map((c,i)=>(
+                      {(report.competitors_mentioned||[]).map((c,i)=>(
                         <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 0',
-                          borderBottom:i<report.competitors_mentioned.length-1?`1px solid ${C.border}`:'none'}}>
+                          borderBottom:i<(report.competitors_mentioned||[]).length-1?`1px solid ${C.border}`:'none'}}>
                           <div style={{flex:1,fontSize:12,fontWeight:500}}>{c.brand}</div>
                           <div style={{fontSize:10,color:C.muted}}>{c.mentions} mentions</div>
                           <span style={{fontSize:10,padding:'2px 6px',borderRadius:8,fontWeight:500,
