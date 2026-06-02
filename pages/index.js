@@ -1120,7 +1120,7 @@ export default function Home(){
                     </div>
                     <div>
                       <div style={{fontSize:10,color:C.muted,marginBottom:7}}>Sample Reddit quotes</div>
-                      {report.top_themes?.length?report.top_themes.slice(0,3).map((t,i)=>(
+                      {(report?.top_themes||[]).slice(0,3).map((t,i)=>(
                         <div key={i} style={{background:'rgba(255,255,255,0.03)',borderRadius:6,padding:'7px 9px',marginBottom:6,borderLeft:'2px solid #FF4500'}}>
                           <div style={{fontSize:11,fontStyle:'italic',color:'#cbd5e1',marginBottom:2}}>"{t.example}"</div>
                           <div style={{fontSize:10,color:C.muted}}>{t.icon} {t.theme}</div>
@@ -1132,9 +1132,9 @@ export default function Home(){
 
                 {/* SLIDE 03 */}
                 <SlideCard num="03" title="Hot Topics & Themes">
-                  {report.top_themes?.length?report.top_themes.map((t,i)=>(
+                  {(report?.top_themes||[]).map((t,i)=>(
                     <div key={i} style={{display:'flex',alignItems:'flex-start',gap:8,padding:'8px 0',
-                      borderBottom:i<report.top_themes?.length?report.top_themes.length-1?`1px solid ${C.border}`:'none'}}>
+                      borderBottom:i<(report?.top_themes||[]).length-1?`1px solid ${C.border}`:'none'}}>
                       <div style={{width:24,height:24,borderRadius:5,background:'rgba(255,255,255,0.05)',
                         display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,flexShrink:0}}>{t.icon}</div>
                       <div style={{flex:1}}>
@@ -1159,8 +1159,8 @@ export default function Home(){
                     <span style={{color:C.red}}> ↓ Falling</span>
                   </div>
                   <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:14}}>
-                    {report?.keyword_associations.map((k,i)=>{
-                      const maxF=Math.max(...report?.keyword_associations.map(x=>x.frequency));
+                    {(report?.keyword_associations||[]).map((k,i)=>{
+                      const maxF=Math.max(...(report?.keyword_associations||[]).map(x=>x.frequency));
                       const sz=10+Math.round((k.frequency/maxF)*9);
                       const tc=trendColor(k.trend);
                       return <span key={i} style={{borderRadius:20,padding:'4px 10px',fontSize:sz,fontWeight:500,
@@ -1169,12 +1169,12 @@ export default function Home(){
                       </span>;
                     })}
                   </div>
-                  {report?.keyword_associations.map((k,i)=>{
-                    const maxF=Math.max(...report?.keyword_associations.map(x=>x.frequency));
+                  {(report?.keyword_associations||[]).map((k,i)=>{
+                    const maxF=Math.max(...(report?.keyword_associations||[]).map(x=>x.frequency));
                     const tc=trendColor(k.trend);
                     return(
                       <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 0',
-                        borderBottom:i<report?.keyword_associations.length-1?`1px solid ${C.border}`:'none',flexWrap:'wrap'}}>
+                        borderBottom:i<(report?.keyword_associations||[]).length-1?`1px solid ${C.border}`:'none',flexWrap:'wrap'}}>
                         <div style={{flex:1,fontSize:12,fontWeight:500,minWidth:100}}>
                           {k.keyword}
                           <div style={{height:4,borderRadius:2,marginTop:3,width:`${Math.round((k.frequency/maxF)*100)}%`,background:tc}}/>
@@ -1209,7 +1209,7 @@ export default function Home(){
                 {/* SLIDE 05 — Posts with links */}
                 <SlideCard num="05" title="Top Reddit Posts — click titles to open on Reddit">
                   <div style={{fontSize:11,color:C.muted,marginBottom:10}}>Click any post title to open it directly on Reddit →</div>
-                  {report?.top_posts.map((p,i)=>(
+                  {(report?.top_posts||[]).map((p,i)=>(
                     <div key={i} style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${C.border}`,borderRadius:8,padding:12,marginBottom:8}}>
                       <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:7,flexWrap:'wrap'}}>
                         <a href={`https://reddit.com/${p.subreddit}`} target="_blank" rel="noopener noreferrer"
@@ -1257,9 +1257,9 @@ export default function Home(){
                       <span style={{fontSize:13,fontWeight:600}}>Competitor Landscape</span>
                     </div>
                     <div style={{padding:'13px 14px'}}>
-                      {(report?.competitors_mentioned||[]).map((c,i)=>(
+                      {((report?.competitors_mentioned||[])||[]).map((c,i)=>(
                         <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 0',
-                          borderBottom:i<(report?.competitors_mentioned||[]).length-1?`1px solid ${C.border}`:'none'}}>
+                          borderBottom:i<((report?.competitors_mentioned||[])||[]).length-1?`1px solid ${C.border}`:'none'}}>
                           <div style={{flex:1,fontSize:12,fontWeight:500}}>{c.brand}</div>
                           <div style={{fontSize:10,color:C.muted}}>{c.mentions} mentions</div>
                           <span style={{fontSize:10,padding:'2px 6px',borderRadius:8,fontWeight:500,
@@ -1277,7 +1277,7 @@ export default function Home(){
                       <span style={{fontSize:13,fontWeight:600}}>AI Insights</span>
                     </div>
                     <div style={{padding:'13px 14px'}}>
-                      {report?.insights.map((ins,i)=>(
+                      {(report?.insights||[]).map((ins,i)=>(
                         <div key={i} style={{background:'rgba(167,139,250,0.06)',border:'1px solid rgba(167,139,250,0.17)',borderRadius:7,padding:10,marginBottom:7}}>
                           <div style={{fontSize:10,color:C.pur,fontWeight:700,marginBottom:3}}>INSIGHT {i+1}</div>
                           <div style={{fontSize:12,lineHeight:1.6}}>{ins}</div>
@@ -1289,7 +1289,7 @@ export default function Home(){
 
                 {/* SLIDE 08 */}
                 <SlideCard num="08" title="Signal Alerts & Recommendations">
-                  {report?.signal_alerts.map((s,i)=>(
+                  {(report?.signal_alerts||[]).map((s,i)=>(
                     <div key={i} style={{borderRadius:7,padding:10,display:'flex',gap:8,marginBottom:7,
                       background:s.urgency==='high'?'rgba(239,68,68,0.07)':s.urgency==='medium'?'rgba(245,158,11,0.07)':'rgba(34,197,94,0.06)',
                       border:`1px solid ${urgColor(s.urgency)}33`}}>
@@ -1312,16 +1312,16 @@ export default function Home(){
 
 📊 Sentiment: ${report.summary?.sentiment_score}/100 (${report.summary?.sentiment_label})
 📝 Posts: ${report.summary?.total_posts} analyzed across ${report.summary?.top_subreddit}
-🔥 Top topic: ${report.top_themes?.length?report.top_themes[0]?.theme} — "${report.top_themes?.length?report.top_themes[0]?.example}"
-💡 Insight: ${report?.insights[0]||'—'}
-🚨 Alert: ${report?.signal_alerts[0]?.signal||'—'} (${report?.signal_alerts[0]?.urgency||'—'} priority)
+🔥 Top topic: ${(report?.top_themes||[])[0]?.theme} — "${(report?.top_themes||[])[0]?.example}"
+💡 Insight: ${(report?.insights||[])[0]||'—'}
+🚨 Alert: ${(report?.signal_alerts||[])[0]?.signal||'—'} (${(report?.signal_alerts||[])[0]?.urgency||'—'} priority)
 
-Top post: ${report?.top_posts[0]?.reddit_url||'—'}
+Top post: ${(report?.top_posts||[])[0]?.reddit_url||'—'}
 
 Generated by ITC Brand Radar`}
                   </div>
                   <button onClick={()=>{
-                    const t=`${report.meta.emoji} ${brand} Reddit Pulse | ${report.meta.fromDate} → ${report.meta.toDate}\n\nSentiment: ${report.summary?.sentiment_score}/100 (${report.summary?.sentiment_label})\nPosts: ${report.summary?.total_posts}\nTop: ${report.top_themes?.length?report.top_themes[0]?.theme}\nInsight: ${report?.insights[0]||''}\nAlert: ${report?.signal_alerts[0]?.signal||''}\nTop post: ${report?.top_posts[0]?.reddit_url||''}`;
+                    const t=`${report.meta.emoji} ${brand} Reddit Pulse | ${report.meta.fromDate} → ${report.meta.toDate}\n\nSentiment: ${report.summary?.sentiment_score}/100 (${report.summary?.sentiment_label})\nPosts: ${report.summary?.total_posts}\nTop: ${(report?.top_themes||[])[0]?.theme}\nInsight: ${(report?.insights||[])[0]||''}\nAlert: ${(report?.signal_alerts||[])[0]?.signal||''}\nTop post: ${(report?.top_posts||[])[0]?.reddit_url||''}`;
                     navigator.clipboard.writeText(t);}}
                     style={{marginTop:8,background:'transparent',border:`1px solid ${C.border}`,borderRadius:6,padding:'6px 14px',fontSize:11,cursor:'pointer',color:C.text}}>
                     Copy to clipboard
