@@ -58,14 +58,22 @@ export default async function handler(req, res) {
 
     // Start Apify run
     const runResponse = await fetch(
-      `https://api.apify.com/v2/acts/iskander~fast-reddit-scraper/runs?token=${APIFY_API_KEY}`,
+      `https://api.apify.com/v2/acts/harshmaur~reddit-scraper/runs?token=${APIFY_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          search_terms: [searchTerm],
-          sort: 'new',
-          t: 'all',
+          searchTerms: [searchTerm],
+          searchPosts: true,
+          searchComments: false,
+          searchCommunities: false,
+          searchSort: 'relevance',
+          searchTime: 'all',
+          maxPostsCount: 100,
+          includeNSFW: false,
+          fastMode: true,
+          crawlCommentsPerPost: false,
+          proxy: { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'] },
         })
       }
     );
@@ -127,17 +135,17 @@ export default async function handler(req, res) {
     const finalPosts = [...brandPosts, ...otherPosts];
 
     const posts = finalPosts.map(p => ({
-      title: (p.title || p.body || p.selftext || 'Reddit Post').slice(0, 200),
-      subreddit: `r/${p.subreddit || p.communityName || p.community || p.subreddit_name_prefixed?.replace('r/','') || 'reddit'}`,
-      upvotes: p.score || p.upVotes || p.ups || p.upvotes || 0,
-      num_comments: p.num_comments || p.commentsCount || p.comments || 0,
-      author: p.author || p.authorName || p.username || 'redditor',
-      body: (p.selftext || p.body || p.text || '').slice(0, 500),
-      key_quote: (p.selftext || p.body || p.text || p.title || '').slice(0, 150),
-      reddit_url: p.url || p.postUrl || (p.permalink ? `https://www.reddit.com${p.permalink}` : p.full_link || ''),
-      created_at: p.created_utc ? new Date(p.created_utc * 1000).toISOString() : (p.createdAt || new Date().toISOString()),
-      flair: p.link_flair_text || p.flair || '',
-      awards: p.total_awards_received || p.awards || 0,
+      title: (p.title || p.body || 'Reddit Post').slice(0, 200),
+      subreddit: `r/${p.communityName || p.subreddit || p.community || 'reddit'}`,
+      upvotes: p.upVotes || p.score || p.ups || 0,
+      num_comments: p.commentsCount || p.num_comments || 0,
+      author: p.authorName || p.author || p.username || 'redditor',
+      body: (p.body || p.selftext || '').slice(0, 500),
+      key_quote: (p.body || p.selftext || p.title || '').slice(0, 150),
+      reddit_url: p.postUrl || p.url || (p.permalink ? `https://www.reddit.com${p.permalink}` : ''),
+      created_at: p.createdAt || new Date().toISOString(),
+      flair: p.flair || p.link_flair_text || '',
+      awards: p.awards || 0,
       mentions_brand: brandPosts.includes(p),
     }));
 
