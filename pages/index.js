@@ -91,54 +91,56 @@ function AllPostsPanel({posts, brand, C}) {
     return text.includes(brandLower) || p.mentions_brand;
   });
   const otherPosts = posts.filter(p => !brandPosts.includes(p));
+  const allSorted = [...brandPosts, ...otherPosts];
+
+  const PostRow = ({p, highlight}) => (
+    <div style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',borderRadius:6,
+      marginBottom:3,background:highlight?'rgba(255,69,0,0.04)':'rgba(255,255,255,0.02)',
+      border:`1px solid ${highlight?'rgba(255,69,0,0.15)':C.border}`}}>
+      <span style={{fontSize:10,color:highlight?C.acc:C.muted,minWidth:80,flexShrink:0}}>{p.subreddit}</span>
+      <span style={{fontSize:11,flex:1,color:highlight?C.text:C.muted,
+        overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</span>
+      <span style={{fontSize:10,color:C.muted,minWidth:40,flexShrink:0,textAlign:'right'}}>▲{p.upvotes}</span>
+      <span style={{fontSize:10,color:C.muted,minWidth:50,flexShrink:0}}>{p.num_comments} cmts</span>
+      {p.reddit_url
+        ? <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
+            style={{fontSize:11,color:C.acc,textDecoration:'none',flexShrink:0,
+              padding:'2px 8px',borderRadius:4,border:`1px solid rgba(255,69,0,0.3)`,
+              background:'rgba(255,69,0,0.05)'}}>🔗 Open</a>
+        : <span style={{fontSize:10,color:C.muted,flexShrink:0,minWidth:52}}>No URL</span>
+      }
+    </div>
+  );
+
   return (
     <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,marginBottom:10,overflow:'hidden'}}>
       <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',
         borderBottom:showAll?`1px solid ${C.border}`:'none',cursor:'pointer'}}
         onClick={()=>setShowAll(p=>!p)}>
-        <span style={{fontSize:10,fontWeight:700,background:'rgba(34,197,94,0.1)',color:C.grn,padding:'2px 7px',borderRadius:4}}>ALL POSTS</span>
-        <span style={{fontSize:13,fontWeight:600}}>All {posts.length} Posts Found</span>
-        <span style={{fontSize:11,color:C.muted}}>({brandPosts.length} mention {brand} · {otherPosts.length} other)</span>
-        <span style={{marginLeft:'auto',fontSize:12,color:C.muted}}>{showAll?'▲ Collapse':'▶ Expand'}</span>
+        <span style={{fontSize:10,fontWeight:700,background:'rgba(34,197,94,0.1)',
+          color:C.grn,padding:'2px 7px',borderRadius:4}}>ALL POSTS</span>
+        <span style={{fontSize:13,fontWeight:600}}>{posts.length} Posts Found</span>
+        <span style={{fontSize:11,color:C.muted,marginLeft:4}}>
+          · <span style={{color:C.acc}}>{brandPosts.length} mention {brand}</span>
+          · {otherPosts.length} other
+        </span>
+        <span style={{marginLeft:'auto',fontSize:12,color:C.muted}}>
+          {showAll?'▲ Collapse':'▶ Expand all posts + links'}
+        </span>
       </div>
       {showAll && (
         <div style={{padding:'8px 14px'}}>
-          {brandPosts.length > 0 && (
-            <div style={{marginBottom:8}}>
-              <div style={{fontSize:10,color:C.grn,fontWeight:600,marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>
-                Mentions {brand} ({brandPosts.length})
-              </div>
-              {brandPosts.map((p,i) => (
-                <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 8px',borderRadius:6,
-                  marginBottom:3,background:'rgba(255,255,255,0.02)',border:`1px solid ${C.border}`}}>
-                  <span style={{fontSize:10,color:C.acc,minWidth:70,flexShrink:0}}>{p.subreddit}</span>
-                  <span style={{fontSize:11,flex:1,color:C.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</span>
-                  <span style={{fontSize:10,color:C.muted,minWidth:45,flexShrink:0}}>▲{p.upvotes}</span>
-                  <span style={{fontSize:10,color:C.muted,minWidth:55,flexShrink:0}}>{p.num_comments} cmts</span>
-                  {p.reddit_url?(
-                    <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
-                      style={{fontSize:10,color:C.acc,textDecoration:'none',flexShrink:0}}>🔗 Open</a>
-                  ):<span style={{fontSize:10,color:C.muted,flexShrink:0}}>No link</span>}
-                </div>
-              ))}
-            </div>
-          )}
-          {otherPosts.length > 0 && (
-            <div>
-              <div style={{fontSize:10,color:C.muted,fontWeight:600,marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>
-                Other Posts ({otherPosts.length})
-              </div>
-              {otherPosts.map((p,i) => (
-                <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'5px 8px',borderRadius:6,marginBottom:2}}>
-                  <span style={{fontSize:10,color:C.muted,minWidth:70,flexShrink:0}}>{p.subreddit}</span>
-                  <span style={{fontSize:10,flex:1,color:C.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</span>
-                  <span style={{fontSize:9,color:C.muted,minWidth:45,flexShrink:0}}>▲{p.upvotes}</span>
-                  {p.reddit_url&&(
-                    <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
-                      style={{fontSize:10,color:C.muted,textDecoration:'none',flexShrink:0}}>🔗 Open</a>
-                  )}
-                </div>
-              ))}
+          <div style={{fontSize:10,color:C.muted,marginBottom:8,display:'flex',gap:12}}>
+            <span>🔴 Orange = mentions {brand}</span>
+            <span>· Grey = other posts</span>
+            <span>· Click 🔗 Open to view on Reddit</span>
+          </div>
+          {allSorted.map((p,i) => (
+            <PostRow key={i} p={p} highlight={brandPosts.includes(p)}/>
+          ))}
+          {allSorted.filter(p=>!p.reddit_url).length > 0 && (
+            <div style={{fontSize:10,color:C.muted,marginTop:6,fontStyle:'italic'}}>
+              * Some posts have no direct URL (Reddit may have removed them)
             </div>
           )}
         </div>
@@ -302,7 +304,11 @@ export default function Home(){
 
       const sovCompetitors = p1?.brand_config?.competitors || BRANDS[brand]?.competitors || [];
       const sov = calcSOV(realPosts, brand, sovCompetitors);
-      console.log('SOV calculated:', JSON.stringify(sov));
+      // Fix: align total_posts with actual realPosts count
+      if (p1?.summary) {
+        p1.summary.total_posts = realPosts.length;
+        p1.summary.total_comments = realPosts.reduce((a,p)=>a+(p.num_comments||0),0);
+      }
       const full={...p1,...p2,sov,meta:{fromDate,toDate,brand,category:BRANDS[brand].category,emoji:BRANDS[brand].emoji},allPosts:realPosts||[],is_real_data:true};
       setReport(full);
       setHistory(prev=>[{from:fromDate,to:toDate,score:p1.summary.sentiment_score,
