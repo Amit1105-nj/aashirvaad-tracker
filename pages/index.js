@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 
 // ── BRAND CONFIG (mirrors server-side) ──
@@ -84,7 +84,7 @@ function SlideCard({num,title,children}){
 }
 
 function AllPostsPanel({posts, brand, C}) {
-  const [showAll, setShowAll] = React.useState(false);
+  const [showAll, setShowAll] = useState(false);
   const brandLower = brand.toLowerCase();
   const brandPosts = posts.filter(p => {
     const text = `${p.title||''} ${p.body||''}`.toLowerCase();
@@ -261,7 +261,7 @@ export default function Home(){
 
       const r2=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,callType:'keywords',
-          themes:p1.top_themes.map(t=>t.theme).join(', '),realPosts})});
+          themes:(p1?.top_themes||[]).map(t=>t.theme).join(', '),realPosts})});
       const j2=await r2.json();
       if(!j2.success) throw new Error(j2.error||'Keywords API call failed');
       const p2=j2.data;
@@ -309,7 +309,7 @@ export default function Home(){
         mood:p1.summary.sentiment_label,posts:p1.summary.total_posts,brand,emoji:BRANDS[brand].emoji},...prev].slice(0,5));
 
       setStep('s6','done');setProgress(100);setStatus('done');
-      addLog(`Done — ${p1.top_themes.length} themes · ${p2.keyword_associations.length} keywords · ${p2.signal_alerts.length} signals`,'ok');
+      addLog(`Done — ${(p1?.top_themes||[]).length} themes · ${(p2?.keyword_associations||[]).length} keywords · ${p2.signal_alerts.length} signals`,'ok');
       setTimeout(()=>reportRef.current?.scrollIntoView({behavior:'smooth'}),300);
       setSidebarOpen(false);
     }catch(err){
@@ -1257,9 +1257,9 @@ export default function Home(){
                       <span style={{fontSize:13,fontWeight:600}}>Competitor Landscape</span>
                     </div>
                     <div style={{padding:'13px 14px'}}>
-                      {((report?.competitors_mentioned||[])||[]).map((c,i)=>(
+                      {(report?.competitors_mentioned||[]).map((c,i)=>(
                         <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 0',
-                          borderBottom:i<((report?.competitors_mentioned||[])||[]).length-1?`1px solid ${C.border}`:'none'}}>
+                          borderBottom:i<(report?.competitors_mentioned||[]).length-1?`1px solid ${C.border}`:'none'}}>
                           <div style={{flex:1,fontSize:12,fontWeight:500}}>{c.brand}</div>
                           <div style={{fontSize:10,color:C.muted}}>{c.mentions} mentions</div>
                           <span style={{fontSize:10,padding:'2px 6px',borderRadius:8,fontWeight:500,
