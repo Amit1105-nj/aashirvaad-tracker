@@ -83,6 +83,70 @@ function SlideCard({num,title,children}){
   );
 }
 
+function AllPostsPanel({posts, brand, C}) {
+  const [showAll, setShowAll] = React.useState(false);
+  const brandLower = brand.toLowerCase();
+  const brandPosts = posts.filter(p => {
+    const text = `${p.title||''} ${p.body||''}`.toLowerCase();
+    return text.includes(brandLower) || p.mentions_brand;
+  });
+  const otherPosts = posts.filter(p => !brandPosts.includes(p));
+  return (
+    <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,marginBottom:10,overflow:'hidden'}}>
+      <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',
+        borderBottom:showAll?`1px solid ${C.border}`:'none',cursor:'pointer'}}
+        onClick={()=>setShowAll(p=>!p)}>
+        <span style={{fontSize:10,fontWeight:700,background:'rgba(34,197,94,0.1)',color:C.grn,padding:'2px 7px',borderRadius:4}}>ALL POSTS</span>
+        <span style={{fontSize:13,fontWeight:600}}>All {posts.length} Posts Found</span>
+        <span style={{fontSize:11,color:C.muted}}>({brandPosts.length} mention {brand} · {otherPosts.length} other)</span>
+        <span style={{marginLeft:'auto',fontSize:12,color:C.muted}}>{showAll?'▲ Collapse':'▶ Expand'}</span>
+      </div>
+      {showAll && (
+        <div style={{padding:'8px 14px'}}>
+          {brandPosts.length > 0 && (
+            <div style={{marginBottom:8}}>
+              <div style={{fontSize:10,color:C.grn,fontWeight:600,marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>
+                Mentions {brand} ({brandPosts.length})
+              </div>
+              {brandPosts.map((p,i) => (
+                <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 8px',borderRadius:6,
+                  marginBottom:3,background:'rgba(255,255,255,0.02)',border:`1px solid ${C.border}`}}>
+                  <span style={{fontSize:10,color:C.acc,minWidth:70,flexShrink:0}}>{p.subreddit}</span>
+                  <span style={{fontSize:11,flex:1,color:C.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</span>
+                  <span style={{fontSize:10,color:C.muted,minWidth:45,flexShrink:0}}>▲{p.upvotes}</span>
+                  <span style={{fontSize:10,color:C.muted,minWidth:55,flexShrink:0}}>{p.num_comments} cmts</span>
+                  {p.reddit_url?(
+                    <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
+                      style={{fontSize:10,color:C.acc,textDecoration:'none',flexShrink:0}}>🔗 Open</a>
+                  ):<span style={{fontSize:10,color:C.muted,flexShrink:0}}>No link</span>}
+                </div>
+              ))}
+            </div>
+          )}
+          {otherPosts.length > 0 && (
+            <div>
+              <div style={{fontSize:10,color:C.muted,fontWeight:600,marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>
+                Other Posts ({otherPosts.length})
+              </div>
+              {otherPosts.map((p,i) => (
+                <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'5px 8px',borderRadius:6,marginBottom:2}}>
+                  <span style={{fontSize:10,color:C.muted,minWidth:70,flexShrink:0}}>{p.subreddit}</span>
+                  <span style={{fontSize:10,flex:1,color:C.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</span>
+                  <span style={{fontSize:9,color:C.muted,minWidth:45,flexShrink:0}}>▲{p.upvotes}</span>
+                  {p.reddit_url&&(
+                    <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
+                      style={{fontSize:10,color:C.muted,textDecoration:'none',flexShrink:0}}>🔗 Open</a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Home(){
   const [brand,setBrand]=useState('Aashirvaad');
   const [fromDate,setFromDate]=useState('');
@@ -1136,73 +1200,9 @@ export default function Home(){
 
                 {/* ALL POSTS FOUND — collapsible */}
                 <div id="all-posts-section"/>
-                {report?.is_real_data && report?.allPosts?.length > 0 && (() => {
-                  const [showAll, setShowAll] = React.useState(false);
-                  const brandPosts = report.allPosts.filter(p => p.mentions_brand);
-                  const otherPosts = report.allPosts.filter(p => !p.mentions_brand);
-                  return (
-                    <div style={{background:C.surf,border:`1px solid ${C.border}`,borderRadius:11,marginBottom:10,overflow:'hidden'}}>
-                      <div style={{display:'flex',alignItems:'center',gap:8,padding:'11px 14px',borderBottom:showAll?`1px solid ${C.border}`:'none',cursor:'pointer'}}
-                        onClick={()=>setShowAll(p=>!p)}>
-                        <span style={{fontSize:10,fontWeight:700,background:'rgba(34,197,94,0.1)',color:C.grn,padding:'2px 7px',borderRadius:4}}>ALL POSTS</span>
-                        <span style={{fontSize:13,fontWeight:600}}>All {report.allPosts.length} Posts Found</span>
-                        <span style={{fontSize:11,color:C.muted}}>({brandPosts.length} mention {brand} · {otherPosts.length} other)</span>
-                        <span style={{marginLeft:'auto',fontSize:12,color:C.muted}}>{showAll?'▲ Collapse':'▶ Expand'}</span>
-                      </div>
-                      {showAll && (
-                        <div style={{padding:'8px 14px'}}>
-                          {/* Brand posts first */}
-                          {brandPosts.length > 0 && (
-                            <div style={{marginBottom:8}}>
-                              <div style={{fontSize:10,color:C.grn,fontWeight:600,marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>
-                                Mentions {brand} ({brandPosts.length})
-                              </div>
-                              {brandPosts.map((p,i) => (
-                                <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 8px',borderRadius:6,marginBottom:3,
-                                  background:'rgba(255,255,255,0.02)',border:`1px solid ${C.border}`}}>
-                                  <span style={{fontSize:10,color:C.acc,minWidth:60}}>{p.subreddit}</span>
-                                  <span style={{fontSize:11,flex:1,color:C.text}}>{p.title}</span>
-                                  <span style={{fontSize:10,color:C.muted,minWidth:50}}>▲{p.upvotes}</span>
-                                  <span style={{fontSize:10,color:C.muted,minWidth:50}}>{p.num_comments} cmts</span>
-                                  {p.reddit_url ? (
-                                    <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
-                                      style={{fontSize:10,color:C.acc,textDecoration:'none',minWidth:50}}>
-                                      🔗 Open
-                                    </a>
-                                  ) : (
-                                    <span style={{fontSize:10,color:C.muted,minWidth:50}}>No link</span>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          {/* Other posts */}
-                          {otherPosts.length > 0 && (
-                            <div>
-                              <div style={{fontSize:10,color:C.muted,fontWeight:600,marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>
-                                Other Posts ({otherPosts.length})
-                              </div>
-                              {otherPosts.map((p,i) => (
-                                <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'5px 8px',borderRadius:6,marginBottom:2,
-                                  background:'rgba(255,255,255,0.01)'}}>
-                                  <span style={{fontSize:10,color:C.muted,minWidth:60}}>{p.subreddit}</span>
-                                  <span style={{fontSize:10,flex:1,color:C.muted}}>{p.title}</span>
-                                  <span style={{fontSize:9,color:C.muted,minWidth:50}}>▲{p.upvotes}</span>
-                                  {p.reddit_url && (
-                                    <a href={p.reddit_url} target="_blank" rel="noopener noreferrer"
-                                      style={{fontSize:10,color:C.muted,textDecoration:'none',minWidth:50}}>
-                                      🔗 Open
-                                    </a>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
+                {report?.is_real_data && report?.allPosts?.length > 0 && (
+                  <AllPostsPanel posts={report.allPosts} brand={brand} C={C}/>
+                )}
 
                 {/* SLIDE 05 — Posts with links */}
                 <SlideCard num="05" title="Top Reddit Posts — click titles to open on Reddit">
