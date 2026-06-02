@@ -178,6 +178,12 @@ export default function Home(){
         body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),callType:'core',realPosts})});
       const j1=await r1.json();
       if(!j1.success) throw new Error(j1.error||'API call failed');
+      if(j1.no_data){
+        addLog(`⚠️ ${j1.message}`,'warn');
+        addLog('No report generated — no real posts found.','warn');
+        setRunning(false);setStatus('idle');setProgress(0);
+        return;
+      }
       const p1=j1.data;
 
       setStep('s1','done');setStep('s2','done');setStep('s3','done');
@@ -205,7 +211,33 @@ export default function Home(){
       addLog('Building report...','step');
       setProgress(92);
 
-      const full={...p1,...p2,meta:{fromDate,toDate,brand,category:BRANDS[brand].category,emoji:BRANDS[brand].emoji},allPosts:realPosts||[]};
+      // Calculate SOV from real posts in JavaScript — no Claude dependency
+      const calcSOV = (posts, brandName, competitors) => {
+        if (!posts || posts.length === 0) return null;
+        const brandNameLower = brandName.toLowerCase();
+        const brandPosts = posts.filter(p => {
+          const text = `${p.title} ${p.body||''}`.toLowerCase();
+          return text.includes(brandNameLower);
+        }).length;
+        const compData = (competitors||[]).map(comp => {
+          const compLower = comp.toLowerCase().split(' ')[0]; // first word e.g. "Pillsbury"
+          const compPosts = posts.filter(p => {
+            const text = `${p.title} ${p.body||''}`.toLowerCase();
+            return text.includes(compLower);
+          }).length;
+          return { brand: comp, posts: compPosts, pct: Math.round((compPosts/posts.length)*100) };
+        });
+        return {
+          brand_name: brandName,
+          brand_posts: brandPosts,
+          brand_pct: Math.round((brandPosts/posts.length)*100),
+          competitors: compData,
+          category_total: posts.length,
+        };
+      };
+
+      const sov = calcSOV(realPosts, brand, BRANDS[brand]?.competitors || p1.brand_config?.competitors || []);
+      const full={...p1,...p2,sov,meta:{fromDate,toDate,brand,category:BRANDS[brand].category,emoji:BRANDS[brand].emoji},allPosts:realPosts||[],is_real_data:true};
       setReport(full);
       setHistory(prev=>[{from:fromDate,to:toDate,score:p1.summary.sentiment_score,
         mood:p1.summary.sentiment_label,posts:p1.summary.total_posts,brand,emoji:BRANDS[brand].emoji},...prev].slice(0,5));
@@ -906,18 +938,33 @@ export default function Home(){
                 {/* KPI row */}
                 <div className="kpi-row" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:12}}>
                   {[
-                    {label:'Posts found',value:report.summary.total_posts,color:C.acc,sub:'in date range'},
+                    {label:'Posts found',value:report.summary.total_posts,color:C.acc,sub:'click to see all',link:true},
                     {label:'Comments',value:report.summary.total_comments,color:C.pur,sub:'analyzed'},
-                    {label:'Sentiment score',value:report.summary.sentiment_score,color:C.grn,sub:'out of 100'},
+                    {label:'Sentiment score',value:report.is_real_data?report.summary.sentiment_score:'—',color:C.grn,sub:'out of 100'},
                     {label:'Overall mood',value:report.summary.sentiment_label,color:C.text,sub:'top: '+report.summary.top_subreddit,small:true},
-                  ].map(({label,value,color,sub,small})=>(
-                    <div key={label} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:13}}>
+                  ].map(({label,value,color,sub,small,link})=>(
+                    <div key={label}
+                      onClick={link&&report.allPosts?.length>0?()=>{const el=document.getElementById('all-posts-section');if(el)el.scrollIntoView({behavior:'smooth'});}:undefined}
+                      style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:13,cursor:link?'pointer':'default',
+                        ...(link?{borderColor:'rgba(255,69,0,0.3)'}:{})}}>
                       <div style={{fontSize:10,color:C.muted,textTransform:'uppercase',letterSpacing:'0.04em',marginBottom:4}}>{label}</div>
                       <div style={{fontSize:small?17:22,fontWeight:700,color,marginBottom:2}}>{value}</div>
                       <div style={{fontSize:10,color:C.muted}}>{sub}</div>
                     </div>
                   ))}
                 </div>
+
+                {/* NO REAL DATA BANNER */}
+                {report && !report.is_real_data && (
+                  <div style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.4)',borderRadius:10,
+                    padding:'12px 16px',marginBottom:10,display:'flex',alignItems:'center',gap:10}}>
+                    <span style={{fontSize:18}}>⚠️</span>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:700,color:C.red}}>Simulated Data — Not Real</div>
+                      <div style={{fontSize:11,color:C.muted}}>No live Reddit posts were found. All numbers, themes and insights below are AI-generated and should not be used for decisions.</div>
+                    </div>
+                  </div>
+                )}
 
                 {/* SOV WIDGET */}
                 {report?.sov && (
@@ -1088,6 +1135,7 @@ export default function Home(){
                 </SlideCard>
 
                 {/* ALL POSTS FOUND — collapsible */}
+                <div id="all-posts-section"/>
                 {report?.is_real_data && report?.allPosts?.length > 0 && (() => {
                   const [showAll, setShowAll] = React.useState(false);
                   const brandPosts = report.allPosts.filter(p => p.mentions_brand);
