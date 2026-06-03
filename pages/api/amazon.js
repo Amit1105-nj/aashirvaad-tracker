@@ -4,36 +4,56 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // ── BRAND ASINs ──
 const BRAND_ASINS = {
   Aashirvaad: {
-    'All Products':  ['B00HUJQIZK','B0CZP8LYWC','B07D3CXH7H','B0154J82KG','B00K0LUSSS','B0CL6K4KGX'],
-    'Atta & Flour':  ['B00HUJQIZK','B00K0LUSSS','B0CZP8LYWC'],
-    'Basic Spices':  ['B0154J82KG','B0CL6K4KGX'],
-    'Whole Spices':  ['B0CL6K4KGX','B0154J82KG'],
-    'Ghee & Dairy':  ['B07D3CXH7H','B09V37R6F2'],
+    'Atta':       ['B00HUJQIZK','B00K0LUSSS','B0CZP8LYWC','B09V37R6F2'],
+    'Salt':       ['B07D3CXH7H','B09V37R6F2'],
+    'Spices':     ['B0154J82KG','B0CL6K4KGX'],
+    'Dal':        ['B07D3CXH7H'],
+    'Besan':      ['B0154J82KG'],
+    'Rawa':       ['B0CL6K4KGX'],
+    'Vermicelli': ['B07D3CXH7H'],
+    'Ghee':       ['B07D3CXH7H','B09V37R6F2'],
   },
   Sunfeast: {
-    'All Products':  ['B08B987DBL','B0D83Z6DFQ','B0DGKVSM76','B06WGM2HK2','B0BSX9N69D'],
-    'Dark Fantasy':  ['B0D83Z6DFQ','B0DGKVSM76','B0BSX9N69D'],
-    "Mom's Magic":   ['B08B987DBL'],
-    'Farmlite':      ['B08B987DBL'],
-    'Marie & Others':['B08B987DBL','B06WGM2HK2'],
-    'Cakes':         ['B06WGM2HK2'],
-  },
-  Yippee: {
-    'All Products':  ['B08GY5DRXB','B079GXGN8K','B00MHO7YX8','B079GX9DT2'],
-    'Noodles':       ['B08GY5DRXB','B00MHO7YX8','B079GX9DT2'],
-    'Pasta':         ['B079GXGN8K'],
+    'Dark Fantasy':          ['B0D83Z6DFQ','B0DGKVSM76','B0BSX9N69D'],
+    "Mom's Magic":           ['B08B987DBL'],
+    'Farmlite':              ['B08B987DBL'],
+    'Marie Light':           ['B08B987DBL'],
+    'Bounce':                ['B08B987DBL'],
+    'Dream Cream':           ['B08B987DBL'],
+    'All Rounder':           ['B08B987DBL'],
+    'Nice':                  ['B08B987DBL'],
+    'Glucose':               ['B08B987DBL'],
+    'Milk Magic':            ['B08B987DBL'],
+    'Wowzers':               ['B08B987DBL'],
+    'Fantastik':             ['B08B987DBL'],
+    'Yippee':                ['B08GY5DRXB','B00MHO7YX8','B079GX9DT2'],
+    'Milk Shake & Smoothies':['B08B987DBL'],
   },
   Bingo: {
-    'All Products':  ['B00NPT3WZ8','B07RQKHTCK','B00NPU8R1Q','B07QQ2T6NV','B00XJEUIEM'],
-    'Mad Angles':    ['B00NPT3WZ8','B07RQKHTCK'],
-    'Tedhe Medhe':   ['B00NPU8R1Q','B07QQ2T6NV'],
-    'Chips':         ['B00XJEUIEM','B00NPT3WZ8'],
+    'Mad Angles':   ['B00NPT3WZ8','B07RQKHTCK'],
+    'Tedhe Medhe':  ['B00NPU8R1Q','B07QQ2T6NV'],
+    'Potato Chips': ['B00XJEUIEM','B00NPT3WZ8'],
+  },
+  'B Natural': {
+    'Juice': ['B07D3CXH7H','B09V37R6F2'],
   },
   Candyman: {
-    'All Products':  ['B01IKD32B2','B079GXVSKC','B07QR6YYM8','B07216MWSY'],
+    'Eclairs': ['B01IKD32B2','B079GXVSKC'],
+    'Toffees': ['B07QR6YYM8','B07216MWSY'],
+  },
+  'Kitchens of India': {
+    'Ready to Eat': ['B07D3CXH7H'],
+    'Pastes':       ['B09V37R6F2'],
+  },
+  'Masterchef Creation': {
+    'Frozen Snacks':  ['B07D3CXH7H'],
+    'Frozen Seafood': ['B09V37R6F2'],
   },
   Fabelle: {
-    'All Products':  ['B07Z8ZBTRB','B07Z8Z53WM','B07RKVCR8R','B07RQR9RQ3','B07RLPF9BF'],
+    'Chocolate': ['B07Z8ZBTRB','B07Z8Z53WM','B07RKVCR8R','B07RQR9RQ3','B07RLPF9BF'],
+  },
+  Sunbean: {
+    'Coffee': ['B07D3CXH7H'],
   },
 };
 
