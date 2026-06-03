@@ -59,7 +59,7 @@ const BRANDS = {
   },
   'Masterchef Creation': {
     emoji: '🍗',
-    logo: '/ITC Master Chef.jpg',
+    logo: '/ITC%20Materchef.jpg',
     logoBg: '#c0392b',
     category: 'Foods',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/nonveg','r/IndianKitchen','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
