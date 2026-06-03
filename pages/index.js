@@ -439,7 +439,7 @@ export default function Home(){
         </div>
         <div>
           <div style={{fontSize:13,fontWeight:600}}>ITC Brand Radar</div>
-          <div style={{fontSize:10,color:C.muted}}>Reddit & Amazon Intelligence</div>
+          <div style={{fontSize:10,color:C.muted}}>Reddit Intelligence · Powered by Claude AI</div>
         </div>
       </div>
 
@@ -586,7 +586,7 @@ export default function Home(){
               <h1 className="page-title" style={{fontSize:19,fontWeight:600}}>{brand} Intelligence Dashboard</h1>
             </div>
             <p style={{fontSize:12,color:C.muted,marginBottom:18}}>
-              {brandConfig.category} · Reddit + Amazon intelligence · Apify scraping → Claude AI → Reports + PPT
+              {brandConfig.category} · Reddit Intelligence · Powered by Claude AI
             </p>
 
             {/* CONFIG PANEL */}
