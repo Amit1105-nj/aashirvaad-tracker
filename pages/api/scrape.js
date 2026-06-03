@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     Sunfeast: {
       default: 'Sunfeast biscuit',
       'Dark Fantasy': 'Sunfeast Dark Fantasy',
-      "Mom's Magic": "Sunfeast Mom's Magic",
+      "Moms Magic": "Sunfeast Moms Magic",
       'Farmlite': 'Sunfeast Farmlite digestive',
       'Bounce': 'Sunfeast Bounce biscuit',
       'Dream Cream': 'Sunfeast Dream Cream',
