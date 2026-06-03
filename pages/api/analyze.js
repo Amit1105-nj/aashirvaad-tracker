@@ -83,9 +83,9 @@ const BRAND_CONFIG = {
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen'],
     subBrandCompetitors: {
       'Ready to Eat': ['MTR','Haldirams','Gits'],
-      'Pastes': ['Kohinoor','Patak's'],
+      'Pastes': ['Kohinoor','Pataks'],
     },
-    competitors: ['MTR','Haldirams','Gits','Kohinoor','Patak's'],
+    competitors: ['MTR','Haldirams','Gits','Kohinoor','Pataks'],
     topics: 'convenience, taste authenticity, packaging, shelf life, travel food, office lunch',
   },
   'Masterchef Creation': {
@@ -93,10 +93,10 @@ const BRAND_CONFIG = {
     description: "ITC's frozen snacks and seafood brand for home cooking",
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/IndianKitchen'],
     subBrandCompetitors: {
-      'Frozen Snacks': ['Godrej Yummiez','Venky's'],
+      'Frozen Snacks': ['Godrej Yummiez','Venkys'],
       'Frozen Seafood': ['Fresho','FreshToHome','Licious'],
     },
-    competitors: ['Godrej Yummiez','Venky's','FreshToHome','Licious','Fresho'],
+    competitors: ['Godrej Yummiez','Venkys','FreshToHome','Licious','Fresho'],
     topics: 'frozen food quality, taste, convenience, price, home cooking, quick meals',
   },
   Fabelle: {
