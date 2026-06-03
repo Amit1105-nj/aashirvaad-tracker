@@ -27,7 +27,7 @@ const BRAND_CONFIG = {
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian','r/Hostels','r/CollegeIndia'],
     subBrandCompetitors: {
       'Dark Fantasy': ['Oreo','Hide & Seek','Unibic Choco Kiss'],
-      "Mom's Magic": ['Good Day','Unibic Cookies'],
+      "Moms Magic": ['Good Day','Unibic Cookies'],
       'Farmlite': ['NutriChoice Digestive','Britannia Digestive'],
       'Bounce': ['Oreo','Bourbon','Treat'],
       'Dream Cream': ['Britannia Treat','Oreo'],
