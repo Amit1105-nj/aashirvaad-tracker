@@ -196,7 +196,6 @@ export default function Home(){
   const [amazonSubCategory,setAmazonSubCategory]=useState('All Products');
   const [runMode,setRunMode]=useState('reddit');
   const [customKeyword,setCustomKeyword]=useState('');
-  const [useCustomKeyword,setUseCustomKeyword]=useState(false); // 'reddit' | 'amazon' | 'both'
 
   // Sub-categories per brand
   const AMAZON_SUB_CATS = {
