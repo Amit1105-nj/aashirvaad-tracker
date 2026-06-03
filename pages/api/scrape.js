@@ -9,42 +9,65 @@ export default async function handler(req, res) {
 
   const BRAND_SEARCH_TERMS = {
     Aashirvaad: {
-      default: 'Aashirvaad atta',
-      'All Products': 'Aashirvaad',
-      'Atta & Flour': 'Aashirvaad atta',
-      'Basic Spices': 'Aashirvaad spices',
-      'Whole Spices': 'Aashirvaad whole spices',
-      'Ghee & Dairy': 'Aashirvaad ghee',
-    },
-    Bingo: {
-      default: 'Bingo chips',
-      'All Products': 'Bingo snacks',
-      'Mad Angles': 'Bingo Mad Angles',
-      'Tedhe Medhe': 'Bingo Tedhe Medhe',
-      'Chips': 'Bingo chips',
-    },
-    Candyman: {
-      default: 'Candyman eclairs',
-      'All Products': 'Candyman ITC',
+      default: 'Aashirvaad',
+      'Atta': 'Aashirvaad atta',
+      'Salt': 'Aashirvaad salt',
+      'Spices': 'Aashirvaad spices masala',
+      'Dal': 'Aashirvaad dal',
+      'Besan': 'Aashirvaad besan',
+      'Rawa': 'Aashirvaad rawa sooji',
+      'Vermicelli': 'Aashirvaad vermicelli',
+      'Ghee': 'Aashirvaad ghee',
     },
     Sunfeast: {
       default: 'Sunfeast biscuit',
-      'All Products': 'Sunfeast biscuit',
       'Dark Fantasy': 'Sunfeast Dark Fantasy',
       "Mom's Magic": "Sunfeast Mom's Magic",
-      'Farmlite': 'Sunfeast Farmlite',
-      'Marie & Others': 'Sunfeast Marie',
-      'Cakes': 'Sunfeast cake',
+      'Farmlite': 'Sunfeast Farmlite digestive',
+      'Bounce': 'Sunfeast Bounce biscuit',
+      'Dream Cream': 'Sunfeast Dream Cream',
+      'Marie Light': 'Sunfeast Marie Light',
+      'All Rounder': 'Sunfeast All Rounder crackers',
+      'Nice': 'Sunfeast Nice biscuit',
+      'Glucose': 'Sunfeast Glucose biscuit',
+      'Milk Magic': 'Sunfeast Milk Magic',
+      'Wowzers': 'Sunfeast Wowzers',
+      'Fantastik': 'Sunfeast Fantastik chocolate',
+      'Yippee': 'Sunfeast Yippee noodles',
+      'Milk Shake & Smoothies': 'Sunfeast milkshake smoothie',
     },
-    Yippee: {
-      default: 'Yippee noodles',
-      'All Products': 'Yippee noodles',
-      'Noodles': 'Yippee Magic Masala noodles',
-      'Pasta': 'Yippee pasta',
+    Bingo: {
+      default: 'Bingo snacks',
+      'Mad Angles': 'Bingo Mad Angles',
+      'Tedhe Medhe': 'Bingo Tedhe Medhe',
+      'Potato Chips': 'Bingo potato chips',
+    },
+    'B Natural': {
+      default: 'B Natural juice',
+      'Juice': 'B Natural fruit juice',
+    },
+    Candyman: {
+      default: 'Candyman ITC',
+      'Eclairs': 'Candyman eclairs',
+      'Toffees': 'Candyman toffee',
+    },
+    'Kitchens of India': {
+      default: 'Kitchens of India',
+      'Ready to Eat': 'Kitchens of India ready to eat',
+      'Pastes': 'Kitchens of India cooking paste',
+    },
+    'Masterchef Creation': {
+      default: 'ITC Masterchef frozen',
+      'Frozen Snacks': 'ITC Masterchef frozen snacks',
+      'Frozen Seafood': 'ITC Masterchef frozen seafood',
     },
     Fabelle: {
-      default: 'Fabelle chocolate',
-      'All Products': 'Fabelle chocolate ITC',
+      default: 'Fabelle chocolate ITC',
+      'Chocolate': 'Fabelle chocolate',
+    },
+    Sunbean: {
+      default: 'Sunbean coffee ITC',
+      'Coffee': 'Sunbean coffee',
     },
   };
 
@@ -69,7 +92,7 @@ export default async function handler(req, res) {
           searchCommunities: false,
           searchSort: 'relevance',
           searchTime: 'all',
-          maxPostsCount: 100,
+          maxPostsCount: 50,
           includeNSFW: false,
           fastMode: true,
           crawlCommentsPerPost: false,
@@ -109,13 +132,16 @@ export default async function handler(req, res) {
       throw new Error('Scrape timed out with no results');
     }
 
-    const r = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_API_KEY}&limit=200&clean=true`);
+    const r = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_API_KEY}&limit=100&clean=true`);
     const rawItems = await r.json();
 
     console.log('Reddit raw items:', rawItems?.length || 0);
     if (rawItems?.length > 0) {
       console.log('Reddit first item keys:', Object.keys(rawItems[0]));
     }
+    console.log('Safe posts after NSFW filter:', safePosts?.length || 0);
+    console.log('Brand posts (mention brand):', brandPosts?.length || 0);
+    console.log('Search term used:', searchTerm);
 
     if (!rawItems || rawItems.length === 0) {
       return res.status(200).json({ success: true, posts: [], message: 'No posts found' });
@@ -133,6 +159,7 @@ export default async function handler(req, res) {
     );
     const otherPosts = safePosts.filter(p => !brandPosts.includes(p));
     const finalPosts = [...brandPosts, ...otherPosts];
+    console.log(`Posts breakdown: raw=${rawItems?.length} safe=${safePosts.length} brand=${brandPosts.length} other=${otherPosts.length} final=${finalPosts.length}`);
 
     const posts = finalPosts.map(p => ({
       title: (p.title || p.body || 'Reddit Post').slice(0, 200),
