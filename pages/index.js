@@ -1051,37 +1051,53 @@ export default function Home(){
                       <span style={{fontSize:13,fontWeight:600}}>Who Owns the Conversation?</span>
                     </div>
                     <div style={{padding:'13px 14px'}}>
-                      <div style={{display:'flex',height:28,borderRadius:6,overflow:'hidden',marginBottom:10,gap:1}}>
-                        <div style={{width:`${report.sov.brand_pct||0}%`,background:C.acc,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:'white',minWidth:30}}>
-                          {report.sov.brand_pct}%
-                        </div>
-                        {(report.sov.competitors||[]).map((comp,i)=>{
-                          const colors=['#2563eb','#7c3aed','#059669','#d97706','#dc2626'];
-                          return comp.pct>0&&(
-                            <div key={i} style={{width:`${comp.pct}%`,background:colors[i%colors.length],display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,color:'white',fontWeight:600,minWidth:20}}>
-                              {comp.pct>5?`${comp.pct}%`:''}
+                      {(() => {
+                        const usedPct = (report.sov.brand_pct||0) + (report.sov.competitors||[]).reduce((a,b)=>a+(b.pct||0),0);
+                        const otherPct = Math.max(0, 100 - usedPct);
+                        const colors = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626'];
+                        return (
+                          <>
+                            <div style={{display:'flex',height:28,borderRadius:6,overflow:'hidden',marginBottom:10,gap:1}}>
+                              <div style={{width:`${report.sov.brand_pct||0}%`,background:C.acc,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:'white',minWidth:30}}>
+                                {report.sov.brand_pct}%
+                              </div>
+                              {(report.sov.competitors||[]).map((comp,i)=>(
+                                comp.pct>0&&(
+                                  <div key={i} style={{width:`${comp.pct}%`,background:colors[i%colors.length],display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,color:'white',fontWeight:600,minWidth:15}}>
+                                    {comp.pct>5?`${comp.pct}%`:''}
+                                  </div>
+                                )
+                              ))}
+                              {otherPct>0&&(
+                                <div style={{flex:1,background:'rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,color:C.muted}}>
+                                  Other {otherPct}%
+                                </div>
+                              )}
                             </div>
-                          );
-                        })}
-                      </div>
-                      <div style={{display:'flex',flexWrap:'wrap',gap:10,marginBottom:6}}>
-                        <div style={{display:'flex',alignItems:'center',gap:5}}>
-                          <div style={{width:10,height:10,borderRadius:2,background:C.acc}}/>
-                          <span style={{fontSize:11,fontWeight:600,color:C.text}}>{report.sov.brand_name} — {report.sov.brand_pct}% ({report.sov.brand_posts} posts)</span>
-                        </div>
-                        {(report.sov.competitors||[]).map((comp,i)=>{
-                          const colors=['#2563eb','#7c3aed','#059669','#d97706','#dc2626'];
-                          return(
-                            <div key={i} style={{display:'flex',alignItems:'center',gap:5}}>
-                              <div style={{width:10,height:10,borderRadius:2,background:colors[i%colors.length]}}/>
-                              <span style={{fontSize:11,color:C.muted}}>{comp.brand} — {comp.pct}% ({comp.posts} posts)</span>
+                            <div style={{display:'flex',flexWrap:'wrap',gap:10,marginBottom:6}}>
+                              <div style={{display:'flex',alignItems:'center',gap:5}}>
+                                <div style={{width:10,height:10,borderRadius:2,background:C.acc}}/>
+                                <span style={{fontSize:11,fontWeight:600,color:C.text}}>{report.sov.brand_name} — {report.sov.brand_pct}% ({report.sov.brand_posts} posts)</span>
+                              </div>
+                              {(report.sov.competitors||[]).map((comp,i)=>(
+                                <div key={i} style={{display:'flex',alignItems:'center',gap:5}}>
+                                  <div style={{width:10,height:10,borderRadius:2,background:colors[i%colors.length]}}/>
+                                  <span style={{fontSize:11,color:C.muted}}>{comp.brand} — {comp.pct}% ({comp.posts} posts)</span>
+                                </div>
+                              ))}
+                              {otherPct>0&&(
+                                <div style={{display:'flex',alignItems:'center',gap:5}}>
+                                  <div style={{width:10,height:10,borderRadius:2,background:'rgba(255,255,255,0.08)',border:`1px solid ${C.border}`}}/>
+                                  <span style={{fontSize:11,color:C.muted}}>Other/General — {otherPct}% (no brand mentioned)</span>
+                                </div>
+                              )}
                             </div>
-                          );
-                        })}
-                      </div>
-                      <div style={{fontSize:10,color:C.muted,fontStyle:'italic'}}>
-                        {report.sov.category_total} total posts analysed · Higher % = more conversation ownership on Reddit
-                      </div>
+                            <div style={{fontSize:10,color:C.muted,fontStyle:'italic'}}>
+                              {report.sov.category_total} total posts · "Other" = posts about the category but no specific brand mentioned
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
