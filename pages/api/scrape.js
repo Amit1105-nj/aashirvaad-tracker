@@ -73,7 +73,10 @@ export default async function handler(req, res) {
 
   try {
     const brandLower = brand.toLowerCase();
-    const subCat = req.body.subCategory || 'All Products';
+    const subCat = req.body.subCategory || 'All';
+    const excludeKeywords = req.body.excludeKeywords
+      ? req.body.excludeKeywords.split(',').map(k=>k.trim().toLowerCase()).filter(Boolean)
+      : [];
     const customKeyword = req.body.customKeyword;
     const brandTerms = BRAND_SEARCH_TERMS[brand] || { default: brand };
     const searchTerm = customKeyword || brandTerms[subCat] || brandTerms.default || brand;
@@ -153,11 +156,21 @@ export default async function handler(req, res) {
       return !p.over18 && !p.nsfw && !p.isNsfw && (p.title || p.body);
     });
 
-    const brandPosts = safePosts.filter(p =>
+    // Apply exclude keywords filter
+    const filteredPosts = excludeKeywords.length > 0
+      ? safePosts.filter(p => {
+          const text = `${p.title||''} ${p.body||''}`.toLowerCase();
+          return !excludeKeywords.some(kw => text.includes(kw));
+        })
+      : safePosts;
+
+    console.log(`Excluded keywords filter: ${safePosts.length} → ${filteredPosts.length} posts`);
+
+    const brandPosts = filteredPosts.filter(p =>
       (p.title || '').toLowerCase().includes(brandLower) ||
       (p.body || '').toLowerCase().includes(brandLower)
     );
-    const otherPosts = safePosts.filter(p => !brandPosts.includes(p));
+    const otherPosts = filteredPosts.filter(p => !brandPosts.includes(p));
     const finalPosts = [...brandPosts, ...otherPosts];
     console.log(`Posts breakdown: raw=${rawItems?.length} safe=${safePosts.length} brand=${brandPosts.length} other=${otherPosts.length} final=${finalPosts.length}`);
 
