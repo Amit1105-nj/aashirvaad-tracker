@@ -263,8 +263,12 @@ export default function Home(){
       {
         addLog('Scraping real Reddit posts via Apify...','step');
         try{
+          const scrapeController = new AbortController();
+          const scrapeTimeout = setTimeout(()=>scrapeController.abort(), 270000); // 270s
           const scrapeRes = await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
+            signal: scrapeController.signal,
             body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate,subCategory:amazonSubCategory,customKeyword:customKeyword||null,excludeKeywords:excludeKeywords||null})});
+          clearTimeout(scrapeTimeout);
           const scrapeData = await scrapeRes.json();
           if(scrapeData.success && scrapeData.posts?.length > 0){
             realPosts = scrapeData.posts;
