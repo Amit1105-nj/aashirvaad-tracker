@@ -1,9 +1,12 @@
 {
   "functions": {
-    "pages/api/amazon.js": {
+    "pages/api/scrape.js": {
       "maxDuration": 300
     },
-    "pages/api/scrape.js": {
+    "pages/api/analyze.js": {
+      "maxDuration": 300
+    },
+    "pages/api/amazon.js": {
       "maxDuration": 300
     },
     "pages/api/ppt.js": {
