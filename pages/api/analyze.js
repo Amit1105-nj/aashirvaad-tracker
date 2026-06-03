@@ -7,7 +7,7 @@ const BRAND_CONFIG = {
   Aashirvaad: {
     category: 'foods',
     description: "ITC's flagship food brand covering atta, spices, ghee, dal and more",
-    subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS'],
+    subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Atta': ['Pillsbury','Fortune Atta','Patanjali Atta','Annapurna'],
       'Salt': ['Tata Salt','Catch Salt','Annapurna Salt'],
@@ -24,7 +24,7 @@ const BRAND_CONFIG = {
   Sunfeast: {
     category: 'biscuits, snacks and beverages',
     description: "ITC's biscuit, cookie and beverage brand including Dark Fantasy, Yippee noodles, and more",
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian','r/Hostels','r/CollegeIndia'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian','r/Hostels','r/CollegeIndia','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Dark Fantasy': ['Oreo','Hide & Seek','Unibic Choco Kiss'],
       "Moms Magic": ['Good Day','Unibic Cookies'],
@@ -47,7 +47,7 @@ const BRAND_CONFIG = {
   Bingo: {
     category: 'snacks and chips',
     description: "ITC's popular snack brand — Mad Angles, Tedhe Medhe, Potato Chips",
-    subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
+    subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Mad Angles': ['Lays Classic','Kurkure Masala Munch','Doritos'],
       'Tedhe Medhe': ['Kurkure','Too Yumm'],
@@ -59,7 +59,7 @@ const BRAND_CONFIG = {
   'B Natural': {
     category: 'juices and fruit beverages',
     description: "ITC's natural fruit juice brand with no added preservatives",
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/HealthyFood','r/Fitness','r/vegetarian','r/IndianDietPlan'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/HealthyFood','r/Fitness','r/vegetarian','r/IndianDietPlan','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Juice': ['Real','Paper Boat','Real Activ','Tropicana'],
     },
@@ -69,7 +69,7 @@ const BRAND_CONFIG = {
   Candyman: {
     category: 'confectionery and candies',
     description: "ITC's candy brand — Eclairs, Toffees and more",
-    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/nostalgia','r/IndianParenting','r/teenagers'],
+    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/nostalgia','r/IndianParenting','r/teenagers','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Eclairs': ['Cadbury Eclairs','Alpenliebe'],
       'Toffees': ['Mentos','Parle','Kopiko'],
@@ -80,7 +80,7 @@ const BRAND_CONFIG = {
   'Kitchens of India': {
     category: 'ready to eat and cooking pastes',
     description: "ITC's premium ready-to-eat and cooking pastes brand",
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Ready to Eat': ['MTR','Haldirams','Gits'],
       'Pastes': ['Kohinoor','Pataks'],
@@ -91,7 +91,7 @@ const BRAND_CONFIG = {
   'Masterchef Creation': {
     category: 'frozen snacks and seafood',
     description: "ITC's frozen snacks and seafood brand for home cooking",
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/IndianKitchen'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/IndianKitchen','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Frozen Snacks': ['Godrej Yummiez','Venkys'],
       'Frozen Seafood': ['Fresho','FreshToHome','Licious'],
@@ -102,7 +102,7 @@ const BRAND_CONFIG = {
   Fabelle: {
     category: 'premium chocolates',
     description: "ITC's luxury artisan chocolate brand sold in ITC hotels and premium retail",
-    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings'],
+    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Chocolate': ['Lindt','Manam','Ferrero Rocher','Cadbury Silk'],
     },
@@ -112,7 +112,7 @@ const BRAND_CONFIG = {
   Sunbean: {
     category: 'coffee',
     description: "ITC's coffee brand competing in the Indian coffee market",
-    subreddits: ['r/india','r/Coffee','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/cafe','r/CasualConversation'],
+    subreddits: ['r/india','r/Coffee','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/cafe','r/CasualConversation','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     subBrandCompetitors: {
       'Coffee': ['Nescafe','Bru','Blue Tokai','Sleepy Owl','Third Wave Coffee'],
     },
