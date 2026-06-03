@@ -9,65 +9,74 @@ export default async function handler(req, res) {
 
   const BRAND_SEARCH_TERMS = {
     Aashirvaad: {
-      default: 'Aashirvaad',
-      'Atta': 'Aashirvaad atta',
-      'Salt': 'Aashirvaad salt',
-      'Spices': 'Aashirvaad spices masala',
-      'Dal': 'Aashirvaad dal',
-      'Besan': 'Aashirvaad besan',
-      'Rawa': 'Aashirvaad rawa sooji',
-      'Vermicelli': 'Aashirvaad vermicelli',
-      'Ghee': 'Aashirvaad ghee',
+      default: { primary: 'Aashirvaad', fallbacks: ['Aashirvaad ITC', 'ITC atta brand', 'Aashirvaad review'] },
+      'All': { primary: 'Aashirvaad', fallbacks: ['Aashirvaad ITC', 'ITC atta brand', 'Aashirvaad review'] },
+      'Atta': { primary: 'Aashirvaad atta', fallbacks: ['chakki atta India', 'best atta brand', 'roti atta soft', 'whole wheat atta', 'multigrain atta India', 'atta for soft roti', 'wheat flour India', 'aata brand review'] },
+      'Salt': { primary: 'Aashirvaad salt', fallbacks: ['best salt India', 'iodized salt India', 'pink salt vs regular', 'low sodium salt India', 'salt brand review India', 'sendha namak', 'rock salt India'] },
+      'Spices': { primary: 'Aashirvaad spices masala', fallbacks: ['best masala brand India', 'Indian spice brand', 'kitchen masala India', 'garam masala review', 'haldi brand India', 'coriander powder India', 'red chilli powder brand', 'masala dabba India'] },
+      'Dal': { primary: 'Aashirvaad dal', fallbacks: ['best dal brand India', 'toor dal India', 'moong dal brand', 'chana dal India', 'dal quality India', 'packaged dal India', 'protein dal India'] },
+      'Besan': { primary: 'Aashirvaad besan', fallbacks: ['gram flour India', 'best besan brand', 'besan quality India', 'chickpea flour India', 'besan for cooking', 'gluten free flour India'] },
+      'Rawa': { primary: 'Aashirvaad rawa sooji', fallbacks: ['best sooji India', 'upma rawa', 'semolina India', 'rava idli brand', 'sooji halwa brand', 'fine rava India'] },
+      'Vermicelli': { primary: 'Aashirvaad vermicelli', fallbacks: ['seviyan India', 'vermicelli brand India', 'sevai milk', 'roasted vermicelli', 'vermicelli kheer', 'pasta vermicelli India'] },
+      'Ghee': { primary: 'Aashirvaad ghee', fallbacks: ['pure desi ghee India', 'best ghee brand', 'cow ghee vs buffalo', 'A2 ghee India', 'ghee for cooking', 'organic ghee India', 'ghee quality review', 'clarified butter India'] },
     },
     Sunfeast: {
-      default: 'Sunfeast biscuit',
-      'Dark Fantasy': 'Sunfeast Dark Fantasy',
-      "Moms Magic": "Sunfeast Moms Magic",
-      'Farmlite': 'Sunfeast Farmlite digestive',
-      'Bounce': 'Sunfeast Bounce biscuit',
-      'Dream Cream': 'Sunfeast Dream Cream',
-      'Marie Light': 'Sunfeast Marie Light',
-      'All Rounder': 'Sunfeast All Rounder crackers',
-      'Nice': 'Sunfeast Nice biscuit',
-      'Glucose': 'Sunfeast Glucose biscuit',
-      'Milk Magic': 'Sunfeast Milk Magic',
-      'Wowzers': 'Sunfeast Wowzers',
-      'Fantastik': 'Sunfeast Fantastik chocolate',
-      'Yippee': 'Sunfeast Yippee noodles',
-      'Milk Shake & Smoothies': 'Sunfeast milkshake smoothie',
+      default: { primary: 'Sunfeast biscuit', fallbacks: ['ITC biscuit brand', 'best biscuit India', 'biscuit brand review India', 'Sunfeast cookies'] },
+      'All': { primary: 'Sunfeast biscuit', fallbacks: ['ITC biscuit brand', 'best biscuit India', 'biscuit brand review India', 'Sunfeast cookies'] },
+      'Dark Fantasy': { primary: 'Sunfeast Dark Fantasy', fallbacks: ['dark fantasy choco fills', 'premium biscuit India', 'chocolate biscuit India', 'best chocolate cookie', 'luxury biscuit India', 'choco filled biscuit', 'dark fantasy review', 'indulgent biscuit India'] },
+      'Moms Magic': { primary: 'Sunfeast Moms Magic', fallbacks: ['butter cookies India', 'cashew cookies brand', 'Indian butter biscuit', 'moms magic review', 'tea time biscuit India'] },
+      'Farmlite': { primary: 'Sunfeast Farmlite digestive', fallbacks: ['digestive biscuit India', 'healthy biscuit brand', 'oats biscuit India', 'low sugar biscuit', 'weight loss biscuit', 'multigrain biscuit India', 'fibre biscuit India'] },
+      'Bounce': { primary: 'Sunfeast Bounce biscuit', fallbacks: ['cream sandwich biscuit', 'jelly biscuit India', 'kids biscuit India', 'fun biscuit brand'] },
+      'Dream Cream': { primary: 'Sunfeast Dream Cream', fallbacks: ['cream biscuit India', 'vanilla cream biscuit', 'best cream biscuit brand', 'filled cream biscuit'] },
+      'Marie Light': { primary: 'Sunfeast Marie Light', fallbacks: ['marie biscuit India', 'light biscuit brand', 'tea biscuit India', 'diet biscuit India', 'marie gold alternative'] },
+      'All Rounder': { primary: 'Sunfeast All Rounder crackers', fallbacks: ['cracker biscuit India', 'namkeen biscuit brand', 'salty biscuit India', '50 50 alternative'] },
+      'Nice': { primary: 'Sunfeast Nice biscuit', fallbacks: ['coconut biscuit India', 'nice biscuit brand', 'sweet biscuit India'] },
+      'Glucose': { primary: 'Sunfeast Glucose biscuit', fallbacks: ['glucose biscuit kids', 'energy biscuit India', 'parle g alternative', 'plain biscuit India'] },
+      'Milk Magic': { primary: 'Sunfeast Milk Magic', fallbacks: ['milk biscuit India', 'calcium biscuit kids', 'kids biscuit milk India'] },
+      'Wowzers': { primary: 'Sunfeast Wowzers', fallbacks: ['cracker snack India', 'ritz alternative India', 'cheese cracker India', 'salty cracker brand'] },
+      'Fantastik': { primary: 'Sunfeast Fantastik chocolate', fallbacks: ['wafer chocolate India', 'chocolate wafer biscuit', 'hazelnut wafer India', 'chocolate snack India'] },
+      'Yippee': { primary: 'Sunfeast Yippee noodles', fallbacks: ['Yippee vs Maggi', 'best instant noodles India', '2 minute noodles India', 'masala noodles India', 'instant noodles review', 'noodles for kids India', 'spicy noodles India', 'college hostel noodles'] },
+      'Milk Shake & Smoothies': { primary: 'Sunfeast milkshake smoothie', fallbacks: ['flavoured milk India', 'mango milkshake brand', 'chocolate milk brand India', 'kids milk drink India', 'packaged smoothie India'] },
     },
     Bingo: {
-      default: 'Bingo snacks',
-      'Mad Angles': 'Bingo Mad Angles',
-      'Tedhe Medhe': 'Bingo Tedhe Medhe',
-      'Potato Chips': 'Bingo potato chips',
+      default: { primary: 'Bingo snacks', fallbacks: ['ITC chips brand', 'Indian snack brand', 'best chips India', 'munch snacks India', 'Bingo review'] },
+      'All': { primary: 'Bingo snacks', fallbacks: ['ITC chips brand', 'Indian snack brand', 'best chips India', 'munch snacks India', 'Bingo review'] },
+      'Mad Angles': { primary: 'Bingo Mad Angles', fallbacks: ['mad angles flavours', 'triangle chips India', 'masala chips India', 'mad angles review', 'chatpata chips', 'best masala chips', 'mad angles new flavour'] },
+      'Tedhe Medhe': { primary: 'Bingo Tedhe Medhe', fallbacks: ['tedhe medhe snack', 'masala puffs India', 'corn snack India', 'spicy puffs India', 'tedhe medhe review'] },
+      'Potato Chips': { primary: 'Bingo potato chips', fallbacks: ['best potato chips India', 'salted chips India', 'crispy chips brand', 'Lays alternative India', 'thin chips India', 'potato wafers India'] },
     },
     'B Natural': {
-      default: 'B Natural juice',
-      'Juice': 'B Natural fruit juice',
+      default: { primary: 'B Natural juice', fallbacks: ['natural juice India', 'no preservative juice India', 'ITC juice brand', 'fruit juice brand India'] },
+      'All': { primary: 'B Natural juice', fallbacks: ['natural juice India', 'no preservative juice India', 'ITC juice brand', 'fruit juice brand India'] },
+      'Juice': { primary: 'B Natural fruit juice', fallbacks: ['mango juice India', 'mixed fruit juice brand', 'healthy juice India', 'real juice alternative', 'no added sugar juice', 'fruit drink for kids', 'cold pressed juice India', '100 percent fruit juice'] },
     },
     Candyman: {
-      default: 'Candyman ITC',
-      'Eclairs': 'Candyman eclairs',
-      'Toffees': 'Candyman toffee',
+      default: { primary: 'Candyman ITC', fallbacks: ['ITC candy brand', 'Indian candy brand', 'toffee brand India'] },
+      'All': { primary: 'Candyman ITC', fallbacks: ['ITC candy brand', 'Indian candy brand', 'toffee brand India'] },
+      'Eclairs': { primary: 'Candyman eclairs', fallbacks: ['chocolate eclairs India', 'caramel toffee India', 'best eclairs brand', 'ITC chocolate candy', 'eclairs childhood India', 'coffee eclairs India'] },
+      'Toffees': { primary: 'Candyman toffee', fallbacks: ['Indian toffee brand', 'hard candy India', 'fruit toffee India', 'penny candy India', 'school candy India', 'nostalgic candy India'] },
     },
     'Kitchens of India': {
-      default: 'Kitchens of India',
-      'Ready to Eat': 'Kitchens of India ready to eat',
-      'Pastes': 'Kitchens of India cooking paste',
+      default: { primary: 'Kitchens of India', fallbacks: ['ITC ready to eat', 'premium Indian food brand', 'gourmet Indian food'] },
+      'All': { primary: 'Kitchens of India', fallbacks: ['ITC ready to eat', 'premium Indian food brand', 'gourmet Indian food'] },
+      'Ready to Eat': { primary: 'Kitchens of India ready to eat', fallbacks: ['best ready to eat India', 'dal makhani ready to eat', 'biryani ready to eat', 'butter chicken ready to eat', 'instant Indian meal', 'travel food India', 'office lunch ready to eat', 'microwave Indian food', 'packaged Indian food', 'RTE food India'] },
+      'Pastes': { primary: 'Kitchens of India cooking paste', fallbacks: ['cooking paste India', 'curry paste India', 'biryani paste brand', 'tikka masala paste', 'ginger garlic paste brand', 'korma paste India'] },
     },
     'Masterchef Creation': {
-      default: 'ITC Masterchef frozen',
-      'Frozen Snacks': 'ITC Masterchef frozen snacks',
-      'Frozen Seafood': 'ITC Masterchef frozen seafood',
+      default: { primary: 'ITC Masterchef frozen', fallbacks: ['frozen food India', 'frozen snack brand India', 'ITC frozen food'] },
+      'All': { primary: 'ITC Masterchef frozen', fallbacks: ['frozen food India', 'frozen snack brand India', 'ITC frozen food'] },
+      'Frozen Snacks': { primary: 'ITC Masterchef frozen snacks', fallbacks: ['frozen chicken India', 'frozen nuggets India', 'frozen kebab India', 'quick frozen snacks', 'party snacks frozen', 'frozen appetizer India', 'freezer snacks India', 'frozen momos India'] },
+      'Frozen Seafood': { primary: 'ITC Masterchef frozen seafood', fallbacks: ['frozen prawns India', 'frozen fish India', 'frozen fish fillet', 'seafood brand India', 'frozen squid India', 'ready to cook seafood India'] },
     },
     Fabelle: {
-      default: 'Fabelle chocolate ITC',
-      'Chocolate': 'Fabelle chocolate',
+      default: { primary: 'Fabelle chocolate ITC', fallbacks: ['ITC chocolate brand', 'luxury chocolate India', 'premium chocolate gift India'] },
+      'All': { primary: 'Fabelle chocolate ITC', fallbacks: ['ITC chocolate brand', 'luxury chocolate India', 'premium chocolate gift India'] },
+      'Chocolate': { primary: 'Fabelle chocolate', fallbacks: ['dark chocolate India', 'artisan chocolate India', 'bean to bar chocolate India', 'Belgian chocolate India', '70 percent dark chocolate', 'chocolate gifting India', 'single origin chocolate', 'ITC hotel chocolate', 'luxury truffle India', 'chocolate box India'] },
     },
     Sunbean: {
-      default: 'Sunbean coffee ITC',
-      'Coffee': 'Sunbean coffee',
+      default: { primary: 'Sunbean coffee ITC', fallbacks: ['ITC coffee brand', 'Indian coffee brand', 'new coffee brand India'] },
+      'All': { primary: 'Sunbean coffee ITC', fallbacks: ['ITC coffee brand', 'Indian coffee brand', 'new coffee brand India'] },
+      'Coffee': { primary: 'Sunbean coffee', fallbacks: ['filter coffee India', 'south Indian coffee brand', 'best instant coffee India', 'coffee powder brand', 'freshly ground coffee India', 'arabica coffee India', 'dark roast coffee India', 'coffee capsule India', 'pour over coffee India', 'cold brew India'] },
     },
   };
 
@@ -78,9 +87,11 @@ export default async function handler(req, res) {
       ? req.body.excludeKeywords.split(',').map(k=>k.trim().toLowerCase()).filter(Boolean)
       : [];
     const customKeyword = req.body.customKeyword;
-    const brandTerms = BRAND_SEARCH_TERMS[brand] || { default: brand };
-    const searchTerm = customKeyword || brandTerms[subCat] || brandTerms.default || brand;
-    console.log(`Searching: "${searchTerm}" for ${brand} / ${subCat}${customKeyword?' (custom keyword)':''}`);
+    const brandTerms = BRAND_SEARCH_TERMS[brand] || { default: { primary: brand, fallbacks: [] } };
+    const termConfig = brandTerms[subCat] || brandTerms.default || { primary: brand, fallbacks: [] };
+    const primaryTerm = customKeyword ? `${customKeyword} ${termConfig.primary}` : termConfig.primary;
+    const allSearchTerms = [primaryTerm, ...(termConfig.fallbacks || [])];
+    console.log(`Search terms for ${brand}/${subCat}: primary="${primaryTerm}", ${termConfig.fallbacks?.length||0} fallbacks`);
 
     // Start Apify run
     const runResponse = await fetch(
@@ -89,7 +100,7 @@ export default async function handler(req, res) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          searchTerms: [searchTerm],
+          searchTerms: [primaryTerm],
           searchPosts: true,
           searchComments: false,
           searchCommunities: false,
@@ -166,12 +177,87 @@ export default async function handler(req, res) {
 
     console.log(`Excluded keywords filter: ${safePosts.length} → ${filteredPosts.length} posts`);
 
-    const brandPosts = filteredPosts.filter(p =>
+    // FALLBACK: if no relevant posts found, try fallback keywords one by one
+    let fallbackIndex = 0;
+    let currentFilteredPosts = filteredPosts;
+    
+    while (currentFilteredPosts.length === 0 && fallbackIndex < allSearchTerms.length - 1) {
+      fallbackIndex++;
+      const fallbackTerm = allSearchTerms[fallbackIndex];
+      console.log(`No posts found — trying fallback ${fallbackIndex}: "${fallbackTerm}"`);
+      
+      try {
+        const fbRun = await fetch(
+          `https://api.apify.com/v2/acts/harshmaur~reddit-scraper/runs?token=${APIFY_API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              searchTerms: [fallbackTerm],
+              searchPosts: true,
+              searchComments: false,
+              searchCommunities: false,
+              searchSort: 'relevance',
+              searchTime: 'all',
+              maxPostsCount: 50,
+              includeNSFW: false,
+              fastMode: true,
+              crawlCommentsPerPost: false,
+              proxy: { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'] },
+            })
+          }
+        );
+        if (!fbRun.ok) continue;
+        const fbRunData = await fbRun.json();
+        const fbRunId = fbRunData.data?.id;
+        if (!fbRunId) continue;
+
+        let fbAttempts = 0, fbStatus = 'RUNNING', fbDatasetId = null;
+        while (fbAttempts < 9 && (fbStatus === 'RUNNING' || fbStatus === 'READY')) {
+          await new Promise(r => setTimeout(r, 5000));
+          const fbS = await fetch(`https://api.apify.com/v2/actor-runs/${fbRunId}?token=${APIFY_API_KEY}`);
+          const fbSd = await fbS.json();
+          fbStatus = fbSd.data?.status;
+          fbDatasetId = fbSd.data?.defaultDatasetId;
+          if (fbStatus === 'FAILED' || fbStatus === 'ABORTED') break;
+          fbAttempts++;
+        }
+        if (fbStatus !== 'SUCCEEDED' || !fbDatasetId) continue;
+
+        const fbR = await fetch(`https://api.apify.com/v2/datasets/${fbDatasetId}/items?token=${APIFY_API_KEY}&limit=100&clean=true`);
+        const fbItems = await fbR.json();
+
+        const fbSafePosts = (fbItems || []).filter(p => {
+          if (p.dataType && p.dataType !== 'post') return false;
+          return !p.over18 && !p.nsfw && (p.title || p.body);
+        });
+        const fbFiltered = excludeKeywords.length > 0
+          ? fbSafePosts.filter(p => {
+              const text = `${p.title||''} ${p.body||''}`.toLowerCase();
+              return !excludeKeywords.some(kw => text.includes(kw));
+            })
+          : fbSafePosts;
+
+        if (fbFiltered.length > 0) {
+          currentFilteredPosts = fbFiltered;
+          console.log(`Fallback "${fallbackTerm}" found ${fbFiltered.length} posts`);
+          // Update brandLower search for fallback results
+          break;
+        }
+      } catch(e) {
+        console.log(`Fallback error: ${e.message}`);
+        continue;
+      }
+    }
+
+    const finalFilteredPosts = currentFilteredPosts.length > 0 ? currentFilteredPosts : filteredPosts;
+    const brandPosts = finalFilteredPosts.filter(p =>
       (p.title || '').toLowerCase().includes(brandLower) ||
       (p.body || '').toLowerCase().includes(brandLower)
     );
-    const otherPosts = filteredPosts.filter(p => !brandPosts.includes(p));
+    const otherPosts = finalFilteredPosts.filter(p => !brandPosts.includes(p));
     const finalPosts = [...brandPosts, ...otherPosts];
+    console.log(`Final: ${brandPosts.length} brand posts + ${otherPosts.length} other = ${finalPosts.length} total`);
     console.log(`Posts breakdown: raw=${rawItems?.length} safe=${safePosts.length} brand=${brandPosts.length} other=${otherPosts.length} final=${finalPosts.length}`);
 
     const posts = finalPosts.map(p => ({
