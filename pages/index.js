@@ -7,54 +7,81 @@ const BRANDS = {
     emoji: '🌾',
     logo: '/Aashirvaad.png',
     logoBg: '#c0392b',
-    category: 'Atta & Flour',
+    category: 'Foods',
     subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS'],
-    competitors: ['Pillsbury','Fortune Atta','Annapurna','Patanjali Atta',"Nature's Basket"],
-    newSubs: [],
-  },
-  Bingo: {
-    emoji: '🍟',
-    logo: '/Bingo.png',
-    logoBg: '#f5f5f5',
-    category: 'Snacks & Chips',
-    subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
-    competitors: ['Lays','Kurkure','Haldirams','Too Yumm','Doritos'],
-    newSubs: [],
-  },
-  Candyman: {
-    emoji: '🍬',
-    logo: '/Candyman (1).jpg',
-    logoBg: '#f9ca24',
-    category: 'Confectionery',
-    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/sweets','r/nostalgia','r/IndianParenting','r/teachers','r/Diwali'],
-    competitors: ['Cadbury Eclairs','Mentos','Alpenliebe','Parle','Kopiko'],
+    competitors: ['Pillsbury','Fortune','Patanjali','Tata Salt','Everest','MDH','Tata Sampann','Bambino','MTR','Amul'],
     newSubs: [],
   },
   Sunfeast: {
     emoji: '🍪',
     logo: '/Sunfeast.png',
-    logoBg: '#f5f5f5',
-    category: 'Biscuits & Pasta',
+    logoBg: '#e67e22',
+    category: 'Foods',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian'],
-    competitors: ['Britannia','Parle-G','McVities','Oreo','Maggi','Unibic','Bonn','Bambino','Del Monte'],
+    competitors: ['Britannia','Parle','Oreo','McVities','Maggi','Unibic','Marie Gold','50-50','KrackJack','Parle-G'],
     newSubs: [],
   },
-  Yippee: {
-    emoji: '🍜',
-    logo: '/Yippee.webp',
+  Bingo: {
+    emoji: '🍿',
+    logo: '/Bingo.png',
     logoBg: '#e74c3c',
-    category: 'Instant Noodles',
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/pune','r/CasualConversation','r/IndianTeens','r/Hostels','r/CollegeIndia','r/LateNightFood'],
-    competitors: ['Maggi','Wai Wai','Knorr',"Ching's Secret",'Top Ramen'],
+    category: 'Foods',
+    subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
+    competitors: ['Lays','Kurkure','Haldirams','Too Yumm','Doritos'],
+    newSubs: [],
+  },
+  'B Natural': {
+    emoji: '🥤',
+    logo: '/B Natural.jpg',
+    logoBg: '#27ae60',
+    category: 'Foods',
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/HealthyFood','r/Fitness','r/vegetarian','r/IndianDietPlan'],
+    competitors: ['Real','Paper Boat','Real Activ','Tropicana','Minute Maid'],
+    newSubs: [],
+  },
+  Candyman: {
+    emoji: '🍬',
+    logo: '/Candyman (1).jpg',
+    logoBg: '#9b59b6',
+    category: 'Foods',
+    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/nostalgia','r/IndianParenting','r/teenagers'],
+    competitors: ['Cadbury Eclairs','Alpenliebe','Mentos','Parle','Kopiko'],
+    newSubs: [],
+  },
+  'Kitchens of India': {
+    emoji: '🍛',
+    logo: '/Kitchen of India.webp',
+    logoBg: '#e67e22',
+    category: 'Foods',
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen'],
+    competitors: ['MTR','Haldirams','Gits','Kohinoor','Patak's'],
+    newSubs: [],
+  },
+  'Masterchef Creation': {
+    emoji: '🍗',
+    logo: '/ITC Master Chef.jpg',
+    logoBg: '#c0392b',
+    category: 'Foods',
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/nonveg','r/IndianKitchen'],
+    competitors: ['Godrej Yummiez','Venky's','Fresho','FreshToHome','Licious'],
     newSubs: [],
   },
   Fabelle: {
     emoji: '🍫',
     logo: '/Fabelle.jpg',
-    logoBg: '#1a0a00',
-    category: 'Premium Chocolates',
-    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings','r/corporate_india','r/DateNight','r/luxuryindia'],
-    competitors: ['Cadbury Silk','Ferrero Rocher','Lindt','Amul Dark','Smoor','Manam','Royce'],
+    logoBg: '#6c3483',
+    category: 'Foods',
+    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings'],
+    competitors: ['Lindt','Manam','Ferrero Rocher','Cadbury Silk','Smoor'],
+    newSubs: [],
+  },
+  Sunbean: {
+    emoji: '☕',
+    logo: '/Sunbean.png',
+    logoBg: '#6f4e37',
+    category: 'Foods',
+    subreddits: ['r/india','r/Coffee','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/cafe','r/CasualConversation'],
+    competitors: ['Nescafe','Bru','Blue Tokai','Sleepy Owl','Third Wave Coffee'],
     newSubs: [],
   },
 };
@@ -173,13 +200,16 @@ export default function Home(){
 
   // Sub-categories per brand
   const AMAZON_SUB_CATS = {
-    Aashirvaad: ['All Products','Atta & Flour','Basic Spices','Whole Spices','Ghee & Dairy'],
-    Sunfeast: ['All Products','Dark Fantasy',"Mom's Magic",'Farmlite','Marie & Others','Cakes'],
-    Yippee: ['All Products','Noodles','Pasta'],
-    Bingo: ['All Products','Mad Angles','Tedhe Medhe','Chips'],
-    Candyman: ['All Products'],
-    Fabelle: ['All Products'],
-  }; // 'reddit' or 'amazon'
+  Aashirvaad: ['Atta','Salt','Spices','Dal','Rawa','Vermicelli','Besan','Ghee'],
+  Sunfeast: ['Dark Fantasy',"Mom's Magic",'Farmlite','Marie Light','Bounce','Dream Cream','All Rounder','Nice','Glucose','Milk Magic','Wowzers','Fantastik','Yippee','Milk Shake & Smoothies'],
+  Bingo: ['Mad Angles','Tedhe Medhe','Potato Chips'],
+  'B Natural': ['Juice'],
+  Candyman: ['Eclairs','Toffees'],
+  'Kitchens of India': ['Ready to Eat','Pastes'],
+  'Masterchef Creation': ['Frozen Snacks','Frozen Seafood'],
+  Fabelle: ['Chocolate'],
+  Sunbean: ['Coffee'],
+}; // 'reddit' or 'amazon'
   const logRef=useRef(null);
   const reportRef=useRef(null);
 
@@ -226,7 +256,7 @@ export default function Home(){
         addLog('Scraping real Reddit posts via Apify...','step');
         try{
           const scrapeRes = await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate,subCategory:amazonSubCategory,customKeyword:useCustomKeyword&&customKeyword?customKeyword:null})});
+            body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate,subCategory:amazonSubCategory,customKeyword:customKeyword||null})});
           const scrapeData = await scrapeRes.json();
           if(scrapeData.success && scrapeData.posts?.length > 0){
             realPosts = scrapeData.posts;
@@ -241,7 +271,7 @@ export default function Home(){
       setProgress(25);
 
       const r1=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),callType:'core',realPosts,customKeyword:useCustomKeyword&&customKeyword?customKeyword:null})});
+        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),subBrand:amazonSubCategory,callType:'core',realPosts,customKeyword:customKeyword||null})});
       const j1=await r1.json();
       if(!j1.success) throw new Error(j1.error||'API call failed');
       if(j1.no_data){
@@ -262,7 +292,7 @@ export default function Home(){
       setProgress(55);
 
       const r2=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,callType:'keywords',
+        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,subBrand:amazonSubCategory,callType:'keywords',
           themes:(p1?.top_themes||[]).map(t=>t.theme).join(', '),realPosts})});
       const j2=await r2.json();
       if(!j2.success) throw new Error(j2.error||'Keywords API call failed');
@@ -575,7 +605,7 @@ export default function Home(){
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:5}}>
                   <label style={{fontSize:11,color:C.muted,fontWeight:500}}>
-                    Category {(AMAZON_SUB_CATS[brand]||[]).length <= 1 ? '(All Products)' : ''}
+                    Sub Brand
                   </label>
                   {(AMAZON_SUB_CATS[brand]||[]).length > 1 ? (
                     <select value={amazonSubCategory} onChange={e=>setAmazonSubCategory(e.target.value)}
@@ -596,22 +626,20 @@ export default function Home(){
               <div style={{marginBottom:12,padding:'10px 14px',background:'rgba(167,139,250,0.06)',
                 border:`1px solid rgba(167,139,250,0.2)`,borderRadius:8}}>
                 <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
-                  <span style={{fontSize:11,color:C.pur,fontWeight:600}}>🔍 Custom Keyword Search</span>
-                  <label style={{display:'flex',alignItems:'center',gap:4,cursor:'pointer',marginLeft:'auto'}}>
-                    <input type="checkbox" checked={useCustomKeyword} onChange={e=>setUseCustomKeyword(e.target.checked)}
-                      style={{cursor:'pointer'}}/>
-                    <span style={{fontSize:11,color:C.muted}}>Override brand search</span>
-                  </label>
+                  <span style={{fontSize:11,color:C.pur,fontWeight:600}}>🔍 Keyword Search</span>
+                  <span style={{fontSize:10,color:C.muted,marginLeft:'auto'}}>
+                    ℹ️ Select brand + sub brand first, then add a keyword
+                  </span>
                 </div>
                 <input
                   value={customKeyword}
                   onChange={e=>setCustomKeyword(e.target.value)}
-                  placeholder={`e.g. "dark chocolate", "healthy snacks", "instant noodles"`}
-                  style={{width:'100%',background:C.card,border:`1px solid ${useCustomKeyword?'rgba(167,139,250,0.5)':C.border}`,
+                  placeholder={`e.g. "premium biscuit", "healthy snack", "dark chocolate"`}
+                  style={{width:'100%',background:C.card,border:`1px solid ${customKeyword?'rgba(167,139,250,0.5)':C.border}`,
                     borderRadius:6,padding:'7px 10px',fontSize:12,color:C.text,fontFamily:'inherit',outline:'none'}}
                 />
-                {useCustomKeyword&&customKeyword&&<div style={{fontSize:10,color:C.pur,marginTop:4}}>
-                  ✓ Will search Reddit for "{customKeyword}" instead of {brand} keywords
+                {customKeyword&&<div style={{fontSize:10,color:C.pur,marginTop:4}}>
+                  ✓ Searching Reddit for "{customKeyword}" within {brand}{amazonSubCategory&&amazonSubCategory!=='All Products'?' · '+amazonSubCategory:''} context
                 </div>}
               </div>
 
