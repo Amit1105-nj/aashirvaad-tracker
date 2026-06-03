@@ -129,7 +129,7 @@ export default async function handler(req, res) {
     let runStatus = 'RUNNING';
     let datasetId = null;
 
-    while (attempts < 9 && (runStatus === 'RUNNING' || runStatus === 'READY')) {
+    while (attempts < 50 && (runStatus === 'RUNNING' || runStatus === 'READY')) {
       await new Promise(r => setTimeout(r, 5000));
       const s = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_API_KEY}`);
       const sd = await s.json();
@@ -139,12 +139,11 @@ export default async function handler(req, res) {
       attempts++;
     }
 
-    // If still running after 45s — fetch whatever results exist so far
-    if (runStatus !== 'SUCCEEDED' && datasetId) {
-      console.log('Fetching partial results after timeout, status:', runStatus);
-    } else if (runStatus !== 'SUCCEEDED') {
-      throw new Error('Scrape timed out with no results');
+    // Fetch results regardless of status - get whatever is available
+    if (runStatus !== 'SUCCEEDED' && !datasetId) {
+      throw new Error('Scrape timed out with no dataset');
     }
+    console.log(`Run status: ${runStatus}, fetching results from dataset: ${datasetId}`);
 
     const r = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_API_KEY}&limit=100&clean=true`);
     const rawItems = await r.json();
@@ -177,11 +176,12 @@ export default async function handler(req, res) {
 
     console.log(`Excluded keywords filter: ${safePosts.length} → ${filteredPosts.length} posts`);
 
-    // FALLBACK: if no relevant posts found, try fallback keywords one by one
+    // FALLBACK: try up to 3 fallback keywords if primary returns 0 posts
     let fallbackIndex = 0;
     let currentFilteredPosts = filteredPosts;
+    const maxFallbacks = 3; // limit to avoid timeout
     
-    while (currentFilteredPosts.length === 0 && fallbackIndex < allSearchTerms.length - 1) {
+    while (currentFilteredPosts.length === 0 && fallbackIndex < Math.min(maxFallbacks, allSearchTerms.length - 1)) {
       fallbackIndex++;
       const fallbackTerm = allSearchTerms[fallbackIndex];
       console.log(`No posts found — trying fallback ${fallbackIndex}: "${fallbackTerm}"`);
@@ -213,7 +213,7 @@ export default async function handler(req, res) {
         if (!fbRunId) continue;
 
         let fbAttempts = 0, fbStatus = 'RUNNING', fbDatasetId = null;
-        while (fbAttempts < 9 && (fbStatus === 'RUNNING' || fbStatus === 'READY')) {
+        while (fbAttempts < 6 && (fbStatus === 'RUNNING' || fbStatus === 'READY')) {
           await new Promise(r => setTimeout(r, 5000));
           const fbS = await fetch(`https://api.apify.com/v2/actor-runs/${fbRunId}?token=${APIFY_API_KEY}`);
           const fbSd = await fbS.json();
