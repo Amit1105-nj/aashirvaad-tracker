@@ -15,7 +15,7 @@ const BRAND_ASINS = {
   },
   Sunfeast: {
     'Dark Fantasy':          ['B0D83Z6DFQ','B0DGKVSM76','B0BSX9N69D'],
-    "Mom's Magic":           ['B08B987DBL'],
+    "Moms Magic":           ['B08B987DBL'],
     'Farmlite':              ['B08B987DBL'],
     'Marie Light':           ['B08B987DBL'],
     'Bounce':                ['B08B987DBL'],
@@ -76,7 +76,7 @@ const COMPETITOR_ASINS = {
   'McVities':       ['B07RQKHTCK'],
   // Yippee competitors
   'Maggi':          ['B08GY5DRXB','B079GXGN8K'],
-  "Ching's Secret": ['B00MHO7YX8'],
+  "Chings Secret": ['B00MHO7YX8'],
   'Top Ramen':      ['B079GX9DT2'],
   'Wai Wai':        ['B00NPT3WZ8'],
   // Candyman competitors
