@@ -286,13 +286,18 @@ export default function Home(){
           return text.includes(brandNameLower);
         }).length;
         const compData = (competitors||[]).map(comp => {
-          const compLower = comp.toLowerCase().split(' ')[0]; // first word e.g. "Pillsbury"
+          // Use first meaningful word (skip common words)
+          const words = comp.toLowerCase().split(' ').filter(w => w.length > 3);
+          const compLower = words[0] || comp.toLowerCase().split(' ')[0];
           const compPosts = posts.filter(p => {
             const text = `${p.title} ${p.body||''}`.toLowerCase();
             return text.includes(compLower);
           }).length;
           return { brand: comp, posts: compPosts, pct: Math.round((compPosts/posts.length)*100) };
         });
+        // Total including unattributed
+        const attributed = brandPosts + compData.reduce((a,b)=>a+(b.posts||0),0);
+        const unattributed = Math.max(0, posts.length - attributed);
         return {
           brand_name: brandName,
           brand_posts: brandPosts,
