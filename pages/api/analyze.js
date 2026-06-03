@@ -5,61 +5,122 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // ── BRAND CONFIG MAP ──
 const BRAND_CONFIG = {
   Aashirvaad: {
-    category: 'atta and wheat flour',
-    description: "ITC's flagship atta brand — India's most popular wheat flour for chapatis and rotis",
+    category: 'foods',
+    description: "ITC's flagship food brand covering atta, spices, ghee, dal and more",
     subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS'],
-    competitors: ['Pillsbury','Fortune Atta','Annapurna','Patanjali Atta',"Nature's Basket"],
-    topics: 'chapati softness, price hike, diabetic atta, packaging tears, Blinkit delivery, chakki comparison, roti texture, multigrain, whole wheat, PCOS-friendly diet, vegetarian cooking',
+    subBrandCompetitors: {
+      'Atta': ['Pillsbury','Fortune Atta','Patanjali Atta','Annapurna'],
+      'Salt': ['Tata Salt','Catch Salt','Annapurna Salt'],
+      'Spices': ['Everest','MDH','Catch','Badshah'],
+      'Dal': ['Tata Sampann','Fortune Dal'],
+      'Besan': ['Tata Sampann Besan','Fortune Besan'],
+      'Rawa': ['Fortune Rawa','Tata Sampann'],
+      'Vermicelli': ['Bambino Vermicelli','MTR Vermicelli'],
+      'Ghee': ['Amul Ghee','Mother Dairy Ghee','Patanjali Ghee'],
+    },
+    competitors: ['Pillsbury','Fortune','Tata Salt','Everest','MDH','Tata Sampann','Bambino','Amul'],
+    topics: 'chapati softness, price hike, diabetic atta, packaging, Blinkit delivery, roti texture, multigrain, whole wheat, spice quality, ghee purity',
+  },
+  Sunfeast: {
+    category: 'biscuits, snacks and beverages',
+    description: "ITC's biscuit, cookie and beverage brand including Dark Fantasy, Yippee noodles, and more",
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian','r/Hostels','r/CollegeIndia'],
+    subBrandCompetitors: {
+      'Dark Fantasy': ['Oreo','Hide & Seek','Unibic Choco Kiss'],
+      "Mom's Magic": ['Good Day','Unibic Cookies'],
+      'Farmlite': ['NutriChoice Digestive','Britannia Digestive'],
+      'Bounce': ['Oreo','Bourbon','Treat'],
+      'Dream Cream': ['Britannia Treat','Oreo'],
+      'Marie Light': ['Marie Gold','Marie Lite'],
+      'All Rounder': ['50-50','KrackJack'],
+      'Nice': ['Nice Time'],
+      'Glucose': ['Parle-G','Tiger'],
+      'Milk Magic': ['Milk Bikis'],
+      'Wowzers': ['Ritz','50-50'],
+      'Fantastik': ['Munch','Perk','5 Star','Dairy Milk'],
+      'Yippee': ['Maggi','Top Ramen','Wai Wai'],
+      'Milk Shake & Smoothies': ['Amul Kool','Hersheys','Epigamia'],
+    },
+    competitors: ['Britannia','Parle','Oreo','Maggi','Marie Gold','Parle-G','Good Day','50-50'],
+    topics: 'biscuit texture, cream filling, tea time biscuits, Dark Fantasy premium, noodles taste, Farmlite health claims, sugar-free, protein biscuits',
   },
   Bingo: {
     category: 'snacks and chips',
-    description: "ITC's popular snack brand — includes Mad Angles, Tedhe Medhe, and various chip variants",
+    description: "ITC's popular snack brand — Mad Angles, Tedhe Medhe, Potato Chips",
     subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
-    competitors: ['Lays Classic','Kurkure Masala Munch','Haldirams Bhujia','Too Yumm Veggie Stix','Doritos Nacho Cheese'],
-    topics: 'flavour variety, crunchiness, value for money, packet size, availability, new flavours, oily vs dry snacks, gaming snacks, Bollywood munching, cricket match snacks',
+    subBrandCompetitors: {
+      'Mad Angles': ['Lays Classic','Kurkure Masala Munch','Doritos'],
+      'Tedhe Medhe': ['Kurkure','Too Yumm'],
+      'Potato Chips': ['Lays','Haldirams Chips','Too Yumm'],
+    },
+    competitors: ['Lays','Kurkure','Haldirams','Too Yumm','Doritos'],
+    topics: 'flavour variety, crunchiness, value for money, packet size, gaming snacks, cricket match snacks',
+  },
+  'B Natural': {
+    category: 'juices and fruit beverages',
+    description: "ITC's natural fruit juice brand with no added preservatives",
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/HealthyFood','r/Fitness','r/vegetarian','r/IndianDietPlan'],
+    subBrandCompetitors: {
+      'Juice': ['Real','Paper Boat','Real Activ','Tropicana'],
+    },
+    competitors: ['Real','Paper Boat','Tropicana','Minute Maid','Real Activ'],
+    topics: 'no preservatives, taste, packaging, price, mango juice, mixed fruit, healthy drinks',
   },
   Candyman: {
     category: 'confectionery and candies',
-    description: "ITC's candy brand — includes eclairs, Lacto King, and other sugar confectionery",
-    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/sweets','r/nostalgia','r/IndianParenting','r/teachers','r/Diwali'],
-    competitors: ['Cadbury Eclairs','Mentos','Alpenliebe','Parle','Kopiko'],
-    topics: 'childhood nostalgia, sweetness level, price per candy, school tuck shop, Diwali gifting, kids favourites, IndianParenting recommendations, flavour variety',
+    description: "ITC's candy brand — Eclairs, Toffees and more",
+    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/nostalgia','r/IndianParenting','r/teenagers'],
+    subBrandCompetitors: {
+      'Eclairs': ['Cadbury Eclairs','Alpenliebe'],
+      'Toffees': ['Mentos','Parle','Kopiko'],
+    },
+    competitors: ['Cadbury Eclairs','Alpenliebe','Mentos','Parle','Kopiko'],
+    topics: 'childhood nostalgia, sweetness, price, school tuck shop, Diwali gifting, kids favourites',
   },
-  Sunfeast: {
-    category: 'biscuits, cookies and pasta',
-    description: "ITC's biscuit and pasta brand — includes Dark Fantasy, Farmlite, Marie Light, and pasta range",
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian'],
-    competitors: ['Britannia Good Day','Oreo','McVities Digestive','Parle Hide&Seek','Unibic cookies','Bourbon biscuits'],
-    topics: 'biscuit texture, cream filling, tea time biscuits, Dark Fantasy premium feel, pasta cooking time, Farmlite health claims, sugar-free biscuits, protein biscuits, fitness snacking',
+  'Kitchens of India': {
+    category: 'ready to eat and cooking pastes',
+    description: "ITC's premium ready-to-eat and cooking pastes brand",
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen'],
+    subBrandCompetitors: {
+      'Ready to Eat': ['MTR','Haldirams','Gits'],
+      'Pastes': ['Kohinoor','Patak's'],
+    },
+    competitors: ['MTR','Haldirams','Gits','Kohinoor','Patak's'],
+    topics: 'convenience, taste authenticity, packaging, shelf life, travel food, office lunch',
   },
-  Yippee: {
-    category: 'instant noodles',
-    description: "ITC's Yippee instant noodles brand competing in the Indian instant noodle market",
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/pune','r/CasualConversation','r/IndianTeens','r/Hostels','r/CollegeIndia','r/LateNightFood'],
-    competitors: ['Maggi','Wai Wai','Knorr',"Ching's Secret",'Top Ramen'],
-    topics: 'taste vs Maggi, cooking time, masala flavour, hostel food, college meals, late night cooking, spice level, variety of flavours, price comparison',
+  'Masterchef Creation': {
+    category: 'frozen snacks and seafood',
+    description: "ITC's frozen snacks and seafood brand for home cooking",
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/IndianKitchen'],
+    subBrandCompetitors: {
+      'Frozen Snacks': ['Godrej Yummiez','Venky's'],
+      'Frozen Seafood': ['Fresho','FreshToHome','Licious'],
+    },
+    competitors: ['Godrej Yummiez','Venky's','FreshToHome','Licious','Fresho'],
+    topics: 'frozen food quality, taste, convenience, price, home cooking, quick meals',
   },
   Fabelle: {
     category: 'premium chocolates',
-    description: "ITC's luxury chocolate brand — positioned as India's finest artisan chocolate, sold in ITC hotels and premium retail",
-    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings','r/corporate_india','r/DateNight','r/luxuryindia'],
-    competitors: ['Cadbury Silk','Ferrero Rocher','Lindt','Amul Dark','Smoor','Manam','Royce'],
-    topics: 'premium gifting, hotel chocolate, price vs quality, cocoa percentage, packaging luxury, wedding gifting, corporate gifting, date night, luxury India, comparison to Smoor and Manam',
+    description: "ITC's luxury artisan chocolate brand sold in ITC hotels and premium retail",
+    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings'],
+    subBrandCompetitors: {
+      'Chocolate': ['Lindt','Manam','Ferrero Rocher','Cadbury Silk'],
+    },
+    competitors: ['Lindt','Manam','Ferrero Rocher','Cadbury Silk','Smoor'],
+    topics: 'premium gifting, hotel chocolate, cocoa percentage, luxury packaging, wedding gifting, corporate gifting',
+  },
+  Sunbean: {
+    category: 'coffee',
+    description: "ITC's coffee brand competing in the Indian coffee market",
+    subreddits: ['r/india','r/Coffee','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/cafe','r/CasualConversation'],
+    subBrandCompetitors: {
+      'Coffee': ['Nescafe','Bru','Blue Tokai','Sleepy Owl','Third Wave Coffee'],
+    },
+    competitors: ['Nescafe','Bru','Blue Tokai','Sleepy Owl','Third Wave Coffee'],
+    topics: 'coffee taste, aroma, price, instant vs filter, cafe quality, morning routine',
   },
 };
 
-function makePostId() {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let id = '';
-  for (let i = 0; i < 6; i++) id += chars[Math.floor(Math.random() * chars.length)];
-  return id;
-}
-
-function makeRedditUrl(subreddit, title, postId) {
-  const sub = subreddit.replace('r/', '');
-  const slug = title.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '_').slice(0, 50);
-  return `https://www.reddit.com/r/${sub}/comments/${postId}/${slug}/`;
-}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -68,6 +129,11 @@ export default async function handler(req, res) {
   if (!fromDate || !toDate || !brand) return res.status(400).json({ error: 'Missing required fields' });
 
   const config = BRAND_CONFIG[brand] || BRAND_CONFIG['Aashirvaad'];
+  const subBrand = req.body.subBrand || req.body.subCategory || null;
+  // Use sub-brand specific competitors if available
+  if (subBrand && config.subBrandCompetitors && config.subBrandCompetitors[subBrand]) {
+    config.competitors = config.subBrandCompetitors[subBrand];
+  }
   const allSubs = subreddits || config.subreddits.join(', ');
 
   // Check if we have real scraped posts to analyse
