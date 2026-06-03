@@ -8,7 +8,7 @@ const BRANDS = {
     logo: '/Aashirvaad.png',
     logoBg: '#c0392b',
     category: 'Foods',
-    subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS'],
+    subreddits: ['r/india','r/IndianFood','r/cooking','r/bangalore','r/delhi','r/grocery','r/mumbai','r/pune','r/AskIndia','r/IndianKitchen','r/diabetes_india','r/HealthyFood','r/vegetarian','r/IndianDietPlan','r/PCOS','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Pillsbury','Fortune','Patanjali','Tata Salt','Everest','MDH','Tata Sampann','Bambino','MTR','Amul'],
     newSubs: [],
   },
@@ -17,7 +17,7 @@ const BRANDS = {
     logo: '/Sunfeast.png',
     logoBg: '#e67e22',
     category: 'Foods',
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/delhi','r/mumbai','r/snackexchange','r/HealthyFood','r/diabetes_india','r/Fitness','r/IndianDietPlan','r/vegetarian','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Britannia','Parle','Oreo','McVities','Maggi','Unibic','Marie Gold','50-50','KrackJack','Parle-G'],
     newSubs: [],
   },
@@ -26,7 +26,7 @@ const BRANDS = {
     logo: '/Bingo.png',
     logoBg: '#e74c3c',
     category: 'Foods',
-    subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation'],
+    subreddits: ['r/india','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/IndianFood','r/teenagers','r/pune','r/munchies','r/cricket','r/IndianTeens','r/Bollywood','r/gaming','r/CasualConversation','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Lays','Kurkure','Haldirams','Too Yumm','Doritos'],
     newSubs: [],
   },
@@ -35,7 +35,7 @@ const BRANDS = {
     logo: '/B Natural.jpg',
     logoBg: '#27ae60',
     category: 'Foods',
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/HealthyFood','r/Fitness','r/vegetarian','r/IndianDietPlan'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/HealthyFood','r/Fitness','r/vegetarian','r/IndianDietPlan','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Real','Paper Boat','Real Activ','Tropicana','Minute Maid'],
     newSubs: [],
   },
@@ -44,7 +44,7 @@ const BRANDS = {
     logo: '/Candyman (1).jpg',
     logoBg: '#9b59b6',
     category: 'Foods',
-    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/nostalgia','r/IndianParenting','r/teenagers'],
+    subreddits: ['r/india','r/AskIndia','r/IndianFood','r/mumbai','r/delhi','r/bangalore','r/nostalgia','r/IndianParenting','r/teenagers','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Cadbury Eclairs','Alpenliebe','Mentos','Parle','Kopiko'],
     newSubs: [],
   },
@@ -53,7 +53,7 @@ const BRANDS = {
     logo: '/Kitchen of India.webp',
     logoBg: '#e67e22',
     category: 'Foods',
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['MTR','Haldirams','Gits','Kohinoor','Pataks'],
     newSubs: [],
   },
@@ -62,7 +62,7 @@ const BRANDS = {
     logo: '/ITC Master Chef.jpg',
     logoBg: '#c0392b',
     category: 'Foods',
-    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/nonveg','r/IndianKitchen'],
+    subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/nonveg','r/IndianKitchen','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Godrej Yummiez','Venkys','Fresho','FreshToHome','Licious'],
     newSubs: [],
   },
@@ -71,7 +71,7 @@ const BRANDS = {
     logo: '/Fabelle.jpg',
     logoBg: '#6c3483',
     category: 'Foods',
-    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings'],
+    subreddits: ['r/india','r/chocolate','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/luxury','r/GiftsForHer','r/weddingplanning','r/IndianWeddings','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Lindt','Manam','Ferrero Rocher','Cadbury Silk','Smoor'],
     newSubs: [],
   },
@@ -80,7 +80,7 @@ const BRANDS = {
     logo: '/Sunbean.png',
     logoBg: '#6f4e37',
     category: 'Foods',
-    subreddits: ['r/india','r/Coffee','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/cafe','r/CasualConversation'],
+    subreddits: ['r/india','r/Coffee','r/IndianFood','r/AskIndia','r/bangalore','r/mumbai','r/delhi','r/cafe','r/CasualConversation','r/hyderabad','r/IndianMoms','r/FrugalIndia','r/chennai','r/Kerala'],
     competitors: ['Nescafe','Bru','Blue Tokai','Sleepy Owl','Third Wave Coffee'],
     newSubs: [],
   },
@@ -199,15 +199,15 @@ export default function Home(){
 
   // Sub-categories per brand
   const AMAZON_SUB_CATS = {
-  Aashirvaad: ['Atta','Salt','Spices','Dal','Rawa','Vermicelli','Besan','Ghee'],
-  Sunfeast: ['Dark Fantasy',"Mom's Magic",'Farmlite','Marie Light','Bounce','Dream Cream','All Rounder','Nice','Glucose','Milk Magic','Wowzers','Fantastik','Yippee','Milk Shake & Smoothies'],
-  Bingo: ['Mad Angles','Tedhe Medhe','Potato Chips'],
-  'B Natural': ['Juice'],
-  Candyman: ['Eclairs','Toffees'],
-  'Kitchens of India': ['Ready to Eat','Pastes'],
-  'Masterchef Creation': ['Frozen Snacks','Frozen Seafood'],
-  Fabelle: ['Chocolate'],
-  Sunbean: ['Coffee'],
+  Aashirvaad: ['All','Atta','Salt','Spices','Dal','Rawa','Vermicelli','Besan','Ghee'],
+  Sunfeast: ['All','Dark Fantasy',"Moms Magic",'Farmlite','Marie Light','Bounce','Dream Cream','All Rounder','Nice','Glucose','Milk Magic','Wowzers','Fantastik','Yippee','Milk Shake & Smoothies'],
+  Bingo: ['All','Mad Angles','Tedhe Medhe','Potato Chips'],
+  'B Natural': ['All','Juice'],
+  Candyman: ['All','Eclairs','Toffees'],
+  'Kitchens of India': ['All','Ready to Eat','Pastes'],
+  'Masterchef Creation': ['All','Frozen Snacks','Frozen Seafood'],
+  Fabelle: ['All','Chocolate'],
+  Sunbean: ['All','Coffee'],
 }; // 'reddit' or 'amazon'
   const logRef=useRef(null);
   const reportRef=useRef(null);
@@ -593,12 +593,12 @@ export default function Home(){
                       style={{background:C.card,border:`1px solid ${C.acc}`,borderRadius:6,padding:'7px 10px 7px 44px',
                         fontSize:12,color:C.acc,fontWeight:600,fontFamily:'inherit',outline:'none',cursor:'pointer',width:'100%'}}>
                       {Object.entries(BRANDS).map(([b,cfg])=>(
-                        <option key={b} value={b}>{b} — {cfg.category}</option>
+                        <option key={b} value={b}>{cfg.emoji} {b}</option>
                       ))}
                     </select>
                     <div style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',
                       width:28,height:28,borderRadius:5,overflow:'hidden',background:brandConfig.logoBg,pointerEvents:'none'}}>
-                      <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                      <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none'}}/>
                     </div>
                   </div>
                 </div>
@@ -726,21 +726,27 @@ export default function Home(){
                 {/* Mode selector */}
                 <div style={{display:'flex',background:C.card,borderRadius:7,overflow:'hidden',border:`1px solid ${C.border}`}}>
                   {[
-                    ['reddit', <img src="/Reddit.png" style={{width:16,height:16,objectFit:'contain',verticalAlign:'middle',marginRight:4}}/>, 'Reddit'],
-                    ['amazon', <div style={{display:'inline-block',background:'white',borderRadius:2,padding:'0 2px',verticalAlign:'middle',marginRight:4}}><img src="/amazon.png" style={{width:20,height:12,objectFit:'contain',display:'block'}}/></div>, 'Amazon'],
-                    ['both', '⚡', 'Both'],
-                  ].map(([mode, icon, label])=>(
-                    <button key={mode} onClick={()=>setRunMode(mode)}
-                      style={{padding:'8px 14px',fontSize:12,fontWeight:600,border:'none',cursor:'pointer',
-                        background:runMode===mode?C.acc:'transparent',
-                        color:runMode===mode?'white':C.muted,display:'flex',alignItems:'center',gap:4}}>
-                      {icon}{label}
-                    </button>
+                    ['reddit', <img src="/Reddit.png" style={{width:16,height:16,objectFit:'contain',verticalAlign:'middle',marginRight:4}}/>, 'Reddit', false],
+                    ['amazon', <div style={{display:'inline-block',background:'white',borderRadius:2,padding:'0 2px',verticalAlign:'middle',marginRight:4}}><img src="/amazon.png" style={{width:20,height:12,objectFit:'contain',display:'block'}}/></div>, 'Amazon', true],
+                    ['both', '⚡', 'Both', true],
+                  ].map(([mode, icon, label, frozen])=>(
+                    <div key={mode} style={{position:'relative'}}>
+                      <button onClick={()=>!frozen&&setRunMode(mode)}
+                        title={frozen?'Coming soon — Amazon integration paused':''}
+                        style={{padding:'8px 14px',fontSize:12,fontWeight:600,border:'none',
+                          cursor:frozen?'not-allowed':'pointer',
+                          background:runMode===mode?C.acc:'transparent',
+                          color:frozen?'rgba(255,255,255,0.25)':runMode===mode?'white':C.muted,
+                          display:'flex',alignItems:'center',gap:4,opacity:frozen?0.4:1}}>
+                        {icon}{label}
+                        {frozen&&<span style={{fontSize:8,color:'#f59e0b',marginLeft:2}}>🔒</span>}
+                      </button>
+                    </div>
                   ))}
                 </div>
                 <button
                   onClick={runMode==='reddit'?runAgent:runMode==='amazon'?fetchAmazon:runBoth}
-                  disabled={running||amazonLoading}
+                  disabled={running||amazonLoading||runMode==='amazon'||runMode==='both'}
                   style={{background:C.acc,color:'white',border:'none',borderRadius:7,padding:'10px 22px',
                     fontSize:13,fontWeight:600,cursor:(running||amazonLoading)?'not-allowed':'pointer',
                     opacity:(running||amazonLoading)?0.4:1,whiteSpace:'nowrap'}}>
@@ -1019,7 +1025,7 @@ export default function Home(){
                   <div>
                     <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
                       <div style={{width:36,height:36,borderRadius:7,overflow:'hidden',background:brandConfig.logoBg,flexShrink:0}}>
-                        <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                        <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none'}}/>
                       </div>
                       <div style={{display:'flex',alignItems:'center',gap:8}}>
                       <img src="/reddit.png" style={{width:20,height:20,objectFit:'contain'}}/>
