@@ -54,7 +54,7 @@ const BRANDS = {
     logoBg: '#e67e22',
     category: 'Foods',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/vegetarian','r/IndianKitchen'],
-    competitors: ['MTR','Haldirams','Gits','Kohinoor','Patak's'],
+    competitors: ['MTR','Haldirams','Gits','Kohinoor','Pataks'],
     newSubs: [],
   },
   'Masterchef Creation': {
@@ -63,7 +63,7 @@ const BRANDS = {
     logoBg: '#c0392b',
     category: 'Foods',
     subreddits: ['r/india','r/IndianFood','r/AskIndia','r/cooking','r/bangalore','r/mumbai','r/delhi','r/MealPrepSunday','r/nonveg','r/IndianKitchen'],
-    competitors: ['Godrej Yummiez','Venky's','Fresho','FreshToHome','Licious'],
+    competitors: ['Godrej Yummiez','Venkys','Fresho','FreshToHome','Licious'],
     newSubs: [],
   },
   Fabelle: {
