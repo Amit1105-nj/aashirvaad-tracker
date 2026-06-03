@@ -128,12 +128,15 @@ export default async function handler(req, res) {
   const { fromDate, toDate, brand, subreddits, callType, themes, realPosts, customKeyword } = req.body;
   if (!fromDate || !toDate || !brand) return res.status(400).json({ error: 'Missing required fields' });
 
-  const config = BRAND_CONFIG[brand] || BRAND_CONFIG['Aashirvaad'];
+  const baseConfig = BRAND_CONFIG[brand] || BRAND_CONFIG['Aashirvaad'];
   const subBrand = req.body.subBrand || req.body.subCategory || null;
-  // Use sub-brand specific competitors if available
-  if (subBrand && config.subBrandCompetitors && config.subBrandCompetitors[subBrand]) {
-    config.competitors = config.subBrandCompetitors[subBrand];
-  }
+  // Use sub-brand specific competitors if available — don't mutate const
+  const config = {
+    ...baseConfig,
+    competitors: (subBrand && baseConfig.subBrandCompetitors && baseConfig.subBrandCompetitors[subBrand])
+      ? baseConfig.subBrandCompetitors[subBrand]
+      : baseConfig.competitors
+  };
   const allSubs = subreddits || config.subreddits.join(', ');
 
   // Check if we have real scraped posts to analyse
