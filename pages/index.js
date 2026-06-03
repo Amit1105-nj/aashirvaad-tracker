@@ -196,6 +196,8 @@ export default function Home(){
   const [amazonSubCategory,setAmazonSubCategory]=useState('All Products');
   const [runMode,setRunMode]=useState('reddit');
   const [customKeyword,setCustomKeyword]=useState('');
+  const [excludeKeywords,setExcludeKeywords]=useState('');
+  const [brandDropdownOpen,setBrandDropdownOpen]=useState(false);
 
   // Sub-categories per brand
   const AMAZON_SUB_CATS = {
@@ -230,6 +232,13 @@ export default function Home(){
     setAmazonSubCategory('All Products');
   };
 
+  // Close brand dropdown on outside click
+  useEffect(()=>{
+    const handler=()=>setBrandDropdownOpen(false);
+    if(brandDropdownOpen) document.addEventListener('click',handler);
+    return()=>document.removeEventListener('click',handler);
+  },[brandDropdownOpen]);
+
   const addLog=(msg,type='info')=>{
     const ts=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     setLogs(prev=>[...prev,{msg,type,ts}]);
@@ -255,7 +264,7 @@ export default function Home(){
         addLog('Scraping real Reddit posts via Apify...','step');
         try{
           const scrapeRes = await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate,subCategory:amazonSubCategory,customKeyword:customKeyword||null})});
+            body:JSON.stringify({brand,subreddits:subsStr,fromDate,toDate,subCategory:amazonSubCategory,customKeyword:customKeyword||null,excludeKeywords:excludeKeywords||null})});
           const scrapeData = await scrapeRes.json();
           if(scrapeData.success && scrapeData.posts?.length > 0){
             realPosts = scrapeData.posts;
@@ -270,7 +279,7 @@ export default function Home(){
       setProgress(25);
 
       const r1=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),subBrand:amazonSubCategory,callType:'core',realPosts,customKeyword:customKeyword||null})});
+        body:JSON.stringify({fromDate,toDate,brand,subreddits:subsStr,competitors:[...activeComps].join(', '),subBrand:amazonSubCategory,callType:'core',realPosts,customKeyword:customKeyword||null,excludeKeywords:excludeKeywords||null})});
       const j1=await r1.json();
       if(!j1.success) throw new Error(j1.error||'API call failed');
       if(j1.no_data){
@@ -589,17 +598,50 @@ export default function Home(){
                 <div style={{display:'flex',flexDirection:'column',gap:5}}>
                   <label style={{fontSize:11,color:C.muted,fontWeight:500}}>Brand</label>
                   <div style={{position:'relative'}}>
-                    <select value={brand} onChange={e=>handleBrandChange(e.target.value)}
-                      style={{background:C.card,border:`1px solid ${C.acc}`,borderRadius:6,padding:'7px 10px 7px 44px',
-                        fontSize:12,color:C.acc,fontWeight:600,fontFamily:'inherit',outline:'none',cursor:'pointer',width:'100%'}}>
-                      {Object.entries(BRANDS).map(([b,cfg])=>(
-                        <option key={b} value={b}>{cfg.emoji} {b}</option>
-                      ))}
-                    </select>
-                    <div style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',
-                      width:28,height:28,borderRadius:5,overflow:'hidden',background:brandConfig.logoBg,pointerEvents:'none'}}>
-                      <img src={brandConfig.logo} alt={brand} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none'}}/>
+                    {/* Custom brand dropdown with logos */}
+                    <div onClick={(e)=>{e.stopPropagation();setBrandDropdownOpen(p=>!p);}}
+                      style={{background:C.card,border:`1px solid ${C.acc}`,borderRadius:6,
+                        padding:'7px 10px 7px 44px',fontSize:12,color:C.acc,fontWeight:600,
+                        cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'space-between',
+                        minHeight:36,userSelect:'none'}}>
+                      <span>{brand}</span>
+                      <span style={{fontSize:10,color:C.muted,marginLeft:8}}>{brandDropdownOpen?'▲':'▼'}</span>
                     </div>
+                    {/* Selected brand logo */}
+                    <div style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',
+                      width:28,height:28,borderRadius:5,overflow:'hidden',background:brandConfig.logoBg,
+                      pointerEvents:'none'}}>
+                      <img src={brandConfig.logo} alt={brand}
+                        style={{width:'100%',height:'100%',objectFit:'cover'}}
+                        onError={e=>{e.target.style.display='none'}}/>
+                    </div>
+                    {/* Dropdown options */}
+                    {brandDropdownOpen&&(
+                      <div style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,zIndex:9999,
+                        background:C.surf,border:`1px solid ${C.border}`,borderRadius:8,
+                        maxHeight:300,overflowY:'auto',boxShadow:'0 8px 32px rgba(0,0,0,0.5)'}}>
+                        {Object.entries(BRANDS).map(([b,cfg])=>(
+                          <div key={b}
+                            onClick={(e)=>{e.stopPropagation();handleBrandChange(b);setBrandDropdownOpen(false);}}
+                            style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',
+                              cursor:'pointer',
+                              background:b===brand?'rgba(255,69,0,0.1)':'transparent',
+                              borderBottom:`1px solid ${C.border}`}}>
+                            <div style={{width:32,height:32,borderRadius:6,overflow:'hidden',
+                              flexShrink:0,background:cfg.logoBg,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              <img src={cfg.logo} alt={b}
+                                style={{width:'100%',height:'100%',objectFit:'cover'}}
+                                onError={e=>{e.target.style.display='none'}}/>
+                            </div>
+                            <div style={{flex:1}}>
+                              <div style={{fontSize:12,fontWeight:600,color:b===brand?C.acc:C.text}}>{b}</div>
+                              <div style={{fontSize:10,color:C.muted}}>{cfg.category}</div>
+                            </div>
+                            {b===brand&&<span style={{color:C.acc,fontSize:14}}>✓</span>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:5}}>
@@ -638,8 +680,30 @@ export default function Home(){
                     borderRadius:6,padding:'7px 10px',fontSize:12,color:C.text,fontFamily:'inherit',outline:'none'}}
                 />
                 {customKeyword&&<div style={{fontSize:10,color:C.pur,marginTop:4}}>
-                  ✓ Searching Reddit for "{customKeyword}" within {brand}{amazonSubCategory&&amazonSubCategory!=='All Products'?' · '+amazonSubCategory:''} context
+                  ✓ Searching Reddit for "{customKeyword}" within {brand}{amazonSubCategory&&amazonSubCategory!=='All'?' · '+amazonSubCategory:''} context
                 </div>}
+                {/* Exclude keywords */}
+                <div style={{marginTop:8}}>
+                  <div style={{fontSize:11,color:C.muted,marginBottom:4,display:'flex',alignItems:'center',gap:6}}>
+                    <span style={{color:C.red}}>🚫</span>
+                    <span>Exclude keywords</span>
+                    <span style={{fontSize:10,color:C.muted}}>(comma separated)</span>
+                  </div>
+                  <input
+                    value={excludeKeywords}
+                    onChange={e=>setExcludeKeywords(e.target.value)}
+                    placeholder="e.g. casino, lottery, prize, game"
+                    style={{width:'100%',background:C.card,
+                      border:`1px solid ${excludeKeywords?'rgba(239,68,68,0.4)':C.border}`,
+                      borderRadius:6,padding:'6px 10px',fontSize:12,color:C.text,
+                      fontFamily:'inherit',outline:'none'}}
+                  />
+                  {excludeKeywords&&(
+                    <div style={{fontSize:10,color:C.red,marginTop:3}}>
+                      🚫 Excluding: {excludeKeywords.split(',').map(k=>k.trim()).filter(Boolean).map(k=>`"${k}"`).join(', ')}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* ROW 2: Dates */}
