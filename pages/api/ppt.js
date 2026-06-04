@@ -502,21 +502,25 @@ export default async function handler(req, res) {
       addBg(s);
       addSlideHeader(s, 3, 'Hot Topics & Themes');
 
-      data?.top_themes.forEach((t, i) => {
-        const rowY = 0.72 + i * 0.88;
+      const maxThemes = 5;
+      (data?.top_themes || []).slice(0, maxThemes).forEach((t, i) => {
+        const rowH = 0.78;
+        const rowGap = 0.06;
+        const rowY = 0.72 + i * (rowH + rowGap);
         const sc = sentClr(t.sentiment);
         // Row bg
-        s.addShape('rect', { x: 0.4, y: rowY, w: 9.2, h: 0.75, fill: { color: CLR.surf }, rectRadius: 0.06, line: { color: '2D3A55', width: 1 } });
+        s.addShape('rect', { x: 0.4, y: rowY, w: 9.2, h: rowH, fill: { color: CLR.surf }, rectRadius: 0.06, line: { color: '2D3A55', width: 1 } });
         // Icon box
-        s.addShape('rect', { x: 0.5, y: rowY + 0.08, w: 0.58, h: 0.58, fill: { color: CLR.card }, rectRadius: 0.06 });
-        s.addText(t.icon, { x: 0.5, y: rowY + 0.08, w: 0.58, h: 0.58, fontSize: 18, align: 'center', valign: 'middle', margin: 0 });
+        s.addShape('rect', { x: 0.5, y: rowY + 0.1, w: 0.55, h: 0.55, fill: { color: CLR.card }, rectRadius: 0.06 });
+        s.addText(t.icon, { x: 0.5, y: rowY + 0.1, w: 0.55, h: 0.55, fontSize: 16, align: 'center', valign: 'middle', margin: 0 });
         // Theme name
-        s.addText(t.theme, { x: 1.2, y: rowY + 0.06, w: 4.5, h: 0.28, fontSize: 11, bold: true, color: CLR.white, margin: 0 });
-        // Quote
-        s.addText(`"${t.example}"`, { x: 1.2, y: rowY + 0.36, w: 5.5, h: 0.28, fontSize: 9, italic: true, color: CLR.muted, margin: 0 });
+        s.addText(t.theme, { x: 1.18, y: rowY + 0.06, w: 4.8, h: 0.26, fontSize: 11, bold: true, color: CLR.white, margin: 0 });
+        // Quote — truncate to avoid overflow
+        const quote = (t.example||'').length > 90 ? t.example.slice(0,90)+'…' : t.example;
+        s.addText(`"${quote}"`, { x: 1.18, y: rowY + 0.34, w: 5.6, h: 0.26, fontSize: 8.5, italic: true, color: CLR.muted, margin: 0 });
         // Count badge
-        s.addShape('rect', { x: 7.1, y: rowY + 0.18, w: 0.7, h: 0.38, fill: { color: CLR.card }, rectRadius: 0.05 });
-        s.addText(`${t.count} mentions`, { x: 6.5, y: rowY + 0.18, w: 1.3, h: 0.38, fontSize: 8, color: CLR.muted, align: 'center', valign: 'middle', margin: 0 });
+        s.addShape('rect', { x: 7.1, y: rowY + 0.2, w: 0.7, h: 0.34, fill: { color: CLR.card }, rectRadius: 0.05 });
+        s.addText(`${t.count} mentions`, { x: 6.5, y: rowY + 0.2, w: 1.3, h: 0.34, fontSize: 8, color: CLR.muted, align: 'center', valign: 'middle', margin: 0 });
         // Sentiment badge
         s.addShape('rect', { x: 7.95, y: rowY + 0.18, w: 1.5, h: 0.38, fill: { color: sc + '22' }, rectRadius: 0.05, line: { color: sc, width: 1 } });
         s.addText(t.sentiment.charAt(0).toUpperCase() + t.sentiment.slice(1), { x: 7.95, y: rowY + 0.18, w: 1.5, h: 0.38, fontSize: 9, bold: true, color: sc, align: 'center', valign: 'middle', margin: 0 });
