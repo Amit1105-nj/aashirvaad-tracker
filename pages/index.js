@@ -507,11 +507,11 @@ export default function Home(){
   return(
     <>
       <Head>
-        <title>ITC Brand Radar — Reddit & Amazon Intelligence</title>
+        <title>ITC Brand Radar — Reddit Intelligence</title>
         <meta name="viewport" content="width=device-width,initial-scale=1"/>
         <meta name="description" content="ITC Brand Radar — Live Reddit & Amazon intelligence for Aashirvaad, Bingo, Sunfeast, Yippee, Candyman and Fabelle. Powered by Apify + Claude AI."/>
         <meta property="og:title" content="ITC Brand Radar"/>
-        <meta property="og:description" content="Live brand intelligence across Reddit & Amazon for all ITC FMCG brands."/>
+        <meta property="og:description" content="Reddit Intelligence · Powered by Claude AI"/>
         <meta property="og:image" content="/ITC.jpg"/>
       </Head>
 
