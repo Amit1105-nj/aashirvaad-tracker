@@ -152,9 +152,8 @@ export default async function handler(req, res) {
     if (rawItems?.length > 0) {
       console.log('Reddit first item keys:', Object.keys(rawItems[0]));
     }
-    console.log('Safe posts after NSFW filter:', safePosts?.length || 0);
-    console.log('Brand posts (mention brand):', brandPosts?.length || 0);
-    console.log('Search term used:', searchTerm);
+    console.log('Search term used:', primaryTerm);
+    console.log('Raw items from Apify:', rawItems?.length || 0);
 
     if (!rawItems || rawItems.length === 0) {
       return res.status(200).json({ success: true, posts: [], message: 'No posts found' });
